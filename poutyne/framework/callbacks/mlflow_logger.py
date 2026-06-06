@@ -111,7 +111,8 @@ class MLFlowLogger(Logger):
         if deprecated_experiment_name is not None:
             warnings.warn(
                 'Positional argument `experiment_name` is deprecated and will be removed in future versions. Please '
-                'use it as a keyword argument, i.e. experiment_name="my-experiment-name"', stacklevel=2
+                'use it as a keyword argument, i.e. experiment_name="my-experiment-name"',
+                stacklevel=2,
             )
             experiment_name = deprecated_experiment_name
 

@@ -322,7 +322,8 @@ def get_batch_size(*values):
             "Step 3: if a value is a dict, then the value for the key 'batch_size' is returned if it is of integral "
             "type.\n"
             "Step 4: if a value is a dict, then the 'len()' of the first element of '.values()' is returned if it is a "
-            "tensor or a Numpy array.\n", stacklevel=2
+            "tensor or a Numpy array.\n",
+            stacklevel=2,
         )
     return 1
 

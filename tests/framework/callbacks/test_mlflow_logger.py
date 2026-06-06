@@ -359,9 +359,7 @@ class MLFlowLoggerTest(TestCase):
             elif isinstance(value, Sequence) and not isinstance(value, str):
                 for idx, value_lower in enumerate(value):
                     good_key = f"{key}.{idx}"
-                    ml_flow_client_calls.append(
-                        call().log_param(run_id=self.a_run_id, key=good_key, value=value_lower)
-                    )
+                    ml_flow_client_calls.append(call().log_param(run_id=self.a_run_id, key=good_key, value=value_lower))
             else:
                 ml_flow_client_calls.append(call().log_param(run_id=self.a_run_id, key=key, value=value))
         return ml_flow_client_calls

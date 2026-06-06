@@ -46,7 +46,8 @@ def atomic_lambda_save(
             # This may happen if the temp filesystem is not the same as the final destination's.
             warnings.warn(
                 "Impossible to move the file to its final destination: "
-                f"os.replace({temporary_filename}, {filename}) -> {e}", stacklevel=2
+                f"os.replace({temporary_filename}, {filename}) -> {e}",
+                stacklevel=2,
             )
             os.remove(temporary_filename)
 

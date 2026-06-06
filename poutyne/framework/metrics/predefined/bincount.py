@@ -36,7 +36,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-
 import torch
 from lightning_utilities.core.imports import RequirementCache
 from torch import Tensor

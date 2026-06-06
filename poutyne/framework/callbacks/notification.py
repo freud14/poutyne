@@ -70,9 +70,7 @@ class NotificationCallback(Callback):
             model.fit_generator(..., callbacks=[notif_callback])
     """
 
-    def __init__(
-        self, notificator: Notificator, alert_frequency: int = 1, experiment_name: None | str = None
-    ) -> None:
+    def __init__(self, notificator: Notificator, alert_frequency: int = 1, experiment_name: None | str = None) -> None:
         super().__init__()
         self.notificator = notificator
         self.alert_frequency = alert_frequency

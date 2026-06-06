@@ -494,9 +494,7 @@ class ModelBundle:
         return loss_function
 
     @classmethod
-    def _get_batch_metrics(
-        cls, batch_metrics: list | None, network: torch.nn.Module, task: str | None
-    ) -> list | None:
+    def _get_batch_metrics(cls, batch_metrics: list | None, network: torch.nn.Module, task: str | None) -> list | None:
         if batch_metrics is None or len(batch_metrics) == 0:
             if hasattr(network, 'batch_metrics'):
                 return network.batch_metrics
@@ -924,9 +922,7 @@ class ModelBundle:
             if tensorboard_writer is not None:
                 tensorboard_writer.close()
 
-    def load_checkpoint(
-        self, checkpoint: int | str, *, verbose: bool = False, strict: bool = True
-    ) -> dict | None:
+    def load_checkpoint(self, checkpoint: int | str, *, verbose: bool = False, strict: bool = True) -> dict | None:
         """
         Loads the model's weights with the weights at a given checkpoint epoch.
 
@@ -1241,9 +1237,7 @@ class ModelBundle:
         """
         return self._predict(self.model.predict, x, **kwargs)
 
-    def _predict(
-        self, predict_func: Callable, *args, verbose=True, checkpoint: str | int = 'best', **kwargs
-    ) -> Any:
+    def _predict(self, predict_func: Callable, *args, verbose=True, checkpoint: str | int = 'best', **kwargs) -> Any:
         if self.logging:
             if not self.monitoring and checkpoint == 'best':
                 checkpoint = 'last'
