@@ -20,9 +20,9 @@ You should have received a copy of the GNU Lesser General Public License along w
 import csv
 import os
 from tempfile import TemporaryDirectory
-from unittest import TestCase, main, skipIf
 from unittest.mock import MagicMock, call
 
+import pytest
 import torch
 import torch.nn as nn
 
@@ -53,23 +53,24 @@ class History(Callback):
         self.history = []
 
 
-class BaseCSVLoggerTest:
+class CSVLoggerTestBase:
+    __test__ = False
     # pylint: disable=not-callable,no-member
     CSVLogger = None
     batch_size = 20
     lr = 1e-3
     num_epochs = 10
 
-    def setUp(self):
+    def setup_method(self):
         torch.manual_seed(42)
         self.pytorch_network = nn.Linear(1, 1)
         self.loss_function = nn.MSELoss()
-        self.optimizer = torch.optim.SGD(self.pytorch_network.parameters(), lr=BaseCSVLoggerTest.lr)
+        self.optimizer = torch.optim.SGD(self.pytorch_network.parameters(), lr=CSVLoggerTestBase.lr)
         self.model = Model(self.pytorch_network, self.optimizer, self.loss_function)
         self.temp_dir_obj = TemporaryDirectory()
         self.csv_filename = os.path.join(self.temp_dir_obj.name, 'my_log.csv')
 
-    def tearDown(self):
+    def teardown_method(self):
         self.temp_dir_obj.cleanup()
 
     def test_logging(self):
@@ -119,7 +120,7 @@ class BaseCSVLoggerTest:
         train_gen = some_data_generator(20)
         valid_gen = some_data_generator(20)
         logger = self.CSVLogger(self.csv_filename)
-        lrs = [BaseCSVLoggerTest.lr, BaseCSVLoggerTest.lr / 2]
+        lrs = [CSVLoggerTestBase.lr, CSVLoggerTestBase.lr / 2]
         optimizer = torch.optim.SGD(
             [
                 {'params': [self.pytorch_network.weight], 'lr': lrs[0]},
@@ -134,58 +135,61 @@ class BaseCSVLoggerTest:
 
     def _test_logging(self, history, lrs=None):
         if lrs is None:
-            lrs = [BaseCSVLoggerTest.lr]
+            lrs = [CSVLoggerTestBase.lr]
         with open(self.csv_filename, encoding='utf-8') as csvfile:
             reader = csv.DictReader(csvfile)
             rows = []
             for row in reader:
                 if row['epoch'] != '':
                     if len(lrs) == 1:
-                        self.assertAlmostEqual(float(row['lr']), lrs[0])
+                        assert float(row['lr']) == pytest.approx(lrs[0], abs=5e-8)
                         del row['lr']
                     else:
                         for i, lr in enumerate(lrs):
-                            self.assertAlmostEqual(float(row[f'lr_group_{i}']), lr)
+                            assert float(row[f'lr_group_{i}']) == pytest.approx(lr, abs=5e-8)
                             del row[f'lr_group_{i}']
 
                 rows.append(row)
-        self.assertEqual(len(rows), len(history))
+        assert len(rows) == len(history)
         for raw_row, hist_entry in zip(rows, history):
             row = {k: v for k, v in raw_row.items() if v != ''}
-            self.assertEqual(row.keys(), hist_entry.keys())
+            assert row.keys() == hist_entry.keys()
             for k in row:
                 if isinstance(hist_entry[k], float):
-                    self.assertAlmostEqual(float(row[k]), hist_entry[k])
+                    assert float(row[k]) == pytest.approx(hist_entry[k], abs=5e-8)
                 else:
-                    self.assertEqual(str(row[k]), str(hist_entry[k]))
+                    assert str(row[k]) == str(hist_entry[k])
 
 
-class NonAtomicCSVLoggerTest(BaseCSVLoggerTest, TestCase):
+class NonAtomicCSVLoggerTest(CSVLoggerTestBase):
+    __test__ = True
     CSVLogger = NonAtomicCSVLogger
 
 
-class AtomicCSVLoggerTest(BaseCSVLoggerTest, TestCase):
+class AtomicCSVLoggerTest(CSVLoggerTestBase):
+    __test__ = True
     CSVLogger = AtomicCSVLogger
 
 
-class BaseTensorBoardLoggerTest:
+class TensorBoardLoggerTestBase:
+    __test__ = False
     SummaryWriter = None
     batch_size = 20
     lr = 1e-3
     num_epochs = 10
 
-    def setUp(self):
+    def setup_method(self):
         torch.manual_seed(42)
         self.pytorch_network = nn.Linear(1, 1)
         self.loss_function = nn.MSELoss()
-        self.optimizer = torch.optim.SGD(self.pytorch_network.parameters(), lr=BaseTensorBoardLoggerTest.lr)
+        self.optimizer = torch.optim.SGD(self.pytorch_network.parameters(), lr=TensorBoardLoggerTestBase.lr)
         self.model = Model(self.pytorch_network, self.optimizer, self.loss_function)
         self.temp_dir_obj = TemporaryDirectory()
         # pylint: disable=not-callable
         self.writer = self.SummaryWriter(self.temp_dir_obj.name)
         self.writer.add_scalars = MagicMock()
 
-    def tearDown(self):
+    def teardown_method(self):
         self.temp_dir_obj.cleanup()
 
     def test_logging(self):
@@ -201,7 +205,7 @@ class BaseTensorBoardLoggerTest:
         train_gen = some_data_generator(20)
         valid_gen = some_data_generator(20)
         logger = TensorBoardLogger(self.writer)
-        lrs = [BaseCSVLoggerTest.lr, BaseCSVLoggerTest.lr / 2]
+        lrs = [CSVLoggerTestBase.lr, CSVLoggerTestBase.lr / 2]
         optimizer = torch.optim.SGD(
             [
                 {'params': [self.pytorch_network.weight], 'lr': lrs[0]},
@@ -216,7 +220,7 @@ class BaseTensorBoardLoggerTest:
 
     def _test_logging(self, history, lrs=None):
         if lrs is None:
-            lrs = [BaseCSVLoggerTest.lr]
+            lrs = [CSVLoggerTestBase.lr]
         calls = []
         for h in history:
             calls.append(call('loss', {'loss': h['loss'], 'val_loss': h['val_loss']}, h['epoch']))
@@ -227,34 +231,37 @@ class BaseTensorBoardLoggerTest:
         self.writer.add_scalars.assert_has_calls(calls, any_order=True)
 
 
-@skipIf(XSummaryWriter is None, "Needs tensorboardX to run this test")
-class TensorboardXLoggerTest(BaseTensorBoardLoggerTest, TestCase):
+@pytest.mark.skipif(XSummaryWriter is None, reason="Needs tensorboardX to run this test")
+class TensorboardXLoggerTest(TensorBoardLoggerTestBase):
+    __test__ = True
     SummaryWriter = XSummaryWriter
 
 
-@skipIf(TorchSummaryWriter is None, "Unable to import SummaryWriter from torch")
-class TorchTensorboardLoggerTest(BaseTensorBoardLoggerTest, TestCase):
+@pytest.mark.skipif(TorchSummaryWriter is None, reason="Unable to import SummaryWriter from torch")
+class TorchTensorboardLoggerTest(TensorBoardLoggerTestBase):
+    __test__ = True
     SummaryWriter = TorchSummaryWriter
 
 
-class BaseTensorBoardLoggerWithSplitTrainValTest:
+class TensorBoardLoggerWithSplitTrainValTestBase:
+    __test__ = False
     SummaryWriter = None
     batch_size = 20
     lr = 1e-3
     num_epochs = 10
 
-    def setUp(self):
+    def setup_method(self):
         torch.manual_seed(42)
         self.pytorch_network = nn.Linear(1, 1)
         self.loss_function = nn.MSELoss()
-        self.optimizer = torch.optim.SGD(self.pytorch_network.parameters(), lr=BaseTensorBoardLoggerTest.lr)
+        self.optimizer = torch.optim.SGD(self.pytorch_network.parameters(), lr=TensorBoardLoggerTestBase.lr)
         self.model = Model(self.pytorch_network, self.optimizer, self.loss_function)
         self.temp_dir_obj = TemporaryDirectory()
         # pylint: disable=not-callable
         self.writer = self.SummaryWriter(self.temp_dir_obj.name)
         self.writer.add_scalar = MagicMock()
 
-    def tearDown(self):
+    def teardown_method(self):
         self.temp_dir_obj.cleanup()
 
     def test_logging(self):
@@ -270,7 +277,7 @@ class BaseTensorBoardLoggerWithSplitTrainValTest:
         train_gen = some_data_generator(20)
         valid_gen = some_data_generator(20)
         logger = TensorBoardLogger(self.writer, split_train_val=True)
-        lrs = [BaseCSVLoggerTest.lr, BaseCSVLoggerTest.lr / 2]
+        lrs = [CSVLoggerTestBase.lr, CSVLoggerTestBase.lr / 2]
         optimizer = torch.optim.SGD(
             [
                 {'params': [self.pytorch_network.weight], 'lr': lrs[0]},
@@ -285,7 +292,7 @@ class BaseTensorBoardLoggerWithSplitTrainValTest:
 
     def _test_logging(self, history, lrs=None):
         if lrs is None:
-            lrs = [BaseCSVLoggerTest.lr]
+            lrs = [CSVLoggerTestBase.lr]
 
         calls = []
         for h in history:
@@ -301,15 +308,13 @@ class BaseTensorBoardLoggerWithSplitTrainValTest:
         self.writer.add_scalar.assert_has_calls(calls, any_order=True)
 
 
-@skipIf(XSummaryWriter is None, "Needs tensorboardX to run this test")
-class TensorboardXLoggerWithSplitTrainValTest(BaseTensorBoardLoggerWithSplitTrainValTest, TestCase):
+@pytest.mark.skipif(XSummaryWriter is None, reason="Needs tensorboardX to run this test")
+class TensorboardXLoggerWithSplitTrainValTest(TensorBoardLoggerWithSplitTrainValTestBase):
+    __test__ = True
     SummaryWriter = XSummaryWriter
 
 
-@skipIf(TorchSummaryWriter is None, "Unable to import SummaryWriter from torch")
-class TorchTensorboardLoggerWithSplitTrainValTest(BaseTensorBoardLoggerWithSplitTrainValTest, TestCase):
+@pytest.mark.skipif(TorchSummaryWriter is None, reason="Unable to import SummaryWriter from torch")
+class TorchTensorboardLoggerWithSplitTrainValTest(TensorBoardLoggerWithSplitTrainValTestBase):
+    __test__ = True
     SummaryWriter = TorchSummaryWriter
-
-
-if __name__ == '__main__':
-    main()

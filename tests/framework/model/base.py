@@ -26,10 +26,9 @@ import torch
 import torch.nn as nn
 
 from poutyne import Callback
-from tests.framework.base import CaptureOutputBase
 
 
-class ModelFittingTestCase(CaptureOutputBase):
+class ModelFittingTestCase:
     epochs = 10
     steps_per_epoch = 5
     batch_size = 20
@@ -38,7 +37,7 @@ class ModelFittingTestCase(CaptureOutputBase):
 
     cuda_device = int(os.environ.get('CUDA_DEVICE', '0'))
 
-    def setUp(self):
+    def setup_method(self):
         self.mock_callback = MagicMock(spec=Callback)
         self.batch_metrics = []
         self.batch_metrics_names = []
@@ -68,7 +67,7 @@ class ModelFittingTestCase(CaptureOutputBase):
             log_dict.update({**val_batch_dict, **val_epochs_dict})
 
         for epoch, log in enumerate(logs, 1):
-            self.assertEqual(log, dict(log_dict, epoch=epoch))
+            assert log == dict(log_dict, epoch=epoch)
 
         call_list = []
         call_list.append(call.on_train_begin({}))
@@ -92,16 +91,16 @@ class ModelFittingTestCase(CaptureOutputBase):
         return call_list
 
     def _test_callbacks_train(self, params, logs, *args, **kwargs):
-        self.assertEqual(len(logs), params['epochs'])
+        assert len(logs) == params['epochs']
 
         call_list = self._get_callback_expected_on_calls_when_training(params, logs, *args, **kwargs)
 
         method_calls = self.mock_callback.method_calls
-        self.assertIn(call.set_model(self.model), method_calls[:2])  # skip set_model and set param call
-        self.assertIn(call.set_params(params), method_calls[:2])
+        assert call.set_model(self.model) in method_calls[:2]  # skip set_model and set param call
+        assert call.set_params(params) in method_calls[:2]
 
-        self.assertEqual(len(method_calls), len(call_list) + 2)  # for set_model and set param
-        self.assertEqual(method_calls[2:], call_list)
+        assert len(method_calls) == len(call_list) + 2  # for set_model and set param
+        assert method_calls[2:] == call_list
 
     def _get_callback_expected_on_calls_when_testing(self, params):
         test_batch_dict = {"time": ANY, "test_loss": ANY}
@@ -131,11 +130,11 @@ class ModelFittingTestCase(CaptureOutputBase):
         call_list = self._get_callback_expected_on_calls_when_testing(params)
 
         method_calls = self.mock_callback.method_calls
-        self.assertEqual(call.set_model(self.model), method_calls[0])  # skip set_model and set param call
-        self.assertEqual(call.set_params(params), method_calls[1])
+        assert call.set_model(self.model) == method_calls[0]  # skip set_model and set param call
+        assert call.set_params(params) == method_calls[1]
 
-        self.assertEqual(len(method_calls), len(call_list) + 2)  # for set_model and set param
-        self.assertEqual(method_calls[2:], call_list)
+        assert len(method_calls) == len(call_list) + 2  # for set_model and set param
+        assert method_calls[2:] == call_list
 
     def _test_return_dict_logs(self, logs):
         test_logs = {"time": ANY, "test_loss": ANY}
@@ -151,7 +150,7 @@ class ModelFittingTestCase(CaptureOutputBase):
                 for metric_name, metric in zip(self.epoch_metrics_names, self.epoch_metrics_values)
             }
         )
-        self.assertEqual(logs, test_logs)
+        assert logs == test_logs
 
     def _test_size_and_type_for_generator(self, pred_y, expected_size):
         if isinstance(pred_y, (list, tuple)):
@@ -161,26 +160,26 @@ class ModelFittingTestCase(CaptureOutputBase):
             for val in pred_y.values():
                 self._test_size_and_type_for_generator(val, expected_size)
         else:
-            self.assertEqual(type(pred_y), np.ndarray)
-            self.assertEqual(pred_y.shape, expected_size)
+            assert type(pred_y) == np.ndarray
+            assert pred_y.shape == expected_size
 
     def _test_device(self, device):
         for p in self.pytorch_network.parameters():
-            self.assertEqual(p.device, device)
+            assert p.device == device
 
         for p in self.optimizer.state:
             if torch.is_tensor(p):
-                self.assertEqual(p.device, device)
+                assert p.device == device
 
         for param_group in self.optimizer.param_groups:
             for param in param_group['params']:
                 if torch.is_tensor(param):
-                    self.assertEqual(param.device, device)
+                    assert param.device == device
 
                 for n, v in self.optimizer.state[param].items():
                     capturable_ok = 'capturable' not in param_group or param_group["capturable"] or n != 'step'
                     if capturable_ok and torch.is_tensor(v):
-                        self.assertEqual(v.device, device, n)
+                        assert v.device == device, n
 
 
 class MultiIOModel(nn.Module):

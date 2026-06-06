@@ -41,8 +41,8 @@ class DictOutputModel(nn.Module):
 
 
 class ModelDictOutputTest(ModelFittingTestCase):
-    def setUp(self):
-        super().setUp()
+    def setup_method(self):
+        super().setup_method()
         torch.manual_seed(42)
         self.pytorch_network = DictOutputModel()
         self.loss_function = nn.MSELoss()
@@ -94,7 +94,7 @@ class ModelDictOutputTest(ModelFittingTestCase):
         y1 = np.random.rand(ModelDictOutputTest.batch_size, 1).astype(np.float32)
         y2 = np.random.rand(ModelDictOutputTest.batch_size, 1).astype(np.float32)
         loss = self.model.train_on_batch(x, (y1, y2))
-        self.assertEqual(type(loss), float)
+        assert type(loss) == float
 
     def test_evaluate_with_pred_dict_output(self):
         y = (
@@ -105,4 +105,4 @@ class ModelDictOutputTest(ModelFittingTestCase):
         # We also test the unpacking.
         _, pred_y = self.model.evaluate(x, y, batch_size=ModelDictOutputTest.batch_size, return_pred=True)
         for pred in pred_y.values():
-            self.assertEqual(pred.shape, (ModelDictOutputTest.evaluate_dataset_len, 1))
+            assert pred.shape == (ModelDictOutputTest.evaluate_dataset_len, 1)

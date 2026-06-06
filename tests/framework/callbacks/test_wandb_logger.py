@@ -1,9 +1,9 @@
 import os
 import warnings
 from tempfile import NamedTemporaryFile, TemporaryDirectory
-from unittest import TestCase, main, skipIf
 from unittest.mock import MagicMock, call, patch
 
+import pytest
 import torch
 import torch.nn as nn
 
@@ -29,9 +29,9 @@ class History(Callback):
         self.history = []
 
 
-@skipIf(wandb is None, "imports for WandBLogger not available")
-class WandBLoggerTest(TestCase):
-    def setUp(self):
+@pytest.mark.skipif(wandb is None, reason="imports for WandBLogger not available")
+class WandBLoggerTest:
+    def setup_method(self):
         torch.manual_seed(42)
         self.pytorch_network = nn.Linear(1, 1)
         self.loss_function = nn.MSELoss()
@@ -68,7 +68,7 @@ class WandBLoggerTest(TestCase):
                     anonymous=self.anonymous_lut.get(None, None),
                 )
             ]
-            self.assertIsNone(os.getenv("WANDB_MODE"))
+            assert os.getenv("WANDB_MODE") is None
             wandb_patch.assert_has_calls(create_experiment_call)
 
     @patch.dict(os.environ, {"WANDB_MODE": "dryrun"}, clear=True)
@@ -88,7 +88,7 @@ class WandBLoggerTest(TestCase):
                     anonymous=self.anonymous_lut.get(None, None),
                 )
             ]
-            self.assertEqual(os.getenv("WANDB_MODE"), "dryrun")
+            assert os.getenv("WANDB_MODE") == "dryrun"
             wandb_patch.assert_has_calls(create_experiment_call)
 
     def test_already_running_warning_init(self):
@@ -96,7 +96,7 @@ class WandBLoggerTest(TestCase):
             wandb_patch.run = self.run_mock
             with warnings.catch_warnings(record=True) as w:
                 WandBLogger(name=self.a_name)
-            self.assertEqual(len(w), 1)
+            assert len(w) == 1
             wandb_patch.assert_not_called()
 
     def test_with_run_init(self):
@@ -104,7 +104,7 @@ class WandBLoggerTest(TestCase):
             wandb_patch.run = self.run_mock
             wandb_logger = WandBLogger(name=self.a_name, experiment=self.run_mock)
             wandb_patch.assert_not_called()
-            self.assertIsInstance(wandb_logger.run, wandb.sdk.wandb_run.Run)
+            assert isinstance(wandb_logger.run, wandb.sdk.wandb_run.Run)
 
     def test_log_config(self):
         with patch("poutyne.framework.wandb_logger.wandb") as wandb_patch:
@@ -280,7 +280,3 @@ class WandBLoggerTest(TestCase):
                 self.pytorch_network, torch_randn_patch().to(), f"a_path/{self.a_name}_model.onnx"
             )
             logger.run.save.assert_called_once_with(f"a_path/{self.a_name}_model.onnx")
-
-
-if __name__ == '__main__':
-    main()

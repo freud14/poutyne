@@ -19,8 +19,9 @@ You should have received a copy of the GNU Lesser General Public License along w
 
 import os
 from tempfile import TemporaryDirectory
-from unittest import TestCase, skipIf
 from unittest.mock import MagicMock, patch
+
+import pytest
 
 try:
     import pandas as pd
@@ -33,8 +34,8 @@ from torch import nn
 from poutyne import Experiment, ModelBundle
 
 
-@skipIf(not pandas_available, "pandas is not available")
-class ExperimentIsBetterThanTest(TestCase):
+@pytest.mark.skipif(not pandas_available, reason="pandas is not available")
+class ExperimentIsBetterThanTest:
     def setUpTwoExperiment(self, a_params=None, b_params=None):
         temp_dir_obj = TemporaryDirectory()
         test_checkpoints_path_a = os.path.join(temp_dir_obj.name, 'expt_a')
@@ -60,7 +61,7 @@ class ExperimentIsBetterThanTest(TestCase):
             mocked_stats.__getitem__.return_value = series_mock
             load_checkpoint_mock.return_value = mocked_stats
 
-            self.assertTrue(self.test_experiment_a.is_better_than(self.test_experiment_b))
+            assert self.test_experiment_a.is_better_than(self.test_experiment_b)
 
     def test_givenAIsGreaterThanBMinMonitoring_thenReturnFalse(self):
         self.setUpTwoExperiment()
@@ -72,7 +73,7 @@ class ExperimentIsBetterThanTest(TestCase):
             mocked_stats.__getitem__.return_value = series_mock
             load_checkpoint_mock.return_value = mocked_stats
 
-            self.assertFalse(self.test_experiment_a.is_better_than(self.test_experiment_b))
+            assert not self.test_experiment_a.is_better_than(self.test_experiment_b)
 
     def test_givenAIsSmallerThanBMaxMonitoring_thenReturnFalse(self):
         # We need to specify the metric for the mode to be properly set to "max"
@@ -86,7 +87,7 @@ class ExperimentIsBetterThanTest(TestCase):
             mocked_stats.__getitem__.return_value = series_mock
             load_checkpoint_mock.return_value = mocked_stats
 
-            self.assertFalse(self.test_experiment_a.is_better_than(self.test_experiment_b))
+            assert not self.test_experiment_a.is_better_than(self.test_experiment_b)
 
     def test_givenAIsGreaterThanBMaxMonitoring_thenReturnTrue(self):
         # We need to specify the metric for the mode to be properly set to "max"
@@ -100,31 +101,31 @@ class ExperimentIsBetterThanTest(TestCase):
             mocked_stats.__getitem__.return_value = series_mock
             load_checkpoint_mock.return_value = mocked_stats
 
-            self.assertTrue(self.test_experiment_a.is_better_than(self.test_experiment_b))
+            assert self.test_experiment_a.is_better_than(self.test_experiment_b)
 
     def test_givenSomeExperimentNotLogging_thenRaiseValueError(self):
         params_a = {"logging": False}
         params_b = {"logging": True}
         self.setUpTwoExperiment(a_params=params_a, b_params=params_b)
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             self.test_experiment_a.is_better_than(self.test_experiment_b)
 
         params_a = {"logging": True}
         params_b = {"logging": False}
         self.setUpTwoExperiment(a_params=params_a, b_params=params_b)
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             self.test_experiment_a.is_better_than(self.test_experiment_b)
 
         params = {"logging": False}
         self.setUpTwoExperiment(a_params=params, b_params=params)
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             self.test_experiment_a.is_better_than(self.test_experiment_b)
 
     def test_givenDifferentMonitorMetric_thenRaiseValueError(self):
         params_a = {"monitor_metric": "loss"}
         params_b = {"monitor_metric": "acc"}
         self.setUpTwoExperiment(a_params=params_a, b_params=params_b)
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             self.test_experiment_a.is_better_than(self.test_experiment_b)
 
     def test_givenDifferentMonitorMode_thenRaiseValueError(self):
@@ -132,5 +133,5 @@ class ExperimentIsBetterThanTest(TestCase):
         params_a = {"monitor_mode": "max", "monitor_metric": "loss"}
         params_b = {"monitor_mode": "min"}
         self.setUpTwoExperiment(a_params=params_a, b_params=params_b)
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             self.test_experiment_a.is_better_than(self.test_experiment_b)

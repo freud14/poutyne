@@ -60,8 +60,8 @@ def some_data_tensor_generator_dict_io(batch_size):
 
 
 class ModelMultiDictIOTest(ModelFittingTestCase):
-    def setUp(self):
-        super().setUp()
+    def setup_method(self):
+        super().setup_method()
         torch.manual_seed(42)
         self.pytorch_network = DictIOModel(['x1', 'x2'], ['y1', 'y2'])
         self.loss_function = dict_mse_loss
@@ -96,14 +96,14 @@ class ModelMultiDictIOTest(ModelFittingTestCase):
     def test_tensor_train_on_batch_multi_dict_io(self):
         x, y = get_batch(ModelMultiDictIOTest.batch_size)
         loss = self.model.train_on_batch(x, y)
-        self.assertEqual(type(loss), float)
+        assert type(loss) == float
 
     def test_train_on_batch_with_pred_multi_dict_io(self):
         x, y = get_batch(ModelMultiDictIOTest.batch_size)
         loss, pred_y = self.model.train_on_batch(x, y, return_pred=True)
-        self.assertEqual(type(loss), float)
+        assert type(loss) == float
         for value in pred_y.values():
-            self.assertEqual(value.shape, (ModelMultiDictIOTest.batch_size, 1))
+            assert value.shape == (ModelMultiDictIOTest.batch_size, 1)
 
     def test_ndarray_train_on_batch_multi_dict_io(self):
         x1 = np.random.rand(ModelMultiDictIOTest.batch_size, 1).astype(np.float32)
@@ -112,19 +112,19 @@ class ModelMultiDictIOTest(ModelFittingTestCase):
         y2 = np.random.rand(ModelMultiDictIOTest.batch_size, 1).astype(np.float32)
         x, y = {'x1': x1, 'x2': x2}, {'y1': y1, 'y2': y2}
         loss = self.model.train_on_batch(x, y)
-        self.assertEqual(type(loss), float)
+        assert type(loss) == float
 
     def test_evaluate_generator_multi_dict_io(self):
         num_steps = 10
         generator = some_data_tensor_generator_dict_io(ModelMultiDictIOTest.batch_size)
         loss, pred_y = self.model.evaluate_generator(generator, steps=num_steps, return_pred=True)
-        self.assertEqual(type(loss), float)
+        assert type(loss) == float
         self._test_size_and_type_for_generator(pred_y, (num_steps * ModelMultiDictIOTest.batch_size, 1))
 
     def test_tensor_evaluate_on_batch_multi_dict_io(self):
         x, y = get_batch(ModelMultiDictIOTest.batch_size)
         loss = self.model.evaluate_on_batch(x, y)
-        self.assertEqual(type(loss), float)
+        assert type(loss) == float
 
     def test_predict_generator_multi_dict_io(self):
         num_steps = 10

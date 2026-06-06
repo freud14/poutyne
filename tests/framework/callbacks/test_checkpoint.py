@@ -18,10 +18,9 @@ You should have received a copy of the GNU Lesser General Public License along w
 """
 
 import os
-import unittest
 from tempfile import TemporaryDirectory
-from unittest import TestCase
 
+import pytest
 import torch
 import torch.nn as nn
 
@@ -29,10 +28,10 @@ from poutyne import Model, ModelCheckpoint, torch_to_numpy
 from tests.framework.tools import some_data_generator
 
 
-class ModelCheckpointTest(TestCase):
+class ModelCheckpointTest:
     batch_size = 20
 
-    def setUp(self):
+    def setup_method(self):
         torch.manual_seed(42)
         self.pytorch_network = nn.Linear(1, 1)
         self.loss_function = nn.MSELoss()
@@ -41,7 +40,7 @@ class ModelCheckpointTest(TestCase):
         self.temp_dir_obj = TemporaryDirectory()
         self.checkpoint_filename = os.path.join(self.temp_dir_obj.name, 'my_checkpoint_{epoch}.ckpt')
 
-    def tearDown(self):
+    def teardown_method(self):
         self.temp_dir_obj.cleanup()
 
     def test_integration(self):
@@ -59,8 +58,8 @@ class ModelCheckpointTest(TestCase):
             checkpoint_filename, monitor='val_loss', verbose=True, period=1, temporary_filename=tmp_filename
         )
         self.model.fit_generator(train_gen, valid_gen, epochs=10, steps_per_epoch=5, callbacks=[checkpointer])
-        self.assertFalse(os.path.isfile(tmp_filename))
-        self.assertTrue(os.path.isfile(checkpoint_filename))
+        assert not os.path.isfile(tmp_filename)
+        assert os.path.isfile(checkpoint_filename)
 
     def test_temporary_filename_arg_with_differing_checkpoint_filename(self):
         epochs = 10
@@ -72,9 +71,9 @@ class ModelCheckpointTest(TestCase):
             checkpoint_filename, monitor='val_loss', verbose=True, period=1, temporary_filename=tmp_filename
         )
         self.model.fit_generator(train_gen, valid_gen, epochs=epochs, steps_per_epoch=5, callbacks=[checkpointer])
-        self.assertFalse(os.path.isfile(tmp_filename))
+        assert not os.path.isfile(tmp_filename)
         for i in range(1, epochs + 1):
-            self.assertTrue(os.path.isfile(checkpoint_filename.format(epoch=i)))
+            assert os.path.isfile(checkpoint_filename.format(epoch=i))
 
     def test_non_atomic_write(self):
         checkpoint_filename = os.path.join(self.temp_dir_obj.name, 'my_checkpoint.ckpt')
@@ -84,7 +83,7 @@ class ModelCheckpointTest(TestCase):
             checkpoint_filename, monitor='val_loss', verbose=True, period=1, atomic_write=False
         )
         self.model.fit_generator(train_gen, valid_gen, epochs=10, steps_per_epoch=5, callbacks=[checkpointer])
-        self.assertTrue(os.path.isfile(checkpoint_filename))
+        assert os.path.isfile(checkpoint_filename)
 
     def test_save_best_only(self):
         checkpointer = ModelCheckpoint(self.checkpoint_filename, monitor='val_loss', verbose=True, save_best_only=True)
@@ -105,12 +104,12 @@ class ModelCheckpointTest(TestCase):
         self._test_restore_best(val_losses)
 
     def test_restore_best_without_save_best_only(self):
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             ModelCheckpoint(
                 self.checkpoint_filename, monitor='val_loss', verbose=True, save_best_only=False, restore_best=True
             )
 
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             ModelCheckpoint(self.checkpoint_filename, monitor='val_loss', verbose=True, restore_best=True)
 
     def test_save_best_only_with_max(self):
@@ -153,7 +152,7 @@ class ModelCheckpointTest(TestCase):
             checkpointer.on_train_batch_end(1, {'batch': 1, 'size': ModelCheckpointTest.batch_size, 'loss': loss})
             checkpointer.on_epoch_end(epoch, {'epoch': epoch, 'loss': loss, 'val_loss': val_loss})
             filename = self.checkpoint_filename.format(epoch=epoch)
-            self.assertEqual(has_checkpoint, os.path.isfile(filename))
+            assert has_checkpoint == os.path.isfile(filename)
         checkpointer.on_train_end({})
 
     def _update_model(self, generator):
@@ -177,8 +176,4 @@ class ModelCheckpointTest(TestCase):
 
         best_weights = torch_to_numpy(self.model.get_weight_copies())
 
-        self.assertEqual(best_weights, final_weights)
-
-
-if __name__ == '__main__':
-    unittest.main()
+        assert best_weights == final_weights

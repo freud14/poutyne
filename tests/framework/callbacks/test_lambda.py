@@ -28,8 +28,8 @@ from tests.framework.tools import some_data_tensor_generator
 
 
 class LambdaTest(ModelFittingTestCase):
-    def setUp(self):
-        super().setUp()
+    def setup_method(self):
+        super().setup_method()
         torch.manual_seed(42)
         self.pytorch_network = nn.Linear(1, 1)
         self.loss_function = nn.MSELoss()
@@ -75,8 +75,8 @@ class LambdaTest(ModelFittingTestCase):
 
         expected_calls = [call(epoch_number, log) for epoch_number, log in enumerate(logs, 1)]
         actual_calls = on_epoch_end.mock_calls
-        self.assertEqual(len(expected_calls), len(actual_calls))
-        self.assertEqual(expected_calls, actual_calls)
+        assert len(expected_calls) == len(actual_calls)
+        assert expected_calls == actual_calls
 
     def test_lambda_test_calls(self):
         lambda_callback, mock_calls = self._get_lambda_callback_with_mock_args()
@@ -86,8 +86,8 @@ class LambdaTest(ModelFittingTestCase):
 
         expected_calls = self.mock_callback.method_calls[2:]
         actual_calls = mock_calls.method_calls
-        self.assertEqual(len(expected_calls), len(actual_calls))
-        self.assertEqual(expected_calls, actual_calls)
+        assert len(expected_calls) == len(actual_calls)
+        assert expected_calls == actual_calls
 
     def test_lambda_train_calls(self):
         lambda_callback, mock_calls = self._get_lambda_callback_with_mock_args()
@@ -104,8 +104,8 @@ class LambdaTest(ModelFittingTestCase):
 
         expected_calls = self.mock_callback.method_calls[2:]
         actual_calls = mock_calls.method_calls
-        self.assertEqual(len(expected_calls), len(actual_calls))
-        self.assertEqual(expected_calls, actual_calls)
+        assert len(expected_calls) == len(actual_calls)
+        assert expected_calls == actual_calls
 
     def _get_lambda_callback_with_mock_args(self):
         mock_callback = Mock(spec=Callback())

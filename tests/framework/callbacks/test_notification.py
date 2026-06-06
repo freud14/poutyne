@@ -17,7 +17,6 @@ You should have received a copy of the GNU Lesser General Public License along w
 <https://www.gnu.org/licenses/>.
 """
 
-from unittest import TestCase
 from unittest.mock import MagicMock, call
 
 import torch
@@ -38,14 +37,13 @@ from tests.framework.tools import (
 )
 
 
-class NotificationCallbackTest(TestCase):
+class NotificationCallbackTest:
     epochs = 10
     steps_per_epoch = 5
     batch_size = 20
     lr = 0.01
 
-    def setUp(self) -> None:
-        super().setUp()
+    def setup_method(self) -> None:
         self.notification_callback_mock = MagicMock()
         self.notificator_mock = MagicMock()
 
@@ -147,8 +145,8 @@ class NotificationCallbackTest(TestCase):
 
     def _assert_mock_calls(self, call_list: list):
         method_calls = self.notificator_mock.method_calls
-        self.assertEqual(len(method_calls), len(call_list))
-        self.assertEqual(method_calls, call_list)
+        assert len(method_calls) == len(call_list)
+        assert method_calls == call_list
 
     @staticmethod
     def _build_notificator_call(logs, experiment_name=None, mode: str = "training") -> list:

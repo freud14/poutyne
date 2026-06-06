@@ -20,9 +20,9 @@ You should have received a copy of the GNU Lesser General Public License along w
 import os
 from tempfile import TemporaryDirectory
 from typing import ClassVar
-from unittest import TestCase, skipIf
 
 import numpy as np
+import pytest
 
 try:
     import pandas as pd
@@ -40,8 +40,9 @@ from tests.framework.experiment.utils import ConstantMetric, ConstantMetricCallb
 from tests.framework.tools import SomeDataGeneratorWithLen
 
 
-@skipIf(not pandas_available, "pandas is not available")
-class BaseExperimentTest:
+@pytest.mark.skipif(not pandas_available, reason="pandas is not available")
+class ExperimentTestBase:
+    __test__ = False
     # pylint: disable=no-member
     NUM_EPOCHS = None
     METRIC_VALUES = None
@@ -49,7 +50,7 @@ class BaseExperimentTest:
     NO_CHECKPOINT_EPOCHS = None
     MONITOR_MODE = None
 
-    def setUp(self):
+    def setup_method(self):
         self.temp_dir_obj = TemporaryDirectory()
         self.test_checkpoints_path = os.path.join(self.temp_dir_obj.name, 'expt')
 
@@ -86,7 +87,7 @@ class BaseExperimentTest:
         self.loss_metric_plot_png_file_path = os.path.join(self.test_checkpoints_path, "plots", "loss.png")
         self.loss_metric_plot_pdf_file_path = os.path.join(self.test_checkpoints_path, "plots", "loss.pdf")
 
-    def tearDown(self):
+    def teardown_method(self):
         self.temp_dir_obj.cleanup()
 
     def test_integration_train(self):
@@ -191,71 +192,71 @@ class BaseExperimentTest:
             lr_schedulers=lr_schedulers,
         )
 
-        self.assertFalse(os.path.isdir(self.test_checkpoints_path))
+        assert not os.path.isdir(self.test_checkpoints_path)
         for path in self.checkpoint_paths:
-            self.assertFalse(os.path.isfile(path))
+            assert not os.path.isfile(path)
         for path in self.no_checkpoint_paths:
-            self.assertFalse(os.path.isfile(path))
-        self.assertFalse(os.path.isfile(self.ckpt_last_path))
-        self.assertFalse(os.path.isfile(self.optim_ckpt_path))
-        self.assertFalse(os.path.isfile(self.rng_ckpt_path))
-        self.assertFalse(os.path.isfile(self.tsv_log_path))
-        self.assertFalse(os.path.isfile(self.epoch_file_path))
-        self.assertFalse(os.path.isfile(self.tsv_test_log_path))
-        self.assertFalse(os.path.isfile(self.time_metric_plot_png_file_path))
-        self.assertFalse(os.path.isfile(self.time_metric_plot_pdf_file_path))
-        self.assertFalse(os.path.isfile(self.loss_metric_plot_png_file_path))
-        self.assertFalse(os.path.isfile(self.loss_metric_plot_pdf_file_path))
-        self.assertFalse(os.path.isfile(self.first_lr_scheduler_ckpt_path))
-        self.assertFalse(os.path.isfile(self.second_lr_scheduler_ckpt_path))
+            assert not os.path.isfile(path)
+        assert not os.path.isfile(self.ckpt_last_path)
+        assert not os.path.isfile(self.optim_ckpt_path)
+        assert not os.path.isfile(self.rng_ckpt_path)
+        assert not os.path.isfile(self.tsv_log_path)
+        assert not os.path.isfile(self.epoch_file_path)
+        assert not os.path.isfile(self.tsv_test_log_path)
+        assert not os.path.isfile(self.time_metric_plot_png_file_path)
+        assert not os.path.isfile(self.time_metric_plot_pdf_file_path)
+        assert not os.path.isfile(self.loss_metric_plot_png_file_path)
+        assert not os.path.isfile(self.loss_metric_plot_pdf_file_path)
+        assert not os.path.isfile(self.first_lr_scheduler_ckpt_path)
+        assert not os.path.isfile(self.second_lr_scheduler_ckpt_path)
 
-        self.assertEqual(len(logs), self.NUM_EPOCHS)
+        assert len(logs) == self.NUM_EPOCHS
         for i, log in enumerate(logs, 1):
-            self.assertIn('epoch', log)
-            self.assertEqual(log['epoch'], i)
-            self.assertIn('loss', log)
-            self.assertIn('val_loss', log)
-            self.assertIn('time', log)
+            assert 'epoch' in log
+            assert log['epoch'] == i
+            assert 'loss' in log
+            assert 'val_loss' in log
+            assert 'time' in log
 
     def _test_train_integration(self, logs, epochs=None, initial_epoch=1, num_lr_schedulers=0):
         if epochs is None:
             epochs = self.NUM_EPOCHS
 
-        self.assertTrue(os.path.isdir(self.test_checkpoints_path))
+        assert os.path.isdir(self.test_checkpoints_path)
         for path in self.checkpoint_paths:
-            self.assertTrue(os.path.isfile(path))
+            assert os.path.isfile(path)
         for path in self.no_checkpoint_paths:
-            self.assertFalse(os.path.isfile(path))
-        self.assertTrue(os.path.isfile(self.ckpt_last_path))
-        self.assertTrue(os.path.isfile(self.optim_ckpt_path))
-        self.assertTrue(os.path.isfile(self.rng_ckpt_path))
-        self.assertTrue(os.path.isfile(self.tsv_log_path))
-        self.assertTrue(os.path.isfile(self.epoch_file_path))
-        self.assertTrue(os.path.isfile(self.time_metric_plot_png_file_path))
-        self.assertTrue(os.path.isfile(self.time_metric_plot_pdf_file_path))
-        self.assertTrue(os.path.isfile(self.loss_metric_plot_png_file_path))
-        self.assertTrue(os.path.isfile(self.loss_metric_plot_pdf_file_path))
-        self.assertFalse(os.path.isfile(self.tsv_test_log_path))
+            assert not os.path.isfile(path)
+        assert os.path.isfile(self.ckpt_last_path)
+        assert os.path.isfile(self.optim_ckpt_path)
+        assert os.path.isfile(self.rng_ckpt_path)
+        assert os.path.isfile(self.tsv_log_path)
+        assert os.path.isfile(self.epoch_file_path)
+        assert os.path.isfile(self.time_metric_plot_png_file_path)
+        assert os.path.isfile(self.time_metric_plot_pdf_file_path)
+        assert os.path.isfile(self.loss_metric_plot_png_file_path)
+        assert os.path.isfile(self.loss_metric_plot_pdf_file_path)
+        assert not os.path.isfile(self.tsv_test_log_path)
         if num_lr_schedulers >= 1:
-            self.assertTrue(os.path.isfile(self.first_lr_scheduler_ckpt_path))
+            assert os.path.isfile(self.first_lr_scheduler_ckpt_path)
         else:
-            self.assertFalse(os.path.isfile(self.first_lr_scheduler_ckpt_path))
+            assert not os.path.isfile(self.first_lr_scheduler_ckpt_path)
         if num_lr_schedulers >= 2:
-            self.assertTrue(os.path.isfile(self.second_lr_scheduler_ckpt_path))
+            assert os.path.isfile(self.second_lr_scheduler_ckpt_path)
         else:
-            self.assertFalse(os.path.isfile(self.second_lr_scheduler_ckpt_path))
+            assert not os.path.isfile(self.second_lr_scheduler_ckpt_path)
 
-        self.assertEqual(len(logs), epochs - initial_epoch + 1)
+        assert len(logs) == epochs - initial_epoch + 1
         for i, log in enumerate(logs, initial_epoch):
-            self.assertIn('epoch', log)
-            self.assertEqual(log['epoch'], i)
-            self.assertIn('loss', log)
-            self.assertIn('val_loss', log)
-            self.assertIn('time', log)
+            assert 'epoch' in log
+            assert log['epoch'] == i
+            assert 'loss' in log
+            assert 'val_loss' in log
+            assert 'time' in log
 
         with open(self.epoch_file_path, encoding='utf-8') as fd:
             epoch = int(fd.read())
-        self.assertEqual(epoch, epochs)
+        assert epoch == epochs
 
         actual_stats = pd.read_csv(self.tsv_log_path, sep='\t')
         pd.testing.assert_frame_equal(self.test_experiment.get_stats(), actual_stats)
@@ -273,7 +274,7 @@ class BaseExperimentTest:
         )
         actual_saved_epochs = self.test_experiment.get_saved_epochs()
 
-        self.assertEqual(self.CHECKPOINT_EPOCHS, actual_saved_epochs['epoch'].tolist())
+        assert actual_saved_epochs['epoch'].tolist() == self.CHECKPOINT_EPOCHS
 
         stats = self.test_experiment.get_stats()
         expected_saved_epochs = stats[stats['epoch'].isin(self.CHECKPOINT_EPOCHS)]
@@ -300,14 +301,14 @@ class BaseExperimentTest:
     def test_test_with_return_dict_format_to_False_raises_exception(self):
         self._train_expt()
         generator = SomeDataGeneratorWithLen(32, 10, 0)
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             self.test_experiment.test(generator, return_dict_format=False)
 
     def _test_test_integration(self, log):
-        self.assertTrue(os.path.isfile(self.tsv_test_log_path))
+        assert os.path.isfile(self.tsv_test_log_path)
 
-        self.assertIn('test_loss', log)
-        self.assertIn('time', log)
+        assert 'test_loss' in log
+        assert 'time' in log
 
     def test_infer(self):
         self._train_expt()
@@ -315,26 +316,26 @@ class BaseExperimentTest:
         generator = SomeDataGeneratorWithLen(32, 10, 0)
         generator = (x for x, _ in generator)
         pred_y = self.test_experiment.infer(generator, steps=num_steps)
-        self.assertEqual(type(pred_y), np.ndarray)
-        self.assertEqual(pred_y.shape, (320, 1))
+        assert type(pred_y) == np.ndarray
+        assert pred_y.shape == (320, 1)
 
     def test_infer_dataset(self):
         self._train_expt()
         dataset = TensorDataset(torch.rand(32 * 10, 1))
         pred_y = self.test_experiment.infer_dataset(dataset)
-        self.assertEqual(type(pred_y), np.ndarray)
-        self.assertEqual(pred_y.shape, (320, 1))
+        assert type(pred_y) == np.ndarray
+        assert pred_y.shape == (320, 1)
 
     def test_infer_data(self):
         self._train_expt()
         x = torch.rand(32 * 10, 1)
         pred_y = self.test_experiment.infer_data(x)
-        self.assertEqual(type(pred_y), np.ndarray)
-        self.assertEqual(pred_y.shape, (320, 1))
+        assert type(pred_y) == np.ndarray
+        assert pred_y.shape == (320, 1)
 
     def test_infer_data_without_training(self):
         x = torch.rand(32 * 10, 1)
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             self.test_experiment.infer_data(x)
 
     def _train_expt(self):
@@ -345,7 +346,8 @@ class BaseExperimentTest:
         )
 
 
-class MonitorMinExperimentTest(BaseExperimentTest, TestCase):
+class MonitorMinExperimentTest(ExperimentTestBase):
+    __test__ = True
     NUM_EPOCHS = 5
     METRIC_VALUES: ClassVar[list] = [9, 3, 6, 2, 3]
     CHECKPOINT_EPOCHS: ClassVar[list] = [1, 2, 4]
@@ -353,7 +355,8 @@ class MonitorMinExperimentTest(BaseExperimentTest, TestCase):
     MONITOR_MODE = "min"
 
 
-class MonitorMaxExperimentTest(BaseExperimentTest, TestCase):
+class MonitorMaxExperimentTest(ExperimentTestBase):
+    __test__ = True
     NUM_EPOCHS = 5
     METRIC_VALUES: ClassVar[list] = [4, 3, 6, 2, 7]
     CHECKPOINT_EPOCHS: ClassVar[list] = [1, 3, 5]

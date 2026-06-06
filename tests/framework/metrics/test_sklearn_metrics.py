@@ -18,9 +18,9 @@ You should have received a copy of the GNU Lesser General Public License along w
 """
 
 from itertools import repeat
-from unittest import TestCase, skipIf
 
 import numpy as np
+import pytest
 import torch
 from torch.utils.data import DataLoader
 
@@ -42,14 +42,14 @@ def gini(y_true, y_pred, sample_weight=None):
     return 1 - ((random[1:] - random[:-1]) * (lorentz[1:] + lorentz[:-1])).sum()
 
 
-@skipIf(not is_sklearn_available, "Scikit-learn is not available")
-class SKLearnMetricsTest(TestCase):
+@pytest.mark.skipif(not is_sklearn_available, reason="Scikit-learn is not available")
+class SKLearnMetricsTest:
     threshold = 0.7
     steps_per_epoch = 5
     batch_size = 20
     num_examples = batch_size * steps_per_epoch
 
-    def setUp(self):
+    def setup_method(self):
         pred_noise = 0.1 * torch.randn((SKLearnMetricsTest.num_examples, 1))
 
         self.regression_pred = torch.randn((SKLearnMetricsTest.num_examples, 1))
@@ -151,8 +151,8 @@ class SKLearnMetricsTest(TestCase):
         actual_epoch_metric = epoch_metric.compute()
         actual_batch_metric = batch_metric.compute()
 
-        self.assertEqual(expected, actual_epoch_metric)
-        self.assertEqual(expected, actual_batch_metric)
+        assert expected == actual_epoch_metric
+        assert expected == actual_batch_metric
 
     def _get_expected_value(self, pred, true, sklearn_metrics, with_sample_weight, *, kwargs=None, names=None):
         true = true.numpy()

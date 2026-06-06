@@ -37,19 +37,20 @@ limitations under the License.
 """
 
 # pylint: disable=protected-access
-from unittest import TestCase
-
 import numpy
+import pytest
 import torch
 import torch.nn as nn
 
 from poutyne import F1, BinaryF1, FBeta, Model
 
 
-class BaseFBetaTest(TestCase):
+# Runs the shared FBeta tests with make_deterministic=None in addition to
+# the deterministic (True) and non-deterministic (False) subclasses.
+class BaseFBetaTest:
     make_deterministic = None
 
-    def setUp(self):
+    def setup_method(self):
         # [0, 1, 1, 1, 3, 1]
         self.predictions = torch.Tensor(
             [
@@ -91,23 +92,30 @@ class BaseFBetaTest(TestCase):
 
     def test_config_errors(self):
         # Bad beta
-        self.assertRaises(ValueError, FBeta, beta=0.0)
+        with pytest.raises(ValueError):
+            FBeta(beta=0.0)
 
         # Bad average option
-        self.assertRaises(ValueError, FBeta, average='mega')
+        with pytest.raises(ValueError):
+            FBeta(average='mega')
 
         # F1 classes with beta different than 1.
-        self.assertRaises(ValueError, F1, beta=2.0)
-        self.assertRaises(ValueError, BinaryF1, beta=2.0)
+        with pytest.raises(ValueError):
+            F1(beta=2.0)
+        with pytest.raises(ValueError):
+            BinaryF1(beta=2.0)
 
         # Precision and recall with beta different than 1.
-        self.assertWarns(UserWarning, FBeta, metric='precision', beta=2.0)
-        self.assertWarns(UserWarning, FBeta, metric='recall', beta=2.0)
+        with pytest.warns(UserWarning):
+            FBeta(metric='precision', beta=2.0)
+        with pytest.warns(UserWarning):
+            FBeta(metric='recall', beta=2.0)
 
     def test_runtime_errors(self):
         fbeta = FBeta(make_deterministic=self.make_deterministic)
         # Metric was never called.
-        self.assertRaises(RuntimeError, fbeta.compute)
+        with pytest.raises(RuntimeError):
+            fbeta.compute()
 
     def test_fbeta_multiclass_state(self):
         fbeta = FBeta(make_deterministic=self.make_deterministic)
@@ -246,7 +254,7 @@ class BaseFBetaTest(TestCase):
         batch_value = fbeta(self.predictions, (targets, mask))
         epoch_value = fbeta.compute()
 
-        self.assertEqual(batch_value, epoch_value)
+        assert batch_value == epoch_value
 
     def _compute(self, *args, **kwargs):
         fbeta = FBeta(*args, **kwargs, make_deterministic=self.make_deterministic)
@@ -255,39 +263,39 @@ class BaseFBetaTest(TestCase):
 
     def test_names(self):
         fbeta = FBeta(average='macro', make_deterministic=self.make_deterministic)
-        self.assertEqual(['fscore_macro', 'precision_macro', 'recall_macro'], fbeta.__name__)
+        assert fbeta.__name__ == ['fscore_macro', 'precision_macro', 'recall_macro']
         fbeta = FBeta(average='micro', make_deterministic=self.make_deterministic)
-        self.assertEqual(['fscore_micro', 'precision_micro', 'recall_micro'], fbeta.__name__)
+        assert fbeta.__name__ == ['fscore_micro', 'precision_micro', 'recall_micro']
         fbeta = FBeta(average='micro', names=['f', 'p', 'r'], make_deterministic=self.make_deterministic)
-        self.assertEqual(['f', 'p', 'r'], fbeta.__name__)
+        assert fbeta.__name__ == ['f', 'p', 'r']
         fbeta = FBeta(average=0, make_deterministic=self.make_deterministic)
-        self.assertEqual(['fscore_0', 'precision_0', 'recall_0'], fbeta.__name__)
+        assert fbeta.__name__ == ['fscore_0', 'precision_0', 'recall_0']
         fbeta = FBeta(metric='fscore', average='macro', make_deterministic=self.make_deterministic)
-        self.assertEqual('fscore_macro', fbeta.__name__)
+        assert fbeta.__name__ == 'fscore_macro'
         fbeta = FBeta(metric='fscore', average='micro', make_deterministic=self.make_deterministic)
-        self.assertEqual('fscore_micro', fbeta.__name__)
+        assert fbeta.__name__ == 'fscore_micro'
         fbeta = FBeta(metric='fscore', average=0, make_deterministic=self.make_deterministic)
-        self.assertEqual('fscore_0', fbeta.__name__)
+        assert fbeta.__name__ == 'fscore_0'
         fbeta = FBeta(metric='precision', average='macro', make_deterministic=self.make_deterministic)
-        self.assertEqual('precision_macro', fbeta.__name__)
+        assert fbeta.__name__ == 'precision_macro'
         fbeta = FBeta(metric='precision', average='micro', make_deterministic=self.make_deterministic)
-        self.assertEqual('precision_micro', fbeta.__name__)
+        assert fbeta.__name__ == 'precision_micro'
         fbeta = FBeta(metric='precision', average=0, make_deterministic=self.make_deterministic)
-        self.assertEqual('precision_0', fbeta.__name__)
+        assert fbeta.__name__ == 'precision_0'
         fbeta = FBeta(metric='recall', average='macro', make_deterministic=self.make_deterministic)
-        self.assertEqual('recall_macro', fbeta.__name__)
+        assert fbeta.__name__ == 'recall_macro'
         fbeta = FBeta(metric='recall', average='micro', make_deterministic=self.make_deterministic)
-        self.assertEqual('recall_micro', fbeta.__name__)
+        assert fbeta.__name__ == 'recall_micro'
         fbeta = FBeta(metric='recall', average=0, make_deterministic=self.make_deterministic)
-        self.assertEqual('recall_0', fbeta.__name__)
+        assert fbeta.__name__ == 'recall_0'
         fbeta = FBeta(metric='fscore', average='macro', names='f', make_deterministic=self.make_deterministic)
-        self.assertEqual('f', fbeta.__name__)
+        assert fbeta.__name__ == 'f'
         fbeta = FBeta(average='macro', names=['f', "p", "r"], make_deterministic=self.make_deterministic)
-        self.assertEqual(["f", "p", "r"], fbeta.__name__)
+        assert fbeta.__name__ == ["f", "p", "r"]
         fbeta = FBeta(average='binary', make_deterministic=self.make_deterministic)
-        self.assertEqual(['fscore_binary_1', 'precision_binary_1', 'recall_binary_1'], fbeta.__name__)
+        assert fbeta.__name__ == ['fscore_binary_1', 'precision_binary_1', 'recall_binary_1']
         fbeta = FBeta(average='binary', pos_label=0, make_deterministic=self.make_deterministic)
-        self.assertEqual(['fscore_binary_0', 'precision_binary_0', 'recall_binary_0'], fbeta.__name__)
+        assert fbeta.__name__ == ['fscore_binary_0', 'precision_binary_0', 'recall_binary_0']
 
     def test_predefined_names(self):
         epoch_metrics = [
@@ -317,9 +325,9 @@ class BaseFBetaTest(TestCase):
         model = Model(nn.Linear(10, 2), 'sgd', 'cross_entropy', epoch_metrics=epoch_metrics)
         actual_fmetric = [epoch_metric._metric for epoch_metric in model.epoch_metrics]
         actual_average = [epoch_metric._average for epoch_metric in model.epoch_metrics]
-        self.assertEqual(fmetric, actual_fmetric)
-        self.assertEqual(average, actual_average)
-        self.assertEqual(names, model.epoch_metrics_names)
+        assert fmetric == actual_fmetric
+        assert average == actual_average
+        assert names == model.epoch_metrics_names
 
 
 class DeterministicFBetaTest(BaseFBetaTest):
@@ -330,10 +338,12 @@ class NonDeterministicFBetaTest(BaseFBetaTest):
     make_deterministic = False
 
 
-class BaseFBetaBinaryTest(TestCase):
+# Runs the shared FBeta binary tests with make_deterministic=None in addition to
+# the deterministic (True) and non-deterministic (False) subclasses.
+class BaseFBetaBinaryTest:
     make_deterministic = None
 
-    def setUp(self):
+    def setup_method(self):
         # [0, 1, 1, 1, 0, 1]
         self.predictions = torch.Tensor([[0.35, 0.25], [0.1, 0.6], [0.1, 0.6], [0.1, 0.5], [0.2, 0.1], [0.1, 0.6]])
         self.targets = torch.Tensor([0, 0, 1, 0, 1, 0])
@@ -392,7 +402,7 @@ class BaseFBetaBinaryTest(TestCase):
         batch_value = fbeta(self.predictions, self.targets)
         epoch_value = fbeta.compute()
 
-        self.assertEqual(batch_value, epoch_value)
+        assert batch_value == epoch_value
 
 
 class DeterministicFBetaBinaryTest(BaseFBetaBinaryTest):

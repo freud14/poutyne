@@ -17,13 +17,11 @@ You should have received a copy of the GNU Lesser General Public License along w
 <https://www.gnu.org/licenses/>.
 """
 
-import unittest
-
+import pytest
 import torch
 import torch.nn as nn
 
 from poutyne import Callback, EarlyStopping, Metric, Model
-from tests.framework.base import CaptureOutputBase
 from tests.framework.tools import some_data_generator
 
 
@@ -54,10 +52,10 @@ class DummyMetricCallback(Callback):
         self.metric.current_epoch = epoch_number
 
 
-class EarlyStoppingTest(CaptureOutputBase):
+class EarlyStoppingTest:
     batch_size = 20
 
-    def setUp(self):
+    def setup_method(self):
         torch.manual_seed(42)
         self.pytorch_network = nn.Linear(1, 1)
         self.loss_function = nn.MSELoss()
@@ -93,21 +91,19 @@ class EarlyStoppingTest(CaptureOutputBase):
         self._test_early_stopping(earlystopper, dummy_metric_values, early_stop_epoch)
 
     def test_mode_not_min_max_raise_error(self):
-        with self.assertRaises(ValueError):
-            invalid_mode = "a_mode"
-            EarlyStopping(monitor='val_dummy', mode=invalid_mode, min_delta=0, patience=2, verbose=False)
+        with pytest.raises(ValueError):
+            EarlyStopping(monitor='val_dummy', mode='a_mode', min_delta=0, patience=2, verbose=False)
 
-    def test_early_stopping_with_verbose(self):
+    def test_early_stopping_with_verbose(self, capsys):
         earlystopper = EarlyStopping(monitor='val_dummy', mode='max', min_delta=0, patience=2, verbose=True)
 
         dummy_metric_values = [2, 8, 4, 5, 2]
         early_stop_epoch = 4
 
-        self._capture_output()
-
         self._test_early_stopping(earlystopper, dummy_metric_values, early_stop_epoch)
 
-        self.assertStdoutContains(['Epoch 4: early stopping'])
+        captured = capsys.readouterr()
+        assert 'Epoch 4: early stopping' in captured.out.strip()
 
     def _test_early_stopping(self, earlystopper, dummy_metric_values, early_stop_epoch):
         dummy_metric = EarlyStoppingDummyMetric(dummy_metric_values)
@@ -120,9 +116,5 @@ class EarlyStoppingTest(CaptureOutputBase):
         history = model.fit_generator(
             train_gen, valid_gen, epochs=10, steps_per_epoch=5, callbacks=[dummy_metric_callback, earlystopper]
         )
-        self.assertEqual(len(history), early_stop_epoch)
-        self.assertEqual(history[-1]['epoch'], early_stop_epoch)
-
-
-if __name__ == '__main__':
-    unittest.main()
+        assert len(history) == early_stop_epoch
+        assert history[-1]['epoch'] == early_stop_epoch

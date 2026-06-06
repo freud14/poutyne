@@ -17,25 +17,24 @@ You should have received a copy of the GNU Lesser General Public License along w
 <https://www.gnu.org/licenses/>.
 """
 
-from unittest import TestCase
 from unittest.mock import MagicMock
 
 from poutyne import Callback, CallbackList
 
 
-class CallbackListTest(TestCase):
-    def setUp(self) -> None:
+class CallbackListTest:
+    def setup_method(self) -> None:
         self.initial_callback = MagicMock(spec=Callback)
         self.callback_list = CallbackList([self.initial_callback])
 
     def test_append_callback(self):
-        self.assertEqual(len(self.callback_list.callbacks), 1)
+        assert len(self.callback_list.callbacks) == 1
         a_callback = MagicMock(spec=Callback)
         self.callback_list.append(a_callback)
 
-        self.assertEqual(len(self.callback_list.callbacks), 2)
+        assert len(self.callback_list.callbacks) == 2
 
     def test_iterator(self):
         a_callback = MagicMock(spec=Callback)
         self.callback_list.append(a_callback)
-        self.assertEqual(len(list(self.callback_list)), 2)
+        assert len(list(self.callback_list)) == 2

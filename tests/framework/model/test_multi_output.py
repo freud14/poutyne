@@ -44,8 +44,8 @@ def some_data_tensor_generator_multi_io(batch_size):
 
 
 class ModelMultiOutputTest(ModelFittingTestCase):
-    def setUp(self):
-        super().setUp()
+    def setup_method(self):
+        super().setup_method()
         torch.manual_seed(42)
         self.pytorch_network = MultiIOModel(num_input=1, num_output=2)
         self.loss_function = nn.MSELoss()
@@ -115,14 +115,14 @@ class ModelMultiOutputTest(ModelFittingTestCase):
         y1 = torch.rand(ModelMultiOutputTest.batch_size, 1)
         y2 = torch.rand(ModelMultiOutputTest.batch_size, 1)
         loss = self.model.train_on_batch(x, (y1, y2))
-        self.assertEqual(type(loss), float)
+        assert type(loss) == float
 
     def test_ndarray_train_on_batch_multi_output(self):
         x = np.random.rand(ModelMultiOutputTest.batch_size, 1).astype(np.float32)
         y1 = np.random.rand(ModelMultiOutputTest.batch_size, 1).astype(np.float32)
         y2 = np.random.rand(ModelMultiOutputTest.batch_size, 1).astype(np.float32)
         loss = self.model.train_on_batch(x, (y1, y2))
-        self.assertEqual(type(loss), float)
+        assert type(loss) == float
 
     def test_evaluate_with_pred_multi_output(self):
         y = (
@@ -133,7 +133,7 @@ class ModelMultiOutputTest(ModelFittingTestCase):
         # We also test the unpacking.
         _, pred_y = self.model.evaluate(x, y, batch_size=ModelMultiOutputTest.batch_size, return_pred=True)
         for pred in pred_y:
-            self.assertEqual(pred.shape, (ModelMultiOutputTest.evaluate_dataset_len, 1))
+            assert pred.shape == (ModelMultiOutputTest.evaluate_dataset_len, 1)
 
     def test_evaluate_data_loader_multi_output(self):
         x = torch.rand(ModelMultiOutputTest.evaluate_dataset_len, 1)
@@ -142,40 +142,40 @@ class ModelMultiOutputTest(ModelFittingTestCase):
         dataset = TensorDataset(x, (y1, y2))
         generator = DataLoader(dataset, ModelMultiOutputTest.batch_size)
         loss, pred_y = self.model.evaluate_generator(generator, return_pred=True)
-        self.assertEqual(type(loss), float)
+        assert type(loss) == float
         for pred in pred_y:
-            self.assertEqual(type(pred), np.ndarray)
-            self.assertEqual(pred.shape, (ModelMultiOutputTest.evaluate_dataset_len, 1))
+            assert type(pred) == np.ndarray
+            assert pred.shape == (ModelMultiOutputTest.evaluate_dataset_len, 1)
 
     def test_evaluate_generator_multi_output(self):
         num_steps = 10
         generator = some_data_tensor_generator_multi_output(ModelMultiOutputTest.batch_size)
         loss, pred_y = self.model.evaluate_generator(generator, steps=num_steps, return_pred=True)
-        self.assertEqual(type(loss), float)
+        assert type(loss) == float
         for pred in pred_y:
-            self.assertEqual(pred.shape, (num_steps * ModelMultiOutputTest.batch_size, 1))
+            assert pred.shape == (num_steps * ModelMultiOutputTest.batch_size, 1)
 
     def test_evaluate_generator_multi_io(self):
         num_steps = 10
         generator = some_data_tensor_generator_multi_io(ModelMultiOutputTest.batch_size)
         loss, pred_y = self.model.evaluate_generator(generator, steps=num_steps, return_pred=True)
-        self.assertEqual(type(loss), float)
+        assert type(loss) == float
         for pred in pred_y:
-            self.assertEqual(pred.shape, (num_steps * ModelMultiOutputTest.batch_size, 1))
+            assert pred.shape == (num_steps * ModelMultiOutputTest.batch_size, 1)
 
     def test_tensor_evaluate_on_batch_multi_output(self):
         y1 = torch.rand(ModelMultiOutputTest.batch_size, 1)
         y2 = torch.rand(ModelMultiOutputTest.batch_size, 1)
         x = torch.rand(ModelMultiOutputTest.batch_size, 1)
         loss = self.model.evaluate_on_batch(x, (y1, y2))
-        self.assertEqual(type(loss), float)
+        assert type(loss) == float
 
     def test_predict_with_np_array_multi_output(self):
         x = np.random.rand(ModelMultiOutputTest.evaluate_dataset_len, 1).astype(np.float32)
 
         pred_y = self.model.predict(x, batch_size=ModelMultiOutputTest.batch_size)
         for pred in pred_y:
-            self.assertEqual(pred.shape, (ModelMultiOutputTest.evaluate_dataset_len, 1))
+            assert pred.shape == (ModelMultiOutputTest.evaluate_dataset_len, 1)
 
     def test_predict_generator_multi_output(self):
         num_steps = 10
@@ -184,7 +184,7 @@ class ModelMultiOutputTest(ModelFittingTestCase):
         pred_y = self.model.predict_generator(generator, steps=num_steps)
 
         for pred in pred_y:
-            self.assertEqual(pred.shape, (num_steps * ModelMultiOutputTest.batch_size, 1))
+            assert pred.shape == (num_steps * ModelMultiOutputTest.batch_size, 1)
 
     def test_tensor_predict_on_batch_multi_output(self):
         x = torch.rand(ModelMultiOutputTest.batch_size, 1)

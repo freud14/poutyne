@@ -20,9 +20,7 @@ You should have received a copy of the GNU Lesser General Public License along w
 # Because of the way the callbacks are generated, we have to disable linting here.
 # pylint: disable=no-name-in-module
 import os
-import unittest
 from tempfile import TemporaryDirectory
-from unittest import TestCase
 
 import torch
 import torch.nn as nn
@@ -31,11 +29,11 @@ from poutyne import ExponentialLR, LRSchedulerCheckpoint, Model, ReduceLROnPlate
 from tests.framework.tools import some_data_generator
 
 
-class OptimizerCheckpointTest(TestCase):
+class OptimizerCheckpointTest:
     batch_size = 20
     epochs = 10
 
-    def setUp(self):
+    def setup_method(self):
         torch.manual_seed(42)
         self.pytorch_network = nn.Linear(1, 1)
         self.loss_function = nn.MSELoss()
@@ -44,7 +42,7 @@ class OptimizerCheckpointTest(TestCase):
         self.temp_dir_obj = TemporaryDirectory()
         self.checkpoint_filename = os.path.join(self.temp_dir_obj.name, 'my_checkpoint_{epoch}.optim')
 
-    def tearDown(self):
+    def teardown_method(self):
         self.temp_dir_obj.cleanup()
 
     def test_any_scheduler_integration(self):
@@ -89,7 +87,7 @@ class OptimizerCheckpointTest(TestCase):
             checkpointer.on_train_batch_end(1, {'batch': 1, 'size': OptimizerCheckpointTest.batch_size, 'loss': loss})
             checkpointer.on_epoch_end(epoch, {'epoch': epoch, 'loss': loss, 'val_loss': 1})
             filename = self.checkpoint_filename.format(epoch=epoch)
-            self.assertTrue(os.path.isfile(filename))
+            assert os.path.isfile(filename)
             scheduler_states[epoch] = torch_to_numpy(lr_scheduler.scheduler.state_dict(), copy=True)
         checkpointer.on_train_end({})
 
@@ -113,8 +111,4 @@ class OptimizerCheckpointTest(TestCase):
             lr_scheduler.load_state(filename)
             saved_scheduler_state = torch_to_numpy(lr_scheduler.scheduler.state_dict())
 
-            self.assertEqual(epoch_scheduler_state, saved_scheduler_state)
-
-
-if __name__ == '__main__':
-    unittest.main()
+            assert epoch_scheduler_state == saved_scheduler_state

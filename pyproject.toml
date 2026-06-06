@@ -106,16 +106,16 @@ ignore = [
     "PLR0402", # import-alias (consider-using-from-import)
     "PLR0913", # too-many-arguments
     "PLR2004", # magic-value-comparison
-    "PT009",   # use plain assert instead of unittest assertEqual (intentional: tests use TestCase)
-    "PT027",   # use pytest.raises instead of assertRaises (intentional: tests use TestCase)
     "B905",    # zip without strict= (too noisy for PyTorch tensor code)
+    "PT011",   # pytest.raises too broad (adding match= is out of scope for this codebase)
+    "PT030",   # pytest.warns too broad (adding match= is out of scope for this codebase)
 ]
 
 [tool.ruff.lint.per-file-ignores]
 "__init__.py" = ["F401", "F403"]
 "examples/**" = ["PLW2901", "T20", "NPY002"]  # x = x.to(device) is intentional; print and legacy numpy expected in examples
 "tutorials/**" = ["T20", "NPY002"]
-"tests/**" = ["NPY002"]  # legacy numpy random API is fine for test fixtures
+"tests/**" = ["NPY002", "E721"]  # E721: tests use exact type checks (type() ==) intentionally; NPY002: legacy numpy random API ok in fixtures
 "poutyne/utils.py" = ["NPY002"]  # np.random.seed/get_state/set_state have no Generator equivalent
 
 [tool.ruff.format]
@@ -124,3 +124,4 @@ quote-style = "preserve"
 [tool.pytest.ini_options]
 addopts = "--cov --cov-report html --cov-report xml"
 testpaths = ["tests"]
+python_classes = ["*Test"]

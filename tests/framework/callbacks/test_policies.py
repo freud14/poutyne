@@ -17,15 +17,15 @@ You should have received a copy of the GNU Lesser General Public License along w
 <https://www.gnu.org/licenses/>.
 """
 
-import unittest
+import pytest
 
 from poutyne import OptimizerPolicy, Phase, cosinespace, linspace, one_cycle_phases, sgdr_phases
 
 
-class TestSpaces(unittest.TestCase):
+class SpacesTest:
     def assert_space(self, space, expected):
         for val, exp in zip(space, expected):
-            self.assertAlmostEqual(val, exp, places=3)
+            assert val == pytest.approx(exp, abs=5e-4)
 
     def test_linspace_const(self):
         self.assert_space(linspace(0, 0, 3), [0, 0, 0])
@@ -58,15 +58,15 @@ class TestSpaces(unittest.TestCase):
         for space_fn in [linspace, cosinespace]:
             space = list(space_fn(2, 1, 3))
             assert len(space) == 3
-            with self.assertRaises(IndexError):
+            with pytest.raises(IndexError):
                 space[4]  # pylint: disable=pointless-statement
 
 
-class TestPhase(unittest.TestCase):
+class PhaseTest:
     def test_init_raises_without_lr_or_momentum(self):
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             Phase(lr=None, momentum=None)
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             Phase()
 
     def test_phase_with_only_one_parameter_set(self):
@@ -74,45 +74,45 @@ class TestPhase(unittest.TestCase):
             steps = 3
             phase = Phase(**{param_name: linspace(1, 0, steps)})
             for params in phase:
-                self.assertIsInstance(params, dict)
-                self.assertTrue(param_name in params)
-                self.assertEqual(len(params), 1)
-                self.assertTrue(0 <= params[param_name] <= 1)
+                assert isinstance(params, dict)
+                assert param_name in params
+                assert len(params) == 1
+                assert 0 <= params[param_name] <= 1
 
     def test_phase_with_two_parameters(self):
         steps = 4
         phase = Phase(lr=linspace(1, 0, steps), momentum=cosinespace(0.8, 1, steps))
-        self.assertEqual(len(list(phase)), steps)
+        assert len(list(phase)) == steps
         for params in phase:
-            self.assertEqual(len(params), 2)
+            assert len(params) == 2
 
-            self.assertTrue("lr" in params)
-            self.assertTrue(0 <= params["lr"] <= 1)
+            assert "lr" in params
+            assert 0 <= params["lr"] <= 1
 
-            self.assertTrue("momentum" in params)
-            self.assertTrue(0.8 <= params["momentum"] <= 1)
+            assert "momentum" in params
+            assert 0.8 <= params["momentum"] <= 1
 
 
-class TestOptimizerPolicy(unittest.TestCase):
-    def setUp(self):
+class OptimizerPolicyTest:
+    def setup_method(self):
         steps = 2
         phases = [Phase(lr=linspace(1, 1, steps)), Phase(lr=linspace(0, 0, steps))]
         self.policy = OptimizerPolicy(phases)
 
     def test_basic_iteration(self):
         policy_iter = iter(self.policy)
-        self.assertEqual(next(policy_iter), {"lr": 1})
-        self.assertEqual(next(policy_iter), {"lr": 1})
+        assert next(policy_iter) == {"lr": 1}
+        assert next(policy_iter) == {"lr": 1}
 
-        self.assertEqual(next(policy_iter), {"lr": 0})
-        self.assertEqual(next(policy_iter), {"lr": 0})
+        assert next(policy_iter) == {"lr": 0}
+        assert next(policy_iter) == {"lr": 0}
 
-        with self.assertRaises(StopIteration):
+        with pytest.raises(StopIteration):
             next(policy_iter)
 
 
-class TestOptimizerPolicyRestart(unittest.TestCase):
-    def setUp(self):
+class OptimizerPolicyRestartTest:
+    def setup_method(self):
         steps = 2
         phases = [
             Phase(lr=linspace(0, 0, steps)),
@@ -131,42 +131,42 @@ class TestOptimizerPolicyRestart(unittest.TestCase):
         assert next(policy_iter) == {"lr": 2}
         assert next(policy_iter) == {"lr": 2}
 
-        with self.assertRaises(StopIteration):
+        with pytest.raises(StopIteration):
             next(policy_iter)
 
 
-class TestOneCycle(unittest.TestCase):
+class OneCycleTest:
     def test_length(self):
         policy = OptimizerPolicy(one_cycle_phases(100))
-        self.assertEqual(len(list(policy.all_steps())), 100)
+        assert len(list(policy.all_steps())) == 100
 
         policy = OptimizerPolicy(one_cycle_phases(99))
-        self.assertEqual(len(list(policy.all_steps())), 99)
+        assert len(list(policy.all_steps())) == 99
 
 
-class TestSGDR(unittest.TestCase):
+class SGDRTest:
     def test_length_with_cycle_mult_one(self):
         policy = OptimizerPolicy(sgdr_phases(10, 1, cycle_mult=1))
-        self.assertEqual(len(list(policy.all_steps())), 10)
+        assert len(list(policy.all_steps())) == 10
 
         policy = OptimizerPolicy(sgdr_phases(10, 2, cycle_mult=1))
-        self.assertEqual(len(list(policy.all_steps())), 20)
+        assert len(list(policy.all_steps())) == 20
 
         policy = OptimizerPolicy(sgdr_phases(10, 10, cycle_mult=1))
-        self.assertEqual(len(list(policy.all_steps())), 100)
+        assert len(list(policy.all_steps())) == 100
 
     def test_length_with_higher_cycle_mult(self):
         policy = OptimizerPolicy(sgdr_phases(10, 1, cycle_mult=2))
-        self.assertEqual(len(list(policy.all_steps())), 10)
+        assert len(list(policy.all_steps())) == 10
 
         policy = OptimizerPolicy(sgdr_phases(10, 2, cycle_mult=2))
-        self.assertEqual(len(list(policy.all_steps())), 30)
+        assert len(list(policy.all_steps())) == 30
 
         policy = OptimizerPolicy(sgdr_phases(10, 3, cycle_mult=2))
-        self.assertEqual(len(list(policy.all_steps())), 70)
+        assert len(list(policy.all_steps())) == 70
 
         policy = OptimizerPolicy(sgdr_phases(10, 1, cycle_mult=3))
-        self.assertEqual(len(list(policy.all_steps())), 10)
+        assert len(list(policy.all_steps())) == 10
 
         policy = OptimizerPolicy(sgdr_phases(10, 2, cycle_mult=3))
-        self.assertEqual(len(list(policy.all_steps())), 40)
+        assert len(list(policy.all_steps())) == 40

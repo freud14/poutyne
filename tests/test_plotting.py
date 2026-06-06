@@ -21,7 +21,8 @@ import os
 from io import BytesIO
 from tempfile import TemporaryDirectory
 from typing import ClassVar
-from unittest import TestCase, skipIf
+
+import pytest
 
 try:
     import matplotlib as mpl
@@ -47,9 +48,9 @@ except ImportError:
 from poutyne import plot_history, plot_metric
 
 
-@skipIf(not matplotlib_available, "matplotlib is not available")
-@skipIf(not pil_available, "PIL is not available")
-class PlotHistoryTest(TestCase):
+@pytest.mark.skipif(not matplotlib_available, reason="matplotlib is not available")
+@pytest.mark.skipif(not pil_available, reason="PIL is not available")
+class PlotHistoryTest:
     HISTORY: ClassVar[list] = [
         {'epoch': 1, 'time': 6.2788, 'loss': 0.3683, 'acc': 88.2645, 'val_loss': 0.0984, 'val_acc': 97.0833},
         {'epoch': 2, 'time': 6.2570, 'loss': 0.1365, 'acc': 95.9166, 'val_loss': 0.0680, 'val_acc': 97.9916},
@@ -62,11 +63,11 @@ class PlotHistoryTest(TestCase):
 
     def test_basic(self):
         figs, axes = plot_history(PlotHistoryTest.HISTORY)
-        self.assertEqual(len(figs), PlotHistoryTest.NUM_METRIC_PLOTS)
-        self.assertEqual(len(axes), PlotHistoryTest.NUM_METRIC_PLOTS)
+        assert len(figs) == PlotHistoryTest.NUM_METRIC_PLOTS
+        assert len(axes) == PlotHistoryTest.NUM_METRIC_PLOTS
         for fig, ax in zip(figs, axes):
-            self.assertIsInstance(fig, Figure)
-            self.assertIsInstance(ax, Axes)
+            assert isinstance(fig, Figure)
+            assert isinstance(ax, Axes)
 
     def test_compare_plot_history_plot_metric(self):
         plot_history_figs, _ = plot_history(PlotHistoryTest.HISTORY, close=False, show=False)
@@ -78,14 +79,14 @@ class PlotHistoryTest(TestCase):
             plot_metrics_figs.append(fig)
 
         for plot_history_fig, plot_metrics_fig in zip(plot_history_figs, plot_metrics_figs):
-            self.assertEqual(self._to_image(plot_history_fig), self._to_image(plot_metrics_fig))
+            assert self._to_image(plot_history_fig) == self._to_image(plot_metrics_fig)
 
     def test_all_different(self):
         plot_history_figs, _ = plot_history(PlotHistoryTest.HISTORY, close=False, show=False)
         images = list(map(self._to_image, plot_history_figs))
         for i, image_i in enumerate(images):
             for j in range(i + 1, len(images)):
-                self.assertNotEqual(image_i, images[j])
+                assert image_i != images[j]
 
     def test_title(self):
         title = 'My Title'
@@ -108,8 +109,8 @@ class PlotHistoryTest(TestCase):
             plot_metrics_fig_no_title,
             plot_metrics_fig_with_title,
         ) in zip(plot_history_figs, plot_metrics_figs_no_title, plot_metrics_figs_with_title):
-            self.assertEqual(self._to_image(plot_history_fig), self._to_image(plot_metrics_fig_with_title))
-            self.assertNotEqual(self._to_image(plot_history_fig), self._to_image(plot_metrics_fig_no_title))
+            assert self._to_image(plot_history_fig) == self._to_image(plot_metrics_fig_with_title)
+            assert self._to_image(plot_history_fig) != self._to_image(plot_metrics_fig_no_title)
 
     def test_different_titles(self):
         titles = ['Time', 'Loss', 'Accuracy']
@@ -132,8 +133,8 @@ class PlotHistoryTest(TestCase):
             plot_metrics_fig_no_title,
             plot_metrics_fig_with_title,
         ) in zip(plot_history_figs, plot_metrics_figs_no_title, plot_metrics_figs_with_title):
-            self.assertEqual(self._to_image(plot_history_fig), self._to_image(plot_metrics_fig_with_title))
-            self.assertNotEqual(self._to_image(plot_history_fig), self._to_image(plot_metrics_fig_no_title))
+            assert self._to_image(plot_history_fig) == self._to_image(plot_metrics_fig_with_title)
+            assert self._to_image(plot_history_fig) != self._to_image(plot_metrics_fig_no_title)
 
     def test_labels(self):
         labels = ['Time', 'Loss', 'Accuracy']
@@ -156,8 +157,8 @@ class PlotHistoryTest(TestCase):
             plot_metrics_fig_no_labels,
             plot_metrics_fig_with_labels,
         ) in zip(plot_history_figs, plot_metrics_figs_no_labels, plot_metrics_figs_with_labels):
-            self.assertEqual(self._to_image(plot_history_fig), self._to_image(plot_metrics_fig_with_labels))
-            self.assertNotEqual(self._to_image(plot_history_fig), self._to_image(plot_metrics_fig_no_labels))
+            assert self._to_image(plot_history_fig) == self._to_image(plot_metrics_fig_with_labels)
+            assert self._to_image(plot_history_fig) != self._to_image(plot_metrics_fig_no_labels)
 
     def test_plot_metrics_use_gca(self):
         fig, ax = plt.subplots()
@@ -167,7 +168,7 @@ class PlotHistoryTest(TestCase):
         plot_metric(PlotHistoryTest.HISTORY, 'loss')
         image_with_gca = self._to_image(plt.gcf())
 
-        self.assertEqual(image_with_provided_ax, image_with_gca)
+        assert image_with_provided_ax == image_with_gca
 
     def test_with_provided_axes(self):
         provided_figs, provided_axes = zip(*(plt.subplots() for _ in range(PlotHistoryTest.NUM_METRIC_PLOTS)))
@@ -175,11 +176,11 @@ class PlotHistoryTest(TestCase):
 
         new_figs, _ = plot_history(PlotHistoryTest.HISTORY, close=False, show=False)
 
-        self.assertEqual(ret_axes, provided_axes)
-        self.assertEqual(len(ret_figs), 0)
+        assert ret_axes == provided_axes
+        assert len(ret_figs) == 0
 
         for provided_fig, new_fig in zip(provided_figs, new_figs):
-            self.assertEqual(self._to_image(provided_fig), self._to_image(new_fig))
+            assert self._to_image(provided_fig) == self._to_image(new_fig)
 
     def test_save(self):
         temp_dir_obj = TemporaryDirectory()
@@ -203,13 +204,13 @@ class PlotHistoryTest(TestCase):
         )
 
         for png_filename, pdf_filename in zip(final_png_filenames, final_pdf_filenames):
-            self.assertTrue(os.path.isfile(png_filename))
-            self.assertTrue(os.path.isfile(pdf_filename))
+            assert os.path.isfile(png_filename)
+            assert os.path.isfile(pdf_filename)
 
         saved_images = [Image.open(filename) for filename in final_png_filenames]
         ret_images = [self._to_image(fig) for fig in figs]
         for save_image, ret_image in zip(saved_images, ret_images):
-            self.assertEqual(save_image, ret_image)
+            assert save_image == ret_image
 
     def _to_image(self, fig):
         fd = BytesIO()

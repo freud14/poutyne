@@ -19,9 +19,9 @@ You should have received a copy of the GNU Lesser General Public License along w
 
 import math
 from tempfile import TemporaryDirectory
-from unittest import TestCase, skipIf
 from unittest.mock import ANY, MagicMock, call
 
+import pytest
 import torch
 import torch.nn as nn
 
@@ -35,8 +35,8 @@ except ImportError:
 from poutyne import GradientTracker, Model, TensorBoardGradientTracker, WeightsGradientsStatsTracker
 
 
-class GradientStatsTrackerTest(TestCase):
-    def setUp(self):
+class GradientStatsTrackerTest:
+    def setup_method(self):
         self.tracker = WeightsGradientsStatsTracker(number_layers=2)
 
         self.absolute_min_both_layer = 0.00
@@ -163,36 +163,36 @@ class GradientStatsTrackerTest(TestCase):
         self._test_stats(batch_expected[self.layer_2_name], batch_actual_stats[self.layer_2_name])
 
     def _test_stats(self, expected, actual):
-        self.assertEqual(len(expected), len(actual))
-        self.assertEqual(expected.keys(), actual.keys())
+        assert len(expected) == len(actual)
+        assert expected.keys() == actual.keys()
         for expected_value, actual_value in zip(expected.values(), actual.values()):
-            self.assertAlmostEqual(float(expected_value), float(actual_value), places=3)
+            assert float(expected_value) == pytest.approx(float(actual_value), abs=5e-4)
 
 
-class GradientTrackerTest(TestCase):
+class GradientTrackerTest:
     def test_keep_good_layer(self):
         # pylint: disable=protected-access
         gradient_tracker = GradientTracker(keep_bias=False)
         layer_to_keep_params = MagicMock()
         layer_to_keep_params.requires_grad = True
-        self.assertTrue(gradient_tracker._keep_layer(layer_to_keep_params, "fake_layer_name_to_keep"))
-        self.assertFalse(gradient_tracker._keep_layer(layer_to_keep_params, "bias_name_not_to_keep"))
+        assert gradient_tracker._keep_layer(layer_to_keep_params, "fake_layer_name_to_keep")
+        assert not gradient_tracker._keep_layer(layer_to_keep_params, "bias_name_not_to_keep")
 
         layer_not_to_keep_params = MagicMock()
         layer_not_to_keep_params.requires_grad = False
-        self.assertFalse(gradient_tracker._keep_layer(layer_not_to_keep_params, "fake_layer_name_not_to_keep"))
-        self.assertFalse(gradient_tracker._keep_layer(layer_not_to_keep_params, "bias_name_not_to_keep"))
+        assert not gradient_tracker._keep_layer(layer_not_to_keep_params, "fake_layer_name_not_to_keep")
+        assert not gradient_tracker._keep_layer(layer_not_to_keep_params, "bias_name_not_to_keep")
 
         gradient_tracker = GradientTracker(keep_bias=True)
         layer_to_keep_params = MagicMock()
         layer_to_keep_params.requires_grad = True
-        self.assertTrue(gradient_tracker._keep_layer(layer_to_keep_params, "fake_layer_name_to_keep"))
-        self.assertTrue(gradient_tracker._keep_layer(layer_to_keep_params, "bias_name_to_keep"))
+        assert gradient_tracker._keep_layer(layer_to_keep_params, "fake_layer_name_to_keep")
+        assert gradient_tracker._keep_layer(layer_to_keep_params, "bias_name_to_keep")
 
         layer_not_to_keep_params = MagicMock()
         layer_not_to_keep_params.requires_grad = False
-        self.assertFalse(gradient_tracker._keep_layer(layer_not_to_keep_params, "fake_layer_name_not_to_keep"))
-        self.assertFalse(gradient_tracker._keep_layer(layer_not_to_keep_params, "bias_name_not_to_keep"))
+        assert not gradient_tracker._keep_layer(layer_not_to_keep_params, "fake_layer_name_not_to_keep")
+        assert not gradient_tracker._keep_layer(layer_not_to_keep_params, "bias_name_not_to_keep")
 
     def test_integration(self):
         train_gen = some_data_generator(20)
@@ -207,7 +207,7 @@ class GradientTrackerTest(TestCase):
 
         self.model.fit_generator(train_gen, valid_gen, epochs=10, steps_per_epoch=5, callbacks=[gradient_tracker])
 
-    @skipIf(not torch.cuda.is_available(), "no gpu available")
+    @pytest.mark.skipif(not torch.cuda.is_available(), reason="no gpu available")
     def test_integration_on_gpu(self):
         train_gen = some_data_generator(20)
         valid_gen = some_data_generator(20)
@@ -222,13 +222,13 @@ class GradientTrackerTest(TestCase):
         self.model.fit_generator(train_gen, valid_gen, epochs=10, steps_per_epoch=5, callbacks=[gradient_tracker])
 
 
-@skipIf(SummaryWriter is None, "Unable to import SummaryWriter from torch")
-class TensorBoardGradientTrackerTest(TestCase):
+@pytest.mark.skipif(SummaryWriter is None, reason="Unable to import SummaryWriter from torch")
+class TensorBoardGradientTrackerTest:
     batch_size = 20
     lr = 1e-3
     num_epochs = 10
 
-    def setUp(self):
+    def setup_method(self):
         torch.manual_seed(42)
         self.loss_function = nn.MSELoss()
         self.temp_dir_obj = TemporaryDirectory()
@@ -236,7 +236,7 @@ class TensorBoardGradientTrackerTest(TestCase):
         self.writer = SummaryWriter(self.temp_dir_obj.name)
         self.writer.add_scalars = MagicMock()
 
-    def tearDown(self):
+    def teardown_method(self):
         self.temp_dir_obj.cleanup()
 
     def test_tracking_one_layer_model(self):
@@ -335,7 +335,5 @@ class TensorBoardGradientTrackerTest(TestCase):
                     expected_calls.append(call(f'other_gradient_stats/{layer_name}bias', {'max': ANY}, epoch))
 
         method_calls = self.writer.add_scalars.mock_calls
-        self.assertEqual(len(method_calls), len(expected_calls))
-        self.assertEqual(method_calls, expected_calls)
-
-        self.assertIn(expected_calls, method_calls)
+        assert len(method_calls) == len(expected_calls)
+        assert method_calls == expected_calls

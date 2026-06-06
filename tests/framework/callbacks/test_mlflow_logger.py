@@ -19,8 +19,9 @@ You should have received a copy of the GNU Lesser General Public License along w
 
 import os
 from collections.abc import Mapping, Sequence
-from unittest import TestCase, skipIf
 from unittest.mock import MagicMock, call, patch
+
+import pytest
 
 try:
     import git
@@ -47,10 +48,10 @@ a_git_commit = "9bff900c30e80c3a35388d3e617db5b7a64c9afd"
 mlflow_default_git_commit_tag = "mlflow.source.git.commit"
 
 
-@skipIf(not git_available, "git package is not available")
-@skipIf(not mlflow_available, "imports for MLFlowLogger not available")
-class MLFlowLoggerTest(TestCase):
-    def setUp(self) -> None:
+@pytest.mark.skipif(not git_available, reason="git package is not available")
+@pytest.mark.skipif(not mlflow_available, reason="imports for MLFlowLogger not available")
+class MLFlowLoggerTest:
+    def setup_method(self) -> None:
         self.a_experiment_name = "a_name"
         self.a_run_id = "101010"
         self.a_experiment_id = "112321"
@@ -86,7 +87,7 @@ class MLFlowLoggerTest(TestCase):
 
     @patch("poutyne.framework.mlflow_logger.mlflow", None)
     def test_whenMLFowNotInstalled_thenRaiseImportError(self):
-        with self.assertRaises(ImportError):
+        with pytest.raises(ImportError):
             MLFlowLogger(self.a_experiment_name)
 
     @patch("poutyne.framework.mlflow_logger._get_git_commit", MagicMock())
@@ -133,7 +134,7 @@ class MLFlowLoggerTest(TestCase):
 
             actual_run_id = mlflow_logger.run_id
             expected_run_id = self.a_run_id
-            self.assertEqual(expected_run_id, actual_run_id)
+            assert expected_run_id == actual_run_id
 
     @patch("poutyne.framework.mlflow_logger._get_git_commit", side_effect=[a_git_commit])
     def test_whenGitRepo_givenAMLFlowInstantiation_thenLogGitCommit(self, get_git_commit_patch):
@@ -389,32 +390,32 @@ class MLFlowLoggerTest(TestCase):
                 ml_flow_client_patch.assert_has_calls(ml_flow_client_step_calls)
 
 
-@skipIf(not git_available, "git package is not available")
-class GetGitCommitTest(TestCase):
-    def setUp(self) -> None:
+@pytest.mark.skipif(not git_available, reason="git package is not available")
+class GetGitCommitTest:
+    def setup_method(self) -> None:
         self.a_fake_path = "a_fake_path"
         self.a_wrong_path = "/a_wrong_path"
         self.a_git_sha = a_git_commit
 
     @patch("poutyne.framework.mlflow_logger.git", None)
     def test_whenGitNotInstall_givenARepositoryPathToGetGitCommit_thenRaiseWarning(self):
-        with self.assertWarns(UserWarning):
+        with pytest.warns(UserWarning):
             _get_git_commit(self.a_fake_path)
 
     @patch("poutyne.framework.mlflow_logger.git", None)
     def test_whenGitNotInstall_givenARepositoryPathToGetGitCommit_thenGitCommitIsNone(self):
-        with self.assertWarns(UserWarning):
+        with pytest.warns(UserWarning):
             commit = _get_git_commit(self.a_fake_path)
-        self.assertIsNone(commit)
+        assert commit is None
 
     @patch("poutyne.framework.mlflow_logger.git.Repo")
     def test_whenGitInstalled_givenARepositoryPathToGetGitCommitButNotAGitRepo_thenRaiseWarning(self, git_repo_patch):
         git_repo_patch.side_effect = git.NoSuchPathError()
-        with self.assertWarns(UserWarning):
+        with pytest.warns(UserWarning):
             _get_git_commit(self.a_fake_path)
 
     def test_whenGitInstalled_givenAWrongRepositoryPathToGetGitCommit_thenRaiseWarning(self):
-        with self.assertWarns(UserWarning):
+        with pytest.warns(UserWarning):
             _get_git_commit(self.a_wrong_path)
 
     @patch("poutyne.framework.mlflow_logger.git.Repo")
@@ -424,4 +425,4 @@ class GetGitCommitTest(TestCase):
         actual = _get_git_commit(self.a_fake_path)
         expected = self.a_git_sha
 
-        self.assertEqual(expected, actual)
+        assert expected == actual

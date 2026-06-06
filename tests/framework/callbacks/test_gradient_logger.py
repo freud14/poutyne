@@ -21,9 +21,9 @@ You should have received a copy of the GNU Lesser General Public License along w
 import csv
 import os
 from tempfile import TemporaryDirectory
-from unittest import TestCase
 from unittest.mock import MagicMock
 
+import pytest
 import torch
 import torch.nn as nn
 
@@ -32,12 +32,13 @@ from poutyne import CSVGradientLogger as NonAtomicCSVGradientLogger
 from tests.framework.tools import some_data_generator
 
 
-class BaseGradientLoggerTest:
+class GradientLoggerTestBase:
+    __test__ = False
     GradientLogger = None
     batch_size = 20
     num_epochs = 10
 
-    def setUp(self):
+    def setup_method(self):
         torch.manual_seed(42)
         self.pytorch_network = nn.Sequential(nn.Linear(1, 2), nn.Linear(2, 1))
         self.loss_function = nn.MSELoss()
@@ -46,11 +47,12 @@ class BaseGradientLoggerTest:
         self.temp_dir_obj = TemporaryDirectory()
         self.csv_filename = os.path.join(self.temp_dir_obj.name, 'layer_{}.csv')
 
-    def tearDown(self):
+    def teardown_method(self):
         self.temp_dir_obj.cleanup()
 
 
-class GradientLoggerBaseTest(BaseGradientLoggerTest, TestCase):
+class GradientLoggerBaseTest(GradientLoggerTestBase):
+    __test__ = True
     GradientLogger = GradientLoggerBase
 
     def test_log_stats_raise_a_NotImplementedError(self):
@@ -59,7 +61,7 @@ class GradientLoggerBaseTest(BaseGradientLoggerTest, TestCase):
         a_batch_number = 1
         a_logs = {}
         a_layer_dict = {}
-        with self.assertRaises(NotImplementedError):
+        with pytest.raises(NotImplementedError):
             logger.log_stats(
                 epoch_number=a_epoch_number, batch_number=a_batch_number, logs=a_logs, layer_stats=a_layer_dict
             )
@@ -72,8 +74,8 @@ class GradientLoggerBaseTest(BaseGradientLoggerTest, TestCase):
         logger.on_train_begin(a_logs)
         actual = logger.layers
         expected = ['0.weight', '1.weight']
-        self.assertEqual(actual, expected)
-        self.assertEqual(len(actual), 2)
+        assert actual == expected
+        assert len(actual) == 2
 
     def test_on_train_begin_with_bias_then_keep_it(self):
         logger = self.GradientLogger(keep_bias=True)
@@ -83,11 +85,13 @@ class GradientLoggerBaseTest(BaseGradientLoggerTest, TestCase):
         logger.on_train_begin(a_logs)
         actual = logger.layers
         expected = ['0.weight', '0.bias', '1.weight', '1.bias']
-        self.assertEqual(actual, expected)
-        self.assertEqual(len(actual), 4)
+        assert actual == expected
+        assert len(actual) == 4
 
 
-class BaseCSVGradientLoggerTest(BaseGradientLoggerTest):
+class CSVGradientLoggerTestBase(GradientLoggerTestBase):
+    __test__ = False
+
     def test_logging(self):
         train_gen = some_data_generator(self.batch_size)
         valid_gen = some_data_generator(self.batch_size)
@@ -142,22 +146,25 @@ class BaseCSVGradientLoggerTest(BaseGradientLoggerTest):
             with open(filename, encoding='utf-8') as csvfile:
                 reader = csv.DictReader(csvfile)
                 rows = list(reader)
-            self.assertEqual(len(rows), len(stats))
+            assert len(rows) == len(stats)
             for row, stats_entry in zip(rows, stats):
-                self.assertEqual(row.keys(), stats_entry.keys())
+                assert row.keys() == stats_entry.keys()
                 for k in row:
-                    self.assertAlmostEqual(float(row[k]), stats_entry[k])
+                    assert float(row[k]) == pytest.approx(stats_entry[k], abs=5e-8)
 
 
-class NonAtomicCSVGradientLoggerTest(BaseCSVGradientLoggerTest, TestCase):
+class NonAtomicCSVGradientLoggerTest(CSVGradientLoggerTestBase):
+    __test__ = True
     GradientLogger = NonAtomicCSVGradientLogger
 
 
-class AtomicCSVGradientLoggerTest(BaseCSVGradientLoggerTest, TestCase):
+class AtomicCSVGradientLoggerTest(CSVGradientLoggerTestBase):
+    __test__ = True
     GradientLogger = AtomicCSVGradientLogger
 
 
-class TensorboardGradientLoggerTest(BaseGradientLoggerTest, TestCase):
+class TensorboardGradientLoggerTest(GradientLoggerTestBase):
+    __test__ = True
     GradientLogger = TensorBoardGradientLogger
 
     def test_logging(self):
@@ -174,7 +181,7 @@ class TensorboardGradientLoggerTest(BaseGradientLoggerTest, TestCase):
     def _test_logging(self, history, writer_mock):
         # Each layer has 7 metric computed on them (mean, var, min, abs_min, max, abs_max and l2 norm)
         # We do 50 steps (10 epoch times 5) = 700 methods call
-        self.assertEqual(len(writer_mock.method_calls), 700)
+        assert len(writer_mock.method_calls) == 700
 
         # We group the seven stats entries for a layer_i intro a list
         grouped_metrics_calls = list(zip(*[iter(writer_mock.method_calls)] * 7))
@@ -186,6 +193,6 @@ class TensorboardGradientLoggerTest(BaseGradientLoggerTest, TestCase):
                 stats_entry.pop("epoch")
                 stats_entry.pop("batch")
 
-                self.assertEqual(len(mock_calls), len(stats_entry))
+                assert len(mock_calls) == len(stats_entry)
                 for stats_idx, k in enumerate(stats_entry.keys()):
-                    self.assertAlmostEqual(mock_calls[stats_idx][1][1][k], stats_entry[k])
+                    assert mock_calls[stats_idx][1][1][k] == pytest.approx(stats_entry[k], abs=5e-8)
