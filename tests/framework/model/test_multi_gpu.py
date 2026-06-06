@@ -85,11 +85,8 @@ class ModelTestMultiGPU(ModelFittingTestCase):
         self.default_main_device = ModelTestMultiGPU.cuda_device
 
     def _test_multiple_gpu_mode(self, devices):
-        if devices == "all":
-            expected = torch.cuda.device_count()
-        else:
-            expected = len(devices)
-        self.assertEqual(len([self.model.device] + self.model.other_device), expected)
+        expected = torch.cuda.device_count() if devices == "all" else len(devices)
+        self.assertEqual(len([self.model.device, *self.model.other_device]), expected)
 
     def _test_single_gpu_mode(self):
         self.assertIsNone(self.model.other_device)

@@ -22,7 +22,8 @@ import contextlib
 import pickle
 import timeit
 from collections import defaultdict
-from typing import Any, Iterable, List, Mapping, Tuple, Union
+from collections.abc import Iterable, Mapping
+from typing import Any
 
 import numpy as np
 import torch
@@ -283,7 +284,7 @@ class Model:
         batches_per_step=1,
         initial_epoch=1,
         verbose=True,
-        progress_options: Union[dict, None] = None,
+        progress_options: dict | None = None,
         callbacks=None,
         dataloader_kwargs=None,
     ):
@@ -509,7 +510,7 @@ class Model:
         batches_per_step=1,
         initial_epoch=1,
         verbose=True,
-        progress_options: Union[dict, None] = None,
+        progress_options: dict | None = None,
         callbacks=None,
     ):
         # pylint: disable=line-too-long
@@ -595,7 +596,7 @@ class Model:
 
         if verbose:
             progress_options = {} if progress_options is None else progress_options
-            callbacks = [ProgressionCallback(**progress_options)] + callbacks
+            callbacks = [ProgressionCallback(**progress_options), *callbacks]
         callback_list = CallbackList(callbacks)
         callback_list.set_model(self)
 
@@ -656,12 +657,14 @@ class Model:
         batches_per_step,
         examples_in_step,
         *,
-        callback=Callback(),
+        callback=None,
         step=None,
         return_pred=False,
         convert_to_numpy=True,
     ):
         # pylint: disable=too-many-locals
+        if callback is None:
+            callback = Callback()
         zero_all_gradients = (step.number - 1) % batches_per_step == 0
         do_backprop = step.number % batches_per_step == 0
 
@@ -697,7 +700,9 @@ class Model:
 
             self._run_validation(valid_step_iterator, callback_list)
 
-    def _fit_batch(self, x, y, *, callback=Callback(), step=None, return_pred=False, convert_to_numpy=True):
+    def _fit_batch(self, x, y, *, callback=None, step=None, return_pred=False, convert_to_numpy=True):
+        if callback is None:
+            callback = Callback()
         self.optimizer.zero_grad()
 
         loss_tensor, batch_metrics, pred_y = self._compute_loss_and_metrics(
@@ -794,7 +799,7 @@ class Model:
             )
 
         if return_dict_format:
-            logs = dict(loss=loss)
+            logs = {"loss": loss}
             logs.update(zip(self.batch_metrics_names, batch_metrics))
 
             return self._format_truth_pred_return((logs,), pred_y, return_pred)
@@ -826,7 +831,7 @@ class Model:
         batch_size=32,
         convert_to_numpy=True,
         verbose=True,
-        progress_options: Union[dict, None] = None,
+        progress_options: dict | None = None,
         callbacks=None,
         dataloader_kwargs=None,
     ) -> Any:
@@ -881,7 +886,7 @@ class Model:
         num_workers=0,
         collate_fn=None,
         verbose=True,
-        progress_options: Union[dict, None] = None,
+        progress_options: dict | None = None,
         callbacks=None,
         dataloader_kwargs=None,
     ) -> Any:
@@ -962,7 +967,7 @@ class Model:
         concatenate_returns=True,
         convert_to_numpy=True,
         verbose=True,
-        progress_options: Union[dict, None] = None,
+        progress_options: dict | None = None,
         callbacks=None,
     ) -> Any:
         """
@@ -1012,7 +1017,7 @@ class Model:
 
         if verbose:
             progress_options = {} if progress_options is None else progress_options
-            callbacks = [ProgressionCallback(**progress_options)] + callbacks
+            callbacks = [ProgressionCallback(**progress_options), *callbacks]
         callback_list = CallbackList(callbacks)
         callback_list.set_model(self)
         callback_list.set_params({'steps': steps})
@@ -1081,9 +1086,9 @@ class Model:
         convert_to_numpy=True,
         callbacks=None,
         verbose=True,
-        progress_options: Union[dict, None] = None,
+        progress_options: dict | None = None,
         dataloader_kwargs=None,
-    ) -> Tuple:
+    ) -> tuple:
         """
         Computes the loss and the metrics of the network on batches of samples and optionally
         returns the predictions.
@@ -1162,8 +1167,8 @@ class Model:
         collate_fn=None,
         dataloader_kwargs=None,
         verbose=True,
-        progress_options: Union[dict, None] = None,
-    ) -> Tuple:
+        progress_options: dict | None = None,
+    ) -> tuple:
         # pylint: disable=too-many-locals
         """
         Computes the loss and the metrics of the network on batches of samples and optionally
@@ -1254,9 +1259,9 @@ class Model:
         concatenate_returns=True,
         convert_to_numpy=True,
         verbose=True,
-        progress_options: Union[dict, None] = None,
+        progress_options: dict | None = None,
         callbacks=None,
-    ) -> Tuple:
+    ) -> tuple:
         # pylint: disable=too-many-locals
         """
         Computes the loss and the metrics of the network on batches of samples and optionally returns
@@ -1370,7 +1375,7 @@ class Model:
 
         if verbose:
             progress_options = {} if progress_options is None else progress_options
-            callbacks = [ProgressionCallback(**progress_options)] + callbacks
+            callbacks = [ProgressionCallback(**progress_options), *callbacks]
 
         if steps is None and hasattr(generator, '__len__'):
             steps = len(generator)
@@ -1416,7 +1421,7 @@ class Model:
             step_iterator.loss, metrics, pred_y, return_pred, true_y, return_ground_truth
         )
 
-    def evaluate_on_batch(self, x, y, *, return_pred=False, return_dict_format=False, convert_to_numpy=True) -> Tuple:
+    def evaluate_on_batch(self, x, y, *, return_pred=False, return_dict_format=False, convert_to_numpy=True) -> tuple:
         """
         Computes the loss and the metrics of the network on a single batch of samples and optionally
         returns the predictions.
@@ -1451,7 +1456,7 @@ class Model:
             )
 
         if return_dict_format:
-            logs = dict(loss=loss)
+            logs = {"loss": loss}
             logs.update(zip(self.batch_metrics_names, batch_metrics))
 
             return self._format_truth_pred_return((logs,), pred_y, return_pred)
@@ -1483,7 +1488,7 @@ class Model:
     def _compute_loss_and_metrics(self, x, y, *, return_loss_tensor=False, return_pred=False, convert_to_numpy=True):
         x, y = self.preprocess_input(x, y)
         if self.other_device is not None:
-            pred_y = torch.nn.parallel.data_parallel(self.network, x, [self.device] + self.other_device)
+            pred_y = torch.nn.parallel.data_parallel(self.network, x, [self.device, *self.other_device])
         else:
             pred_y = self.network(*x)
         loss = self.loss_function(pred_y, y)
@@ -1494,10 +1499,7 @@ class Model:
             for epoch_metric in self.epoch_metrics:
                 epoch_metric.update(pred_y, y)
 
-        if return_pred:
-            pred_y = torch_to_numpy(pred_y) if convert_to_numpy else pred_y
-        else:
-            pred_y = None
+        pred_y = (torch_to_numpy(pred_y) if convert_to_numpy else pred_y) if return_pred else None
 
         return loss, batch_metrics, pred_y
 
@@ -1612,9 +1614,9 @@ class Model:
     def _get_named_optimizer_attrs(self):
         param_to_name = {param: name for name, param in self.network.named_parameters()}
 
-        param_name_groups = []
-        for group in self.optimizer.param_groups:
-            param_name_groups.append([param_to_name[param] for param in group['params']])
+        param_name_groups = [
+            [param_to_name[param] for param in group['params']] for group in self.optimizer.param_groups
+        ]
 
         named_state = {param_to_name[param]: state for param, state in self.optimizer.state.items()}
 
@@ -1657,7 +1659,7 @@ class Model:
         Returns a dictionary containing copies of the parameters of the network.
         """
         weights = self.get_weights()
-        for k in weights.keys():
+        for k in weights:
             weights[k] = weights[k].cpu().clone()
         return weights
 
@@ -1767,7 +1769,7 @@ class Model:
             `self`.
         """
         self.other_device = None
-        if isinstance(device, List) or device == "all":
+        if isinstance(device, list) or device == "all":
             if device == "all":
                 device = [f"cuda:{device}" for device in range(torch.cuda.device_count())]
             self.device = device[0]

@@ -26,7 +26,7 @@ from poutyne import ColorProgress, EmptyStringAttrClass
 
 class EmptyStringAttrClassTest(TestCase):
     def test_empty_string_att_class_get_attr_return_empty_string(self):
-        actual = getattr(EmptyStringAttrClass(), "an_attribute")
+        actual = EmptyStringAttrClass().an_attribute
         expected = ""
         self.assertEqual(actual, expected)
 

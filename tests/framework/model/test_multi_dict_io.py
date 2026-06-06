@@ -43,7 +43,7 @@ class DictIOModel(nn.Module):
 
 
 def dict_mse_loss(y_pred, y_true):
-    return sum(F.mse_loss(y_pred[k], y_true[k]) for k in y_true.keys())
+    return sum(F.mse_loss(y_pred[k], y_true[k]) for k in y_true)
 
 
 def get_batch(batch_size):
@@ -51,7 +51,7 @@ def get_batch(batch_size):
     x2 = torch.rand(batch_size, 1)
     y1 = torch.rand(batch_size, 1)
     y2 = torch.rand(batch_size, 1)
-    return dict(x1=x1, x2=x2), dict(y1=y1, y2=y2)
+    return {'x1': x1, 'x2': x2}, {'y1': y1, 'y2': y2}
 
 
 def some_data_tensor_generator_dict_io(batch_size):
@@ -110,7 +110,7 @@ class ModelMultiDictIOTest(ModelFittingTestCase):
         x2 = np.random.rand(ModelMultiDictIOTest.batch_size, 1).astype(np.float32)
         y1 = np.random.rand(ModelMultiDictIOTest.batch_size, 1).astype(np.float32)
         y2 = np.random.rand(ModelMultiDictIOTest.batch_size, 1).astype(np.float32)
-        x, y = dict(x1=x1, x2=x2), dict(y1=y1, y2=y2)
+        x, y = {'x1': x1, 'x2': x2}, {'y1': y1, 'y2': y2}
         loss = self.model.train_on_batch(x, y)
         self.assertEqual(type(loss), float)
 
@@ -136,5 +136,5 @@ class ModelMultiDictIOTest(ModelFittingTestCase):
     def test_tensor_predict_on_batch_multi_dict_io(self):
         x1 = torch.rand(ModelMultiDictIOTest.batch_size, 1)
         x2 = torch.rand(ModelMultiDictIOTest.batch_size, 1)
-        pred_y = self.model.predict_on_batch(dict(x1=x1, x2=x2))
+        pred_y = self.model.predict_on_batch({'x1': x1, 'x2': x2})
         self._test_size_and_type_for_generator(pred_y, (ModelMultiDictIOTest.batch_size, 1))

@@ -17,7 +17,7 @@ You should have received a copy of the GNU Lesser General Public License along w
 <https://www.gnu.org/licenses/>.
 """
 
-from typing import Dict, Iterable, List, Tuple
+from collections.abc import Iterable
 
 import numpy as np
 import torch
@@ -42,7 +42,7 @@ class WeightsGradientsStatsTracker:
 
         self.reset()
 
-    def batch_statistic_upgrade(self, named_parameters: Iterable[Tuple[str, torch.nn.parameter.Parameter]]) -> None:
+    def batch_statistic_upgrade(self, named_parameters: Iterable[tuple[str, torch.nn.parameter.Parameter]]) -> None:
         """
         Accumulate the running absolute mean, running absolute mean variance, min, absolute min, max ant the absolute
         max for all the layers.
@@ -94,7 +94,7 @@ class WeightsGradientsStatsTracker:
 
         self.count += 1
 
-    def get_stats(self, layer_names: List[str]) -> Dict:
+    def get_stats(self, layer_names: list[str]) -> dict:
         """
         Get the accumulated statistics of the layers.
 
@@ -150,20 +150,20 @@ class GradientTracker(Callback):
 
         self.tracker = None
 
-    def on_train_batch_end(self, batch_number: int, logs: Dict) -> None:
+    def on_train_batch_end(self, batch_number: int, logs: dict) -> None:
         # pylint: disable=unused-argument
         named_parameters = ((n, p) for n, p in self.model.network.named_parameters() if self._keep_layer(p, n))
         self.tracker.batch_statistic_upgrade(named_parameters)
 
-    def on_train_begin(self, logs: Dict) -> None:
+    def on_train_begin(self, logs: dict) -> None:
         for layer_name, layer_params in self.model.network.named_parameters():
             self._update_layers_to_track(layer_name, layer_params)
         self.tracker = WeightsGradientsStatsTracker(self.number_layers)
 
-    def on_epoch_end(self, epoch_number: int, logs: Dict) -> None:
+    def on_epoch_end(self, epoch_number: int, logs: dict) -> None:
         self._on_epoch_end_log(epoch_number, logs)
 
-    def _on_epoch_end_log(self, epoch_number: int, logs: Dict) -> None:
+    def _on_epoch_end_log(self, epoch_number: int, logs: dict) -> None:
         """
         The method to define the behavior of the logging tracker.
 
@@ -212,7 +212,7 @@ class TensorBoardGradientTracker(GradientTracker):
 
         self.writer = writer
 
-    def _on_epoch_end_log(self, epoch_number: int, logs: Dict) -> None:
+    def _on_epoch_end_log(self, epoch_number: int, logs: dict) -> None:
         gradient_distributions_stats = ["mean", "mean_std_dev_up", "mean_std_dev_down"]
         other_gradient_stats = ["min", "max"]
 

@@ -49,10 +49,7 @@ def do_register_metric_func(func, names=None, unique_name=None):
     names = [func.__name__] if names is None or len(names) == 0 else names
     names = [names] if isinstance(names, str) else names
     names = [clean_metric_func_name(name) for name in names]
-    if unique_name is None:
-        update = {name: func for name in names}
-    else:
-        update = {name: (unique_name, func) for name in names}
+    update = dict.fromkeys(names, func) if unique_name is None else dict.fromkeys(names, (unique_name, func))
     metric_funcs_dict.update(update)
     return names
 
@@ -73,10 +70,7 @@ def do_register_metric_class(clz, names=None, unique_name=None):
     names = [camel_to_snake(clz.__name__)] if names is None or len(names) == 0 else names
     names = [names] if isinstance(names, str) else names
     names = [clean_metric_class_name(name) for name in names]
-    if unique_name is None:
-        update = {name: clz for name in names}
-    else:
-        update = {name: (unique_name, clz) for name in names}
+    update = dict.fromkeys(names, clz) if unique_name is None else dict.fromkeys(names, (unique_name, clz))
     metric_classes_dict.update(update)
     return names
 
@@ -115,4 +109,4 @@ def _get_metric(metric_name):
             return name, metric()
         return metric()
 
-    raise ValueError(f"Invalid metric name {repr(metric_name)}.")
+    raise ValueError(f"Invalid metric name {metric_name!r}.")

@@ -18,7 +18,6 @@ You should have received a copy of the GNU Lesser General Public License along w
 """
 
 import math
-from typing import Optional
 
 BAR_EIGHTHS_CHARACTERS = [" ", "\u258f", "\u258e", "\u258d", "\u258c", "\u258b", "\u258a", "\u2589"]
 
@@ -50,9 +49,9 @@ class ProgressBar:
         steps: int,
         *,
         bar_length: int = 20,
-        bar_format: Optional[str] = None,
+        bar_format: str | None = None,
         bar_character: str = "\u2588",
-        partial_bar_characters: Optional[list] = None,
+        partial_bar_characters: list | None = None,
     ) -> None:
         self.total_steps = steps
 
@@ -96,13 +95,13 @@ class ProgressBar:
 
     def progress_bar_formatting(self) -> str:
         percentage = self.actual_steps / self.total_steps
-        bar_length_complete = int(math.floor(percentage * self.bar_length)) * self.bar_character
+        bar_length_complete = math.floor(percentage * self.bar_length) * self.bar_character
         bar_length_incomplete = (self.bar_length - len(bar_length_complete) - 1) * " "
 
         partial_character = ""
         if percentage < 1.0:
             partial_percentage = percentage * self.bar_length - len(bar_length_complete)
-            partial_index = int(math.floor(partial_percentage * len(self.partial_bar_characters)))
+            partial_index = math.floor(partial_percentage * len(self.partial_bar_characters))
             partial_character = self.partial_bar_characters[partial_index]
 
         progress_bar = bar_length_complete + partial_character + bar_length_incomplete

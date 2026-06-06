@@ -20,6 +20,7 @@ You should have received a copy of the GNU Lesser General Public License along w
 import os
 import pickle
 from tempfile import TemporaryDirectory
+from typing import ClassVar
 from unittest import TestCase, skipIf
 
 try:
@@ -146,15 +147,15 @@ class BaseExperimentCheckpointLoadingTest:
 
 class MonitorMinCheckpointExperimentTest(BaseExperimentCheckpointLoadingTest, TestCase):
     NUM_EPOCHS = 5
-    METRIC_VALUES = [9, 3, 6, 2, 3]
-    CHECKPOINT_EPOCHS = [1, 2, 4]
-    NO_CHECKPOINT_EPOCHS = [3, 5]
+    METRIC_VALUES: ClassVar[list] = [9, 3, 6, 2, 3]
+    CHECKPOINT_EPOCHS: ClassVar[list] = [1, 2, 4]
+    NO_CHECKPOINT_EPOCHS: ClassVar[list] = [3, 5]
     MONITOR_MODE = "min"
 
 
 class MonitorMaxCheckpointExperimentTest(BaseExperimentCheckpointLoadingTest, TestCase):
     NUM_EPOCHS = 5
-    METRIC_VALUES = [4, 3, 6, 2, 7]
-    CHECKPOINT_EPOCHS = [1, 3, 5]
-    NO_CHECKPOINT_EPOCHS = [2, 4]
+    METRIC_VALUES: ClassVar[list] = [4, 3, 6, 2, 7]
+    CHECKPOINT_EPOCHS: ClassVar[list] = [1, 3, 5]
+    NO_CHECKPOINT_EPOCHS: ClassVar[list] = [2, 4]
     MONITOR_MODE = "max"

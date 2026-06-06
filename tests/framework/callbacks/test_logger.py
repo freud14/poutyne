@@ -121,7 +121,10 @@ class BaseCSVLoggerTest:
         logger = self.CSVLogger(self.csv_filename)
         lrs = [BaseCSVLoggerTest.lr, BaseCSVLoggerTest.lr / 2]
         optimizer = torch.optim.SGD(
-            [dict(params=[self.pytorch_network.weight], lr=lrs[0]), dict(params=[self.pytorch_network.bias], lr=lrs[1])]
+            [
+                {'params': [self.pytorch_network.weight], 'lr': lrs[0]},
+                {'params': [self.pytorch_network.bias], 'lr': lrs[1]},
+            ]
         )
         model = Model(self.pytorch_network, optimizer, self.loss_function)
         history = model.fit_generator(
@@ -132,7 +135,7 @@ class BaseCSVLoggerTest:
     def _test_logging(self, history, lrs=None):
         if lrs is None:
             lrs = [BaseCSVLoggerTest.lr]
-        with open(self.csv_filename, 'r', encoding='utf-8') as csvfile:
+        with open(self.csv_filename, encoding='utf-8') as csvfile:
             reader = csv.DictReader(csvfile)
             rows = []
             for row in reader:
@@ -150,7 +153,7 @@ class BaseCSVLoggerTest:
         for raw_row, hist_entry in zip(rows, history):
             row = {k: v for k, v in raw_row.items() if v != ''}
             self.assertEqual(row.keys(), hist_entry.keys())
-            for k in row.keys():
+            for k in row:
                 if isinstance(hist_entry[k], float):
                     self.assertAlmostEqual(float(row[k]), hist_entry[k])
                 else:
@@ -200,7 +203,10 @@ class BaseTensorBoardLoggerTest:
         logger = TensorBoardLogger(self.writer)
         lrs = [BaseCSVLoggerTest.lr, BaseCSVLoggerTest.lr / 2]
         optimizer = torch.optim.SGD(
-            [dict(params=[self.pytorch_network.weight], lr=lrs[0]), dict(params=[self.pytorch_network.bias], lr=lrs[1])]
+            [
+                {'params': [self.pytorch_network.weight], 'lr': lrs[0]},
+                {'params': [self.pytorch_network.bias], 'lr': lrs[1]},
+            ]
         )
         model = Model(self.pytorch_network, optimizer, self.loss_function)
         history = model.fit_generator(
@@ -266,7 +272,10 @@ class BaseTensorBoardLoggerWithSplitTrainValTest:
         logger = TensorBoardLogger(self.writer, split_train_val=True)
         lrs = [BaseCSVLoggerTest.lr, BaseCSVLoggerTest.lr / 2]
         optimizer = torch.optim.SGD(
-            [dict(params=[self.pytorch_network.weight], lr=lrs[0]), dict(params=[self.pytorch_network.bias], lr=lrs[1])]
+            [
+                {'params': [self.pytorch_network.weight], 'lr': lrs[0]},
+                {'params': [self.pytorch_network.bias], 'lr': lrs[1]},
+            ]
         )
         model = Model(self.pytorch_network, optimizer, self.loss_function)
         history = model.fit_generator(

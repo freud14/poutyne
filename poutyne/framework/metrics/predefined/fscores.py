@@ -37,7 +37,6 @@ limitations under the License.
 """
 
 import warnings
-from typing import List, Optional, Tuple, Union
 
 import torch
 
@@ -124,14 +123,14 @@ class FBeta(Metric):
     def __init__(
         self,
         *,
-        metric: Optional[str] = None,
-        average: Union[str, int] = 'macro',
+        metric: str | None = None,
+        average: str | int = 'macro',
         beta: float = 1.0,
         pos_label: int = 1,
         ignore_index: int = -100,
         threshold: float = 0.0,
-        names: Optional[Union[str, List[str]]] = None,
-        make_deterministic: Optional[bool] = None,
+        names: str | list[str] | None = None,
+        make_deterministic: bool | None = None,
     ) -> None:
         super().__init__()
         self.metric_options = ('fscore', 'precision', 'recall')
@@ -139,7 +138,7 @@ class FBeta(Metric):
             raise ValueError(f"`metric` has to be one of {self.metric_options}.")
 
         if metric in ('precision', 'recall') and beta != 1.0:
-            warnings.warn(f"The use of the `beta` argument is useless with {repr(metric)}.")
+            warnings.warn(f"The use of the `beta` argument is useless with {metric!r}.", stacklevel=2)
 
         average_options = ('binary', 'micro', 'macro')
         if average not in average_options and not isinstance(average, int):
@@ -206,8 +205,8 @@ class FBeta(Metric):
             raise ValueError(f"`names` should contain names for the following metrics: {', '.join(default_name)}.")
 
     def forward(
-        self, y_pred: torch.Tensor, y_true: Union[torch.Tensor, Tuple[torch.Tensor, torch.Tensor]]
-    ) -> Union[float, Tuple[float]]:
+        self, y_pred: torch.Tensor, y_true: torch.Tensor | tuple[torch.Tensor, torch.Tensor]
+    ) -> float | tuple[float]:
         """
         Update the confusion matrix for calculating the F-score and compute the metrics for the current batch. See
         :meth:`FBeta.compute` for details on the return value.
@@ -227,7 +226,7 @@ class FBeta(Metric):
         true_positive_sum, pred_sum, true_sum = self._update(y_pred, y_true)
         return self._compute(true_positive_sum, pred_sum, true_sum)
 
-    def update(self, y_pred: torch.Tensor, y_true: Union[torch.Tensor, Tuple[torch.Tensor, torch.Tensor]]) -> None:
+    def update(self, y_pred: torch.Tensor, y_true: torch.Tensor | tuple[torch.Tensor, torch.Tensor]) -> None:
         """
         Update the confusion matrix for calculating the F-score.
 
@@ -241,7 +240,7 @@ class FBeta(Metric):
         """
         self._update(y_pred, y_true)
 
-    def _update(self, y_pred: torch.Tensor, y_true: Union[torch.Tensor, Tuple[torch.Tensor, torch.Tensor]]) -> None:  # noqa: PLR0912 (too-many-branches)
+    def _update(self, y_pred: torch.Tensor, y_true: torch.Tensor | tuple[torch.Tensor, torch.Tensor]) -> None:  # noqa: PLR0912 (too-many-branches)
         with set_deterministic_debug_mode(self.deterministic_debug_mode):
             if isinstance(y_true, tuple):
                 y_true, mask = y_true
@@ -318,7 +317,7 @@ class FBeta(Metric):
 
             return true_positive_sum, pred_sum, true_sum
 
-    def compute(self) -> Union[float, Tuple[float]]:
+    def compute(self) -> float | tuple[float]:
         """
         Returns either a float if a single metric is set in the ``__init__`` or a tuple
         of floats (f-score, precision, recall) if all metrics are requested.

@@ -20,7 +20,7 @@ You should have received a copy of the GNU Lesser General Public License along w
 import inspect
 import pickle
 import sys
-from typing import BinaryIO, Dict
+from typing import BinaryIO
 
 import torch.optim.lr_scheduler
 from torch.optim import Optimizer
@@ -53,10 +53,10 @@ class _PyTorchLRSchedulerWrapper(Callback):
         self.state_to_load = None
         self.torch_lr_scheduler = torch_lr_scheduler
 
-    def on_epoch_end(self, epoch_number: int, logs: Dict):
+    def on_epoch_end(self, epoch_number: int, logs: dict):
         self.scheduler.step()
 
-    def on_train_begin(self, logs: Dict):
+    def on_train_begin(self, logs: dict):
         self.scheduler = self.torch_lr_scheduler(self.model.optimizer, *self.args, **self.kwargs)
 
         # Load state if the scheduler was not initialized when the user asked
@@ -113,8 +113,8 @@ class ReduceLROnPlateau(_PyTorchLRSchedulerWrapper):
     """
 
     def __init__(self, *args, monitor: str = 'val_loss', **kwargs):
-        super().__init__(torch_lr_scheduler=torch.optim.lr_scheduler.ReduceLROnPlateau, *args, **kwargs)
+        super().__init__(*args, torch_lr_scheduler=torch.optim.lr_scheduler.ReduceLROnPlateau, **kwargs)
         self.monitor = monitor
 
-    def on_epoch_end(self, epoch_number: int, logs: Dict):
+    def on_epoch_end(self, epoch_number: int, logs: dict):
         self.scheduler.step(logs[self.monitor])

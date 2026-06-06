@@ -17,7 +17,6 @@ You should have received a copy of the GNU Lesser General Public License along w
 <https://www.gnu.org/licenses/>.
 """
 
-from typing import List, Union
 from unittest import TestCase
 from unittest.mock import MagicMock, call, patch
 
@@ -187,8 +186,8 @@ class ProgressTest(TestCase):
         epoch_number,
         num_steps: int = 5,
         with_progress_bar: bool = True,
-        show_every_n_steps: Union[str, int] = 'all',
-    ) -> List:
+        show_every_n_steps: str | int = 'all',
+    ) -> list:
         color_progress_calls = []
 
         self.progression_callback.on_epoch_begin(epoch_number, self.an_empty_log)
@@ -236,8 +235,8 @@ class ProgressTest(TestCase):
         epoch_number,
         num_steps: int = 5,
         with_progress_bar: bool = True,
-        show_every_n_steps: Union[str, int] = 'all',
-    ) -> List:
+        show_every_n_steps: str | int = 'all',
+    ) -> list:
         color_progress_calls = []
 
         self.progression_callback.on_valid_begin(self.an_empty_log)

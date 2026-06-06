@@ -21,7 +21,8 @@ You should have received a copy of the GNU Lesser General Public License along w
 import os
 import pickle
 import warnings
-from typing import Any, Callable, Dict, List, Tuple, Union
+from collections.abc import Callable
+from typing import Any
 
 try:
     import pandas as pd
@@ -86,8 +87,8 @@ class ModelBundle:
         *,
         logging: bool = True,
         monitoring: bool = True,
-        monitor_metric: Union[str, None] = None,
-        monitor_mode: Union[str, None] = None,
+        monitor_metric: str | None = None,
+        monitor_mode: str | None = None,
         _is_direct=True,
     ) -> None:
         if _is_direct:
@@ -112,16 +113,16 @@ class ModelBundle:
         directory: str,
         network: torch.nn.Module,
         *,
-        device: Union[torch.device, List[torch.device], List[str], None, str] = None,
+        device: torch.device | list[torch.device] | list[str] | None | str = None,
         logging: bool = True,
-        optimizer: Union[torch.optim.Optimizer, str] = 'sgd',
-        loss_function: Union[Callable, str] = None,
-        batch_metrics: Union[List, None] = None,
-        epoch_metrics: Union[List, None] = None,
+        optimizer: torch.optim.Optimizer | str = 'sgd',
+        loss_function: Callable | str | None = None,
+        batch_metrics: list | None = None,
+        epoch_metrics: list | None = None,
         monitoring: bool = True,
-        monitor_metric: Union[str, None] = None,
-        monitor_mode: Union[str, None] = None,
-        task: Union[str, None] = None,
+        monitor_metric: str | None = None,
+        monitor_mode: str | None = None,
+        task: str | None = None,
     ):
         # pylint: disable=line-too-long
         """
@@ -335,8 +336,8 @@ class ModelBundle:
         *,
         logging: bool = True,
         monitoring: bool = True,
-        monitor_metric: Union[str, None] = None,
-        monitor_mode: Union[str, None] = None,
+        monitor_metric: str | None = None,
+        monitor_mode: str | None = None,
     ):
         # pylint: disable=line-too-long
         """
@@ -480,8 +481,8 @@ class ModelBundle:
 
     @classmethod
     def _get_loss_function(
-        cls, loss_function: Union[Callable, str], network: torch.nn.Module, task: Union[str, None]
-    ) -> Union[Callable, str]:
+        cls, loss_function: Callable | str, network: torch.nn.Module, task: str | None
+    ) -> Callable | str:
         if loss_function is None:
             if hasattr(network, 'loss_function'):
                 return network.loss_function
@@ -494,8 +495,8 @@ class ModelBundle:
 
     @classmethod
     def _get_batch_metrics(
-        cls, batch_metrics: Union[List, None], network: torch.nn.Module, task: Union[str, None]
-    ) -> Union[List, None]:
+        cls, batch_metrics: list | None, network: torch.nn.Module, task: str | None
+    ) -> list | None:
         if batch_metrics is None or len(batch_metrics) == 0:
             if hasattr(network, 'batch_metrics'):
                 return network.batch_metrics
@@ -504,7 +505,7 @@ class ModelBundle:
         return batch_metrics
 
     @classmethod
-    def _get_epoch_metrics(cls, epoch_metrics: Union[List, None], network, task: Union[str, None]) -> Union[List, None]:
+    def _get_epoch_metrics(cls, epoch_metrics: list | None, network, task: str | None) -> list | None:
         if epoch_metrics is None or len(epoch_metrics) == 0:
             if hasattr(network, 'epoch_metrics'):
                 return network.epoch_metrics
@@ -516,9 +517,9 @@ class ModelBundle:
     def _get_monitoring_config(
         cls,
         monitoring: bool,
-        monitor_metric: Union[str, None],
-        monitor_mode: Union[str, None],
-        task: Union[str, None] = None,
+        monitor_metric: str | None,
+        monitor_mode: str | None,
+        task: str | None = None,
     ) -> None:
         if not monitoring:
             return False, None, None
@@ -544,7 +545,7 @@ class ModelBundle:
 
         return pd.read_csv(self.log_filename, sep='\t')
 
-    def get_best_epoch_stats(self) -> Dict:
+    def get_best_epoch_stats(self) -> dict:
         """
         Returns all computed statistics corresponding to the best epoch according to the
         ``monitor_metric`` and ``monitor_mode`` attributes.
@@ -597,23 +598,23 @@ class ModelBundle:
         return history.iloc[saved_epoch_indices]
 
     def _warn_missing_file(self, filename: str) -> None:
-        warnings.warn(f"Missing checkpoint: {filename}.")
+        warnings.warn(f"Missing checkpoint: {filename}.", stacklevel=2)
 
-    def _load_epoch_state(self, lr_schedulers: List) -> int:
+    def _load_epoch_state(self, lr_schedulers: list) -> int:
         # pylint: disable=broad-except
         initial_epoch = 1
         if os.path.isfile(self.epoch_filename):
-            with open(self.epoch_filename, 'r', encoding='utf-8') as f:
+            with open(self.epoch_filename, encoding='utf-8') as f:
                 initial_epoch = int(f.read()) + 1
 
             if os.path.isfile(self.model_checkpoint_filename):
-                print(f"Loading weights from {self.model_checkpoint_filename} and starting at epoch {initial_epoch:d}.")
+                print(f"Loading weights from {self.model_checkpoint_filename} and starting at epoch {initial_epoch:d}.")  # noqa: T201
                 self.model.load_weights(self.model_checkpoint_filename)
             else:
                 self._warn_missing_file(self.model_checkpoint_filename)
 
             if os.path.isfile(self.optimizer_checkpoint_filename):
-                print(
+                print(  # noqa: T201
                     f"Loading optimizer state from {self.optimizer_checkpoint_filename} and "
                     f"starting at epoch {initial_epoch:d}."
                 )
@@ -622,7 +623,7 @@ class ModelBundle:
                 self._warn_missing_file(self.optimizer_checkpoint_filename)
 
             if os.path.isfile(self.random_state_checkpoint_filename):
-                print(
+                print(  # noqa: T201
                     f"Loading random states from {self.random_state_checkpoint_filename} and "
                     f"starting at epoch {initial_epoch:d}."
                 )
@@ -633,7 +634,7 @@ class ModelBundle:
             for i, lr_scheduler in enumerate(lr_schedulers):
                 filename = self.lr_scheduler_filename % i
                 if os.path.isfile(filename):
-                    print(f"Loading LR scheduler state from {filename} and starting at epoch {initial_epoch:d}.")
+                    print(f"Loading LR scheduler state from {filename} and starting at epoch {initial_epoch:d}.")  # noqa: T201
                     lr_scheduler.load_state(filename)
                 else:
                     self._warn_missing_file(filename)
@@ -642,7 +643,7 @@ class ModelBundle:
 
     def _init_model_restoring_callbacks(
         self, initial_epoch: int, keep_only_last_best: bool, save_every_epoch: bool
-    ) -> List:
+    ) -> list:
         callbacks = []
         if not save_every_epoch:
             best_checkpoint = ModelCheckpoint(
@@ -675,7 +676,7 @@ class ModelBundle:
 
         return callbacks
 
-    def _init_tensorboard_callbacks(self, disable_tensorboard: bool) -> Tuple:
+    def _init_tensorboard_callbacks(self, disable_tensorboard: bool) -> tuple:
         tensorboard_writer = None
         callbacks = []
         if not disable_tensorboard:
@@ -691,7 +692,7 @@ class ModelBundle:
                 callbacks += [TensorBoardLogger(tensorboard_writer)]
         return tensorboard_writer, callbacks
 
-    def _init_lr_scheduler_callbacks(self, lr_schedulers: List) -> List:
+    def _init_lr_scheduler_callbacks(self, lr_schedulers: list) -> list:
         callbacks = []
         if self.logging:
             for i, lr_scheduler in enumerate(lr_schedulers):
@@ -713,7 +714,7 @@ class ModelBundle:
                 save_extensions=('png', 'pdf'),
             )
 
-    def train(self, train_generator, valid_generator=None, **kwargs) -> List[Dict]:
+    def train(self, train_generator, valid_generator=None, **kwargs) -> list[dict]:
         """
         Trains or finetunes the model on a dataset using a generator. If a previous training already occurred
         and lasted a total of `n_previous` epochs, then the model's weights will be set to the last checkpoint and the
@@ -757,7 +758,7 @@ class ModelBundle:
         """
         return self._train(self.model.fit_generator, train_generator, valid_generator, **kwargs)
 
-    def train_dataset(self, train_dataset, valid_dataset=None, **kwargs) -> List[Dict]:
+    def train_dataset(self, train_dataset, valid_dataset=None, **kwargs) -> list[dict]:
         """
         Trains or finetunes the model on a dataset. If a previous training already occurred
         and lasted a total of `n_previous` epochs, then the model's weights will be set to the last checkpoint and the
@@ -798,7 +799,7 @@ class ModelBundle:
         """
         return self._train(self.model.fit_dataset, train_dataset, valid_dataset, **kwargs)
 
-    def train_data(self, x, y, validation_data=None, **kwargs) -> List[Dict]:
+    def train_data(self, x, y, validation_data=None, **kwargs) -> list[dict]:
         """
         Trains or finetunes the model on data under the form of NumPy arrays or torch tensors. If a previous
         training already occurred and lasted a total of `n_previous` epochs, then the model's weights will be set to the
@@ -852,14 +853,14 @@ class ModelBundle:
         self,
         training_func,
         *args,
-        callbacks: Union[List, None] = None,
-        lr_schedulers: Union[List, None] = None,
+        callbacks: list | None = None,
+        lr_schedulers: list | None = None,
         keep_only_last_best: bool = False,
         save_every_epoch: bool = False,
         disable_tensorboard: bool = False,
         seed: int = 42,
         **kwargs,
-    ) -> List[Dict]:
+    ) -> list[dict]:
         set_seeds(seed)
 
         lr_schedulers = [] if lr_schedulers is None else lr_schedulers
@@ -924,8 +925,8 @@ class ModelBundle:
                 tensorboard_writer.close()
 
     def load_checkpoint(
-        self, checkpoint: Union[int, str], *, verbose: bool = False, strict: bool = True
-    ) -> Union[Dict, None]:
+        self, checkpoint: int | str, *, verbose: bool = False, strict: bool = True
+    ) -> dict | None:
         """
         Loads the model's weights with the weights at a given checkpoint epoch.
 
@@ -975,7 +976,7 @@ class ModelBundle:
         metrics_str = ', '.join(
             f'{metric_name}: {epoch_stats[metric_name].item():g}' for metric_name in epoch_stats.columns[2:]
         )
-        print(metrics_str)
+        print(metrics_str)  # noqa: T201
 
     def _load_epoch_checkpoint(self, epoch: int, *, verbose: bool = False, strict: bool = True) -> None:
         ckpt_filename = self.best_checkpoint_filename.format(epoch=epoch)
@@ -984,7 +985,7 @@ class ModelBundle:
         epoch_stats = history.iloc[epoch - 1 : epoch]
 
         if verbose:
-            print(f"Loading checkpoint {ckpt_filename}")
+            print(f"Loading checkpoint {ckpt_filename}")  # noqa: T201
             self._print_epoch_stats(epoch_stats)
 
         if not os.path.isfile(ckpt_filename):
@@ -992,16 +993,16 @@ class ModelBundle:
 
         return epoch_stats, self.model.load_weights(ckpt_filename, strict=strict)
 
-    def _load_best_checkpoint(self, *, verbose: bool = False, strict: bool = True) -> Dict:
+    def _load_best_checkpoint(self, *, verbose: bool = False, strict: bool = True) -> dict:
         best_epoch_stats = self.get_best_epoch_stats()
         best_epoch = best_epoch_stats['epoch'].item()
 
         ckpt_filename = self.best_checkpoint_filename.format(epoch=best_epoch)
 
         if verbose:
-            print(f"Found best checkpoint at epoch: {best_epoch}")
+            print(f"Found best checkpoint at epoch: {best_epoch}")  # noqa: T201
             self._print_epoch_stats(best_epoch_stats)
-            print(f"Loading checkpoint {ckpt_filename}")
+            print(f"Loading checkpoint {ckpt_filename}")  # noqa: T201
 
         return best_epoch_stats, self.model.load_weights(ckpt_filename, strict=strict)
 
@@ -1010,14 +1011,14 @@ class ModelBundle:
         epoch_stats = history.iloc[-1:]
 
         if verbose:
-            print(f"Loading checkpoint {self.model_checkpoint_filename}")
+            print(f"Loading checkpoint {self.model_checkpoint_filename}")  # noqa: T201
             self._print_epoch_stats(epoch_stats)
 
         return epoch_stats, self.model.load_weights(self.model_checkpoint_filename, strict=strict)
 
     def _load_path_checkpoint(self, path, verbose: bool = False, strict: bool = True) -> None:
         if verbose:
-            print(f"Loading checkpoint {path}")
+            print(f"Loading checkpoint {path}")  # noqa: T201
 
         return self.model.load_weights(path, strict=strict)
 
@@ -1056,7 +1057,7 @@ class ModelBundle:
         """
         return self._test(self.model.evaluate_generator, test_generator, **kwargs)
 
-    def test_dataset(self, test_dataset, **kwargs) -> Dict:
+    def test_dataset(self, test_dataset, **kwargs) -> dict:
         """
         Computes and returns the loss and the metrics of the model on a given test dataset.
 
@@ -1089,7 +1090,7 @@ class ModelBundle:
         """
         return self._test(self.model.evaluate_dataset, test_dataset, **kwargs)
 
-    def test_data(self, x, y, **kwargs) -> Dict:
+    def test_data(self, x, y, **kwargs) -> dict:
         """
         Computes and returns the loss and the metrics of the model on a given test dataset.
 
@@ -1131,12 +1132,12 @@ class ModelBundle:
         self,
         evaluate_func,
         *args,
-        checkpoint: Union[str, int] = 'best',
+        checkpoint: str | int = 'best',
         seed: int = 42,
         name='test',
         verbose=True,
         **kwargs,
-    ) -> Dict:
+    ) -> dict:
         if kwargs.get('return_dict_format') is False:
             raise ValueError("This method only returns a dict.")
         kwargs['return_dict_format'] = True
@@ -1149,7 +1150,7 @@ class ModelBundle:
             epoch_stats = self.load_checkpoint(checkpoint, verbose=verbose)
 
         if verbose:
-            print(f"Running {name}")
+            print(f"Running {name}")  # noqa: T201
         ret = evaluate_func(*args, **kwargs, verbose=verbose)
 
         if self.logging:
@@ -1241,7 +1242,7 @@ class ModelBundle:
         return self._predict(self.model.predict, x, **kwargs)
 
     def _predict(
-        self, predict_func: Callable, *args, verbose=True, checkpoint: Union[str, int] = 'best', **kwargs
+        self, predict_func: Callable, *args, verbose=True, checkpoint: str | int = 'best', **kwargs
     ) -> Any:
         if self.logging:
             if not self.monitoring and checkpoint == 'best':

@@ -63,7 +63,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 import os
 import warnings
 from abc import ABC, abstractmethod
-from typing import IO, Callable, Dict, Optional
+from collections.abc import Callable
+from typing import IO
 
 from poutyne.framework.callbacks._utils import atomic_lambda_save
 from poutyne.framework.callbacks.callbacks import Callback
@@ -124,7 +125,7 @@ class PeriodicSaveCallback(ABC, Callback):
         restore_best: bool = False,
         period: int = 1,
         verbose: bool = False,
-        temporary_filename: Optional[str] = None,
+        temporary_filename: str | None = None,
         atomic_write: bool = True,
         open_mode: str = 'wb',
         read_mode: str = 'rb',
@@ -160,7 +161,7 @@ class PeriodicSaveCallback(ABC, Callback):
         self.period = period
 
     @abstractmethod
-    def save_file(self, fd: IO, epoch_number: int, logs: Dict) -> None:
+    def save_file(self, fd: IO, epoch_number: int, logs: dict) -> None:
         """
         Abstract method that is called every time a save needs to be done.
 
@@ -171,7 +172,7 @@ class PeriodicSaveCallback(ABC, Callback):
         """
         pass
 
-    def _save_file(self, filename: str, epoch_number: int, logs: Dict) -> None:
+    def _save_file(self, filename: str, epoch_number: int, logs: dict) -> None:
         atomic_lambda_save(
             filename,
             self.save_file,
@@ -181,7 +182,7 @@ class PeriodicSaveCallback(ABC, Callback):
             atomic=self.atomic_write,
         )
 
-    def on_epoch_end(self, epoch_number: int, logs: Dict) -> None:
+    def on_epoch_end(self, epoch_number: int, logs: dict) -> None:
         filename = self.filename.format_map(logs)
 
         if self.save_best_only:
@@ -193,7 +194,7 @@ class PeriodicSaveCallback(ABC, Callback):
                     self.best_filename = filename
 
                     if self.verbose:
-                        print(
+                        print(  # noqa: T201
                             f'Epoch {epoch_number:d}: {self.monitor} improved from {old_best:0.5f} '
                             f'to {self.current_best:0.5f}, saving file to {self.best_filename}'
                         )
@@ -208,7 +209,7 @@ class PeriodicSaveCallback(ABC, Callback):
                 raise KeyError(f"The monitored metric name {self.monitor} is not found in computed metrics.")
         elif epoch_number % self.period == 0:
             if self.verbose:
-                print(f'Epoch {epoch_number:d}: saving file to {filename}')
+                print(f'Epoch {epoch_number:d}: saving file to {filename}')  # noqa: T201
             self._save_file(filename, epoch_number, logs)
 
     @abstractmethod
@@ -222,17 +223,17 @@ class PeriodicSaveCallback(ABC, Callback):
         """
         pass
 
-    def on_train_end(self, logs: Dict) -> None:
+    def on_train_end(self, logs: dict) -> None:
         if self.restore_best:
             if self.best_filename is not None:
                 if self.verbose:
-                    print(f'Restoring data from {self.best_filename}')
+                    print(f'Restoring data from {self.best_filename}')  # noqa: T201
                 # pylint: disable=unspecified-encoding
-                open_kwargs = dict(encoding='utf-8') if 'b' not in self.read_mode else {}
+                open_kwargs = {'encoding': 'utf-8'} if 'b' not in self.read_mode else {}
                 with open(self.best_filename, self.read_mode, **open_kwargs) as fd:
                     self.restore(fd)
             else:
-                warnings.warn('No data to restore!')
+                warnings.warn('No data to restore!', stacklevel=2)
 
 
 class PeriodicSaveLambda(PeriodicSaveCallback):
@@ -250,12 +251,12 @@ class PeriodicSaveLambda(PeriodicSaveCallback):
         :class:`~poutyne.PeriodicSaveCallback`
     """
 
-    def __init__(self, func: Callable, *args, restore: Optional[Callable] = None, **kwargs) -> None:
+    def __init__(self, func: Callable, *args, restore: Callable | None = None, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.func = func
         self._restore = restore
 
-    def save_file(self, fd: IO, epoch_number: int, logs: Dict) -> None:
+    def save_file(self, fd: IO, epoch_number: int, logs: dict) -> None:
         self.func(fd, epoch_number, logs)
 
     def restore(self, fd: IO) -> None:

@@ -19,21 +19,21 @@ You should have received a copy of the GNU Lesser General Public License along w
 
 import torch.optim as optim
 
-all_optimizers_dict = dict(
-    adadelta=optim.Adadelta,
-    adagrad=optim.Adagrad,
-    adam=optim.Adam,
-    adamw=optim.AdamW,
-    sparseadam=optim.SparseAdam,
-    adamax=optim.Adamax,
-    asgd=optim.ASGD,
-    lbfgs=optim.LBFGS,
-    nadam=optim.NAdam,
-    radam=optim.RAdam,
-    rmsprop=optim.RMSprop,
-    rprop=optim.Rprop,
-    sgd=optim.SGD,
-)
+all_optimizers_dict = {
+    'adadelta': optim.Adadelta,
+    'adagrad': optim.Adagrad,
+    'adam': optim.Adam,
+    'adamw': optim.AdamW,
+    'sparseadam': optim.SparseAdam,
+    'adamax': optim.Adamax,
+    'asgd': optim.ASGD,
+    'lbfgs': optim.LBFGS,
+    'nadam': optim.NAdam,
+    'radam': optim.RAdam,
+    'rmsprop': optim.RMSprop,
+    'rprop': optim.Rprop,
+    'sgd': optim.SGD,
+}
 
 
 def get_optimizer(optimizer, module):

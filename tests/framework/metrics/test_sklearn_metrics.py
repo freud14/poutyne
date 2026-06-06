@@ -35,10 +35,7 @@ from poutyne import SKLearnMetrics, TensorDataset
 
 def gini(y_true, y_pred, sample_weight=None):
     sort_indices = np.argsort(y_pred)
-    if sample_weight is not None:
-        sample_weight = sample_weight[sort_indices]
-    else:
-        sample_weight = np.ones_like(y_true)
+    sample_weight = sample_weight[sort_indices] if sample_weight is not None else np.ones_like(y_true)
     y_true = y_true[sort_indices]
     random = (sample_weight / sample_weight.sum()).cumsum()
     lorentz = y_true.cumsum() / y_true.sum()
@@ -82,7 +79,7 @@ class SKLearnMetricsTest(TestCase):
         self._test_classification(two_skl_metrics, False)
 
     def test_multiclass_classification_with_kwargs(self):
-        roc_auc_kwargs = dict(multi_class='ovr', average='macro')
+        roc_auc_kwargs = {"multi_class": 'ovr', "average": 'macro'}
         self._test_multiclass_classification(roc_auc_score, True, kwargs=roc_auc_kwargs)
         self._test_multiclass_classification(roc_auc_score, False, kwargs=roc_auc_kwargs)
 

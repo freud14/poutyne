@@ -47,7 +47,7 @@ class ModelOptimizerInstanciationTest(unittest.TestCase):
         self.assertOptimizerEquality(model.optimizer, expected)
 
     def test_with_dict_optimizer(self):
-        model = Model(self.pytorch_network, dict(optim='sgd', lr=1e-3), self.loss_function)
+        model = Model(self.pytorch_network, {'optim': 'sgd', 'lr': 1e-3}, self.loss_function)
         expected = optim.SGD(self.pytorch_network.parameters(), lr=1e-3)
         self.assertOptimizerEquality(model.optimizer, expected)
 
@@ -57,7 +57,7 @@ class ModelOptimizerInstanciationTest(unittest.TestCase):
         self.assertOptimizerEquality(model.optimizer, expected)
 
     def test_with_other_dict_than_sgd(self):
-        model = Model(self.pytorch_network, dict(optim='adam', lr=0.1), self.loss_function)
+        model = Model(self.pytorch_network, {'optim': 'adam', 'lr': 0.1}, self.loss_function)
         expected = optim.Adam(self.pytorch_network.parameters(), lr=0.1)
         self.assertOptimizerEquality(model.optimizer, expected)
 

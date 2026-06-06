@@ -215,7 +215,7 @@ class ModelTest(ModelFittingTestCase):
             returned_params = self.model.get_weight_copies()
 
             self.assertEqual(returned_params.keys(), expected_params.keys())
-            for k in expected_params.keys():
+            for k in expected_params:
                 np.testing.assert_almost_equal(returned_params[k].numpy(), expected_params[k].numpy(), decimal=4)
 
     def test_fitting_generator_n_batches_per_step_higher_than_num_batches(self):
@@ -237,7 +237,7 @@ class ModelTest(ModelFittingTestCase):
         returned_params = self.model.get_weight_copies()
 
         self.assertEqual(returned_params.keys(), expected_params.keys())
-        for k in expected_params.keys():
+        for k in expected_params:
             np.testing.assert_almost_equal(returned_params[k].numpy(), expected_params[k].numpy(), decimal=4)
 
     def test_fitting_generator_n_batches_per_step_uneven_batches(self):
@@ -272,7 +272,7 @@ class ModelTest(ModelFittingTestCase):
             returned_params = self.model.get_weight_copies()
 
             self.assertEqual(returned_params.keys(), expected_params.keys())
-            for k in expected_params.keys():
+            for k in expected_params:
                 np.testing.assert_almost_equal(returned_params[k].numpy(), expected_params[k].numpy(), decimal=4)
 
     def test_fitting_ndarray_generator(self):
@@ -526,13 +526,13 @@ class ModelTest(ModelFittingTestCase):
         x = torch.rand(ModelTest.batch_size, 1)
         y = torch.rand(ModelTest.batch_size, 1)
         logs = self.model.train_on_batch(x, y, return_dict_format=True)
-        self.assertEqual(set(logs.keys()), set(['loss'] + self.batch_metrics_names))
+        self.assertEqual(set(logs.keys()), {'loss', *self.batch_metrics_names})
 
     def test_train_on_batch_with_return_dict_and_pred(self):
         x = torch.rand(ModelTest.batch_size, 1)
         y = torch.rand(ModelTest.batch_size, 1)
         logs, pred_y = self.model.train_on_batch(x, y, return_dict_format=True, return_pred=True)
-        self.assertEqual(set(logs.keys()), set(['loss'] + self.batch_metrics_names))
+        self.assertEqual(set(logs.keys()), {'loss', *self.batch_metrics_names})
         self.assertEqual(pred_y.shape, (ModelTest.batch_size, 1))
 
     def test_evaluate(self):
@@ -793,13 +793,11 @@ class ModelTest(ModelFittingTestCase):
     def _get_batch_metrics_expected_on_calls_when_training(self, epochs, steps, has_valid=True, valid_steps=None):
         call_list = []
         for _ in range(epochs):
-            for _ in range(steps):
-                call_list.append(call(ANY, ANY))
+            call_list.extend(call(ANY, ANY) for _ in range(steps))
             call_list.append(call.compute())
             call_list.append(call.reset())
             if has_valid:
-                for _ in range(1, valid_steps + 1):
-                    call_list.append(call(ANY, ANY))
+                call_list.extend(call(ANY, ANY) for _ in range(1, valid_steps + 1))
                 call_list.append(call.compute())
                 call_list.append(call.reset())
         return call_list
@@ -807,13 +805,11 @@ class ModelTest(ModelFittingTestCase):
     def _get_epoch_metrics_expected_on_calls_when_training(self, epochs, steps, has_valid=True, valid_steps=None):
         call_list = []
         for _ in range(epochs):
-            for _ in range(steps):
-                call_list.append(call.update(ANY, ANY))
+            call_list.extend(call.update(ANY, ANY) for _ in range(steps))
             call_list.append(call.compute())
             call_list.append(call.reset())
             if has_valid:
-                for _ in range(1, valid_steps + 1):
-                    call_list.append(call.update(ANY, ANY))
+                call_list.extend(call.update(ANY, ANY) for _ in range(1, valid_steps + 1))
                 call_list.append(call.compute())
                 call_list.append(call.reset())
         return call_list
@@ -854,13 +850,13 @@ class ModelTest(ModelFittingTestCase):
         x = torch.rand(ModelTest.batch_size, 1)
         y = torch.rand(ModelTest.batch_size, 1)
         logs = self.model.evaluate_on_batch(x, y, return_dict_format=True)
-        self.assertEqual(set(logs.keys()), set(['loss'] + self.batch_metrics_names))
+        self.assertEqual(set(logs.keys()), {'loss', *self.batch_metrics_names})
 
     def test_evaluate_on_batch_with_return_dict_and_pred(self):
         x = torch.rand(ModelTest.batch_size, 1)
         y = torch.rand(ModelTest.batch_size, 1)
         logs, pred_y = self.model.evaluate_on_batch(x, y, return_dict_format=True, return_pred=True)
-        self.assertEqual(set(logs.keys()), set(['loss'] + self.batch_metrics_names))
+        self.assertEqual(set(logs.keys()), {'loss', *self.batch_metrics_names})
         self.assertEqual(pred_y.shape, (ModelTest.batch_size, 1))
 
     def test_evaluate_on_batch_with_return_dict_and_pred_without_convert_to_numpy(self):
@@ -869,7 +865,7 @@ class ModelTest(ModelFittingTestCase):
         logs, pred_y = self.model.evaluate_on_batch(
             x, y, return_dict_format=True, return_pred=True, convert_to_numpy=False
         )
-        self.assertEqual(set(logs.keys()), set(['loss'] + self.batch_metrics_names))
+        self.assertEqual(set(logs.keys()), {'loss', *self.batch_metrics_names})
         self.assertTrue(torch.is_tensor(pred_y))
         self.assertEqual(pred_y.shape, (ModelTest.batch_size, 1))
 

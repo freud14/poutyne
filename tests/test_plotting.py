@@ -20,6 +20,7 @@ You should have received a copy of the GNU Lesser General Public License along w
 import os
 from io import BytesIO
 from tempfile import TemporaryDirectory
+from typing import ClassVar
 from unittest import TestCase, skipIf
 
 try:
@@ -49,14 +50,14 @@ from poutyne import plot_history, plot_metric
 @skipIf(not matplotlib_available, "matplotlib is not available")
 @skipIf(not pil_available, "PIL is not available")
 class PlotHistoryTest(TestCase):
-    HISTORY = [
+    HISTORY: ClassVar[list] = [
         {'epoch': 1, 'time': 6.2788, 'loss': 0.3683, 'acc': 88.2645, 'val_loss': 0.0984, 'val_acc': 97.0833},
         {'epoch': 2, 'time': 6.2570, 'loss': 0.1365, 'acc': 95.9166, 'val_loss': 0.0680, 'val_acc': 97.9916},
         {'epoch': 3, 'time': 6.3314, 'loss': 0.1057, 'acc': 96.8458, 'val_loss': 0.0531, 'val_acc': 98.4916},
         {'epoch': 4, 'time': 6.2574, 'loss': 0.0874, 'acc': 97.2937, 'val_loss': 0.0521, 'val_acc': 98.4166},
         {'epoch': 5, 'time': 6.3268, 'loss': 0.0775, 'acc': 97.6666, 'val_loss': 0.0464, 'val_acc': 98.6166},
     ]
-    METRICS = ['time', 'loss', 'acc']
+    METRICS: ClassVar[list] = ['time', 'loss', 'acc']
     NUM_METRIC_PLOTS = len(METRICS)
 
     def test_basic(self):

@@ -18,7 +18,8 @@ You should have received a copy of the GNU Lesser General Public License along w
 """
 
 import itertools
-from typing import Callable, Dict
+from collections.abc import Callable
+from typing import ClassVar
 
 from poutyne.framework.callbacks.callbacks import Callback
 from poutyne.framework.callbacks.color_formatting import ColorProgress
@@ -58,7 +59,7 @@ class ProgressionCallback(Callback):
             ``n``, show only every n-th steps. (Default value = 'all').
     """
 
-    EVERY_N_STEPS_CHOICES = ['all', 'none']
+    EVERY_N_STEPS_CHOICES: ClassVar[list] = ['all', 'none']
 
     def __init__(
         self,
@@ -97,7 +98,7 @@ class ProgressionCallback(Callback):
         self.train_last_step = None
         self.valid_last_step = None
 
-    def set_params(self, params: Dict):
+    def set_params(self, params: dict):
         super().set_params(params)
         self._train_steps = self.params['steps']
         self._valid_steps = self.params.get('valid_steps')
@@ -113,33 +114,33 @@ class ProgressionCallback(Callback):
             # when we return to the train, it's all messed up
             self.color_progress.close_progress_bar()
 
-    def on_train_begin(self, logs: Dict) -> None:
-        self.metrics = ['loss'] + self.model.metrics_names
+    def on_train_begin(self, logs: dict) -> None:
+        self.metrics = ['loss', *self.model.metrics_names]
         self.epochs = self.params['epochs']
         self.steps = self._train_steps
 
-    def on_valid_begin(self, logs: Dict) -> None:
+    def on_valid_begin(self, logs: dict) -> None:
         if self.show_on_valid:
             self.step_times_weighted_sum = 0.0
 
-            self.metrics = ['loss'] + self.model.metrics_names
+            self.metrics = ['loss', *self.model.metrics_names]
             self.steps = self._valid_steps
 
             self._set_progress_bar()
 
             self.color_progress.on_valid_begin()
 
-    def on_test_begin(self, logs: Dict) -> None:
+    def on_test_begin(self, logs: dict) -> None:
         self.step_times_weighted_sum = 0.0
 
-        self.metrics = ['loss'] + self.model.metrics_names
+        self.metrics = ['loss', *self.model.metrics_names]
         self.steps = self._test_steps
 
         self._set_progress_bar()
 
         self.color_progress.on_test_begin()
 
-    def on_predict_begin(self, logs: Dict) -> None:
+    def on_predict_begin(self, logs: dict) -> None:
         self.step_times_weighted_sum = 0.0
 
         self.metrics = []
@@ -149,7 +150,7 @@ class ProgressionCallback(Callback):
 
         self.color_progress.on_predict_begin()
 
-    def on_epoch_begin(self, epoch_number: int, logs: Dict) -> None:
+    def on_epoch_begin(self, epoch_number: int, logs: dict) -> None:
         self.step_times_weighted_sum = 0.0
         self.epoch_number = epoch_number
         self.steps = self._train_steps
@@ -158,7 +159,7 @@ class ProgressionCallback(Callback):
 
         self.color_progress.on_epoch_begin(epoch_number=self.epoch_number, epochs=self.epochs)
 
-    def on_epoch_end(self, epoch_number: int, logs: Dict) -> None:
+    def on_epoch_end(self, epoch_number: int, logs: dict) -> None:
         self.steps = self._train_steps
         epoch_total_time = logs['time']
 
@@ -170,13 +171,13 @@ class ProgressionCallback(Callback):
             metrics_str=metrics_str,
         )
 
-    def on_test_end(self, logs: Dict) -> None:
+    def on_test_end(self, logs: dict) -> None:
         test_total_time = logs['time']
         progress_fun = self.color_progress.on_test_end
 
         self._end_progress(logs, test_total_time, progress_fun)
 
-    def on_predict_end(self, logs: Dict) -> None:
+    def on_predict_end(self, logs: dict) -> None:
         predict_total_time = logs['time']
         progress_fun = self.color_progress.on_predict_end
 
@@ -187,7 +188,7 @@ class ProgressionCallback(Callback):
             isinstance(show_every_n_steps_flag, int) and batch_number % show_every_n_steps_flag == 0
         )
 
-    def on_train_batch_end(self, batch_number: int, logs: Dict) -> None:
+    def on_train_batch_end(self, batch_number: int, logs: dict) -> None:
         train_step_times_rate = self._compute_step_times_rate(batch_number, logs)
         progress_batch_end_fun = self.color_progress.on_train_batch_end
 
@@ -201,7 +202,7 @@ class ProgressionCallback(Callback):
         )
         self.train_last_step = batch_number
 
-    def on_valid_batch_end(self, batch_number: int, logs: Dict) -> None:
+    def on_valid_batch_end(self, batch_number: int, logs: dict) -> None:
         if self.show_on_valid:
             valid_step_times_rate = self._compute_step_times_rate(batch_number, logs)
             progress_batch_end_fun = self.color_progress.on_valid_batch_end
@@ -217,7 +218,7 @@ class ProgressionCallback(Callback):
 
         self.valid_last_step = batch_number
 
-    def on_test_batch_end(self, batch_number: int, logs: Dict) -> None:
+    def on_test_batch_end(self, batch_number: int, logs: dict) -> None:
         test_step_times_rate = self._compute_step_times_rate(batch_number, logs)
         progress_batch_end_fun = self.color_progress.on_test_batch_end
 
@@ -230,7 +231,7 @@ class ProgressionCallback(Callback):
             do_print=do_print,
         )
 
-    def on_predict_batch_end(self, batch_number: int, logs: Dict) -> None:
+    def on_predict_batch_end(self, batch_number: int, logs: dict) -> None:
         predict_step_times_rate = self._compute_step_times_rate(batch_number, logs)
         progress_batch_end_fun = self.color_progress.on_predict_batch_end
 
@@ -243,7 +244,7 @@ class ProgressionCallback(Callback):
             do_print=do_print,
         )
 
-    def _get_metrics_string(self, logs: Dict) -> str:
+    def _get_metrics_string(self, logs: dict) -> str:
         train_metrics_str_gen = (f'{k}: {logs[k]:f}' for k in self.metrics if logs.get(k) is not None)
         val_metrics_str_gen = (
             f"{'val_' + k}: {logs['val_' + k]:f}" for k in self.metrics if logs.get('val_' + k) is not None
@@ -253,7 +254,7 @@ class ProgressionCallback(Callback):
         )
         return ', '.join(itertools.chain(train_metrics_str_gen, val_metrics_str_gen, test_metrics_str_gen))
 
-    def _compute_step_times_rate(self, batch_number: int, logs: Dict) -> float:
+    def _compute_step_times_rate(self, batch_number: int, logs: dict) -> float:
         if self.equal_weights:
             self.step_times_weighted_sum += logs['time']
             step_times_rate = self.step_times_weighted_sum / batch_number
@@ -263,7 +264,7 @@ class ProgressionCallback(Callback):
             step_times_rate = self.step_times_weighted_sum / normalizing_factor
         return step_times_rate
 
-    def _end_progress(self, logs: Dict, total_time: float, func: Callable) -> None:
+    def _end_progress(self, logs: dict, total_time: float, func: Callable) -> None:
         """
         Update the progress at the end of a test or valid phase.
         """
@@ -274,7 +275,7 @@ class ProgressionCallback(Callback):
             func(total_time=total_time, steps=self.last_step, metrics_str=metrics_str)
 
     def _batch_end_progress(
-        self, *, logs: Dict, step_times_rate: float, batch_number: int, func: Callable, do_print: bool
+        self, *, logs: dict, step_times_rate: float, batch_number: int, func: Callable, do_print: bool
     ) -> None:
         """
         Update the progress at the end of train, valid or test batch.
@@ -295,7 +296,7 @@ class ProgressionCallback(Callback):
 
 
 class EpochProgressionCallback(Callback):
-    EVERY_N_EPOCHS_CHOICES = ['all', 'none']
+    EVERY_N_EPOCHS_CHOICES: ClassVar[list] = ['all', 'none']
 
     def __init__(self, *, coloring=True, show_every_n_epochs='all') -> None:
         super().__init__()
@@ -307,13 +308,13 @@ class EpochProgressionCallback(Callback):
         )
         self.show_every_n_epochs = show_every_n_epochs
 
-    def set_params(self, params: Dict):
+    def set_params(self, params: dict):
         super().set_params(params)
         self._train_steps = self.params['steps']
         self._valid_steps = self.params.get('valid_steps')
 
-    def on_train_begin(self, logs: Dict) -> None:
-        self.metrics = ['loss'] + self.model.metrics_names
+    def on_train_begin(self, logs: dict) -> None:
+        self.metrics = ['loss', *self.model.metrics_names]
         self.epochs = self.params['epochs']
 
     def _test_show_epoch(self, epoch_number):
@@ -321,11 +322,11 @@ class EpochProgressionCallback(Callback):
             self.show_every_n_epochs == 'all' or epoch_number % self.show_every_n_epochs == 0
         )
 
-    def on_epoch_begin(self, epoch_number: int, logs: Dict) -> None:
+    def on_epoch_begin(self, epoch_number: int, logs: dict) -> None:
         if self._test_show_epoch(epoch_number):
             self.color_progress.on_epoch_begin(epoch_number=epoch_number, epochs=self.epochs)
 
-    def on_epoch_end(self, epoch_number: int, logs: Dict) -> None:
+    def on_epoch_end(self, epoch_number: int, logs: dict) -> None:
         if self._test_show_epoch(epoch_number):
             self.color_progress.on_epoch_end(
                 total_time=logs['time'],
@@ -334,7 +335,7 @@ class EpochProgressionCallback(Callback):
                 metrics_str=self._get_metrics_string(logs),
             )
 
-    def _get_metrics_string(self, logs: Dict) -> str:
+    def _get_metrics_string(self, logs: dict) -> str:
         train_metrics_str_gen = (f'{k}: {logs[k]:f}' for k in self.metrics if logs.get(k) is not None)
         val_metrics_str_gen = (
             f"{'val_' + k}: {logs['val_' + k]:f}" for k in self.metrics if logs.get('val_' + k) is not None

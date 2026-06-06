@@ -19,7 +19,7 @@ You should have received a copy of the GNU Lesser General Public License along w
 
 import itertools
 import os
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Optional, Union
 
 try:
     import matplotlib.pyplot as plt
@@ -96,19 +96,19 @@ def _close_figs(figs):
 
 
 def plot_history(
-    history: Union[List[Dict[str, Union[float, int]]], 'pd.DataFrame'],
+    history: Union[list[dict[str, float | int]], 'pd.DataFrame'],
     *,
-    metrics: Optional[List[str]] = None,
-    labels: Optional[List[str]] = None,
-    titles: Optional[Union[List[str], str]] = None,
-    axes: Optional[List['matplotlib.axes.Axes']] = None,
+    metrics: list[str] | None = None,
+    labels: list[str] | None = None,
+    titles: list[str] | str | None = None,
+    axes: list['matplotlib.axes.Axes'] | None = None,
     show: bool = True,
     save: bool = False,
     save_filename_template: str = '{metric}',
-    save_directory: Optional[str] = None,
-    save_extensions: Union[List[str], Tuple[str]] = ('png',),
-    close: Optional[bool] = None,
-    fig_kwargs: Optional[Dict[str, Any]] = None,
+    save_directory: str | None = None,
+    save_extensions: list[str] | tuple[str] = ('png',),
+    close: bool | None = None,
+    fig_kwargs: dict[str, Any] | None = None,
 ):
     """
     Plot the training history in matplotlib. By default, all metrics are plotted.
@@ -188,10 +188,10 @@ def plot_history(
 
 
 def plot_metric(
-    history: Union[List[Dict[str, Union[float, int]]], 'pd.DataFrame'],
+    history: Union[list[dict[str, float | int]], 'pd.DataFrame'],
     metric: str,
     *,
-    label: Optional[str] = None,
+    label: str | None = None,
     title: str = '',
     ax: Optional['matplotlib.axes.Axes'] = None,
 ):

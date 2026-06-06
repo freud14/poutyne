@@ -60,7 +60,6 @@ OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
-from typing import Dict
 
 import numpy as np
 
@@ -118,13 +117,13 @@ class EarlyStopping(Callback):
             self.min_delta *= 1
             self.monitor_op = np.greater
 
-    def on_train_begin(self, logs: Dict):
+    def on_train_begin(self, logs: dict):
         # Allow instances to be re-used
         self.wait = 0
         self.stopped_epoch = 0
         self.best = np.inf if self.mode == 'min' else -np.inf
 
-    def on_epoch_end(self, epoch_number: int, logs: Dict):
+    def on_epoch_end(self, epoch_number: int, logs: dict):
         current = logs[self.monitor]
         if self.monitor_op(current - self.min_delta, self.best):
             self.best = current
@@ -135,4 +134,4 @@ class EarlyStopping(Callback):
                 self.stopped_epoch = epoch_number
                 self.model.stop_training = True
                 if self.verbose:
-                    print(f'Epoch {self.stopped_epoch}: early stopping')
+                    print(f'Epoch {self.stopped_epoch}: early stopping')  # noqa: T201

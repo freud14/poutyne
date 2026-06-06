@@ -21,7 +21,6 @@ import contextlib
 from collections import OrderedDict
 from itertools import chain, islice
 from math import cos, pi
-from typing import Dict, List, Optional, Tuple
 
 try:
     import matplotlib.pyplot as plt
@@ -98,7 +97,7 @@ class Phase:
         momentum (List[float], optional): a configuration space for the momentum.
     """
 
-    def __init__(self, *, lr: Optional[float] = None, momentum: Optional[float] = None):
+    def __init__(self, *, lr: float | None = None, momentum: float | None = None):
         if lr is None and momentum is None:
             raise ValueError("You must specify lr and/or momentum.")
 
@@ -149,11 +148,11 @@ class Phase:
 # pylint
 def one_cycle_phases(
     steps: int,
-    lr: Tuple[float, float] = (0.1, 1),
-    momentum: Tuple[float, float] = (0.95, 0.85),
+    lr: tuple[float, float] = (0.1, 1),
+    momentum: tuple[float, float] = (0.95, 0.85),
     finetune_lr: float = 0.01,
     finetune_fraction: float = 0.1,
-) -> List[Phase]:
+) -> list[Phase]:
     """
     The "one-cycle" policy as described in the paper `Super-Convergence: Very Fast Training of
     Neural Networks Using Large Learning Rates <https://arxiv.org/abs/1708.07120>`_.
@@ -198,9 +197,9 @@ def one_cycle_phases(
 def sgdr_phases(
     base_cycle_length: int,
     cycles: int,
-    lr: Tuple[float, float] = (1.0, 0.1),
+    lr: tuple[float, float] = (1.0, 0.1),
     cycle_mult: int = 2,
-) -> List[Phase]:
+) -> list[Phase]:
     """
     The "SGDR" policy as described in the paper `SGDR: Stochastic Gradient Descent with Warm Restarts
     <https://arxiv.org/abs/1608.03983>`_.
@@ -241,13 +240,13 @@ class OptimizerPolicy(Callback):
         initial_step (int): The step to start the policy in. Used for restarting.
     """
 
-    def __init__(self, phases: List, *, initial_step: int = 0):
+    def __init__(self, phases: list, *, initial_step: int = 0):
         super().__init__()
         self.phases = phases
         self.current_step = initial_step
         self.phases_iter = iter(self)
 
-    def on_train_batch_begin(self, batch_number: int, logs: Dict):
+    def on_train_batch_begin(self, batch_number: int, logs: dict):
         # Don't do anything when we run out of phases.
         with contextlib.suppress(StopIteration):
             spec = next(self.phases_iter)
@@ -259,7 +258,7 @@ class OptimizerPolicy(Callback):
             self.current_step += 1
             yield param_dict
 
-    def all_steps(self) -> List[Dict]:
+    def all_steps(self) -> list[dict]:
         """
         Return the list of dictionaries of configurations for all steps.
 
@@ -273,7 +272,7 @@ class OptimizerPolicy(Callback):
     def __repr__(self):
         return f"OptimizerPolicy:\n    phases: {self.current_step}\n    current_step: {len(self.phases)}"
 
-    def _update_optimizer(self, param_dict: Dict):
+    def _update_optimizer(self, param_dict: dict):
         for param_name, param_value in param_dict.items():
             for group in self.model.optimizer.param_groups:
                 group[param_name] = param_value

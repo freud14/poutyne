@@ -18,7 +18,7 @@ You should have received a copy of the GNU Lesser General Public License along w
 """
 
 import os
-from typing import Dict, List, Mapping, Sequence
+from collections.abc import Mapping, Sequence
 from unittest import TestCase, skipIf
 from unittest.mock import MagicMock, call, patch
 
@@ -349,7 +349,7 @@ class MLFlowLoggerTest(TestCase):
 
             self._assert_has_granularity_calls(ml_flow_client_patch)
 
-    def _populate_calls_from_dict(self, config_dict: Dict) -> List:
+    def _populate_calls_from_dict(self, config_dict: dict) -> list:
         ml_flow_client_calls = []
         for key, value in config_dict.items():
             if isinstance(value, Mapping):
@@ -360,13 +360,13 @@ class MLFlowLoggerTest(TestCase):
                 for idx, value_lower in enumerate(value):
                     good_key = f"{key}.{idx}"
                     ml_flow_client_calls.append(
-                        (call().log_param(run_id=self.a_run_id, key=good_key, value=value_lower))
+                        call().log_param(run_id=self.a_run_id, key=good_key, value=value_lower)
                     )
             else:
                 ml_flow_client_calls.append(call().log_param(run_id=self.a_run_id, key=key, value=value))
         return ml_flow_client_calls
 
-    def _populate_calls_from_logs(self, logs: Dict) -> List:
+    def _populate_calls_from_logs(self, logs: dict) -> list:
         ml_flow_client_calls = []
         for epoch_num, epoch_log in enumerate(logs):
             epoch_log.pop("epoch")

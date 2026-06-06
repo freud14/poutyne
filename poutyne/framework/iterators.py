@@ -34,8 +34,7 @@ def cycle(iterable):  # Equivalent to itertools cycle, without any extra memory 
     while True:
         # yield from causes an infinite loop, not sure why.
         # pylint: disable=use-yield-from
-        for x in iterable:
-            yield x
+        yield from iterable
 
 
 def _get_step_iterator(steps, generator):
@@ -151,12 +150,11 @@ class EpochIterator:
         self.steps_per_epoch = steps_per_epoch
         self.validation_steps = validation_steps
 
-        if valid_generator is not None:
-            if validation_steps is None:
-                if hasattr(valid_generator, '__len__'):
-                    self.validation_steps = len(valid_generator)
-                elif steps_per_epoch is not None:
-                    self.validation_steps = steps_per_epoch
+        if valid_generator is not None and validation_steps is None:
+            if hasattr(valid_generator, '__len__'):
+                self.validation_steps = len(valid_generator)
+            elif steps_per_epoch is not None:
+                self.validation_steps = steps_per_epoch
         if steps_per_epoch is None and hasattr(train_generator, '__len__'):
             self.steps_per_epoch = len(train_generator)
 

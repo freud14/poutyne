@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # Configuration file for the Sphinx documentation builder.
 #
@@ -18,7 +17,7 @@ import sys
 
 sys.path.insert(0, os.path.abspath('../..'))
 
-from poutyne import __version__ as poutyne_version  # noqa: E402  # pylint: disable=wrong-import-position
+from poutyne import __version__ as poutyne_version  # pylint: disable=wrong-import-position
 
 year = str(datetime.datetime.now().year)
 

@@ -18,7 +18,6 @@ You should have received a copy of the GNU Lesser General Public License along w
 """
 
 import warnings
-from typing import Dict
 
 from poutyne.framework.callbacks.callbacks import Callback
 
@@ -53,21 +52,21 @@ class BestModelRestore(Callback):
         self.best_weights = None
         self.verbose = verbose
 
-    def on_epoch_end(self, epoch_number: int, logs: Dict):
+    def on_epoch_end(self, epoch_number: int, logs: dict):
         if self.monitor_op(logs[self.monitor], self.current_best):
             old_best = self.current_best
             self.current_best = logs[self.monitor]
 
             if self.verbose:
-                print(
+                print(  # noqa: T201
                     f'Epoch {epoch_number:d}: {self.monitor} improved from {old_best:0.5f} to {self.current_best:0.5f}'
                 )
             self.best_weights = self.model.get_weight_copies()
 
-    def on_train_end(self, logs: Dict):
+    def on_train_end(self, logs: dict):
         if self.best_weights is not None:
             if self.verbose:
-                print('Restoring best model')
+                print('Restoring best model')  # noqa: T201
             self.model.set_weights(self.best_weights)
         else:
-            warnings.warn('No weights to restore!')
+            warnings.warn('No weights to restore!', stacklevel=2)

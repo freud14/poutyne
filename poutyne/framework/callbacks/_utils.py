@@ -19,7 +19,7 @@ You should have received a copy of the GNU Lesser General Public License along w
 
 import os
 import warnings
-from typing import Callable
+from collections.abc import Callable
 
 
 def atomic_lambda_save(
@@ -27,12 +27,12 @@ def atomic_lambda_save(
     save_lambda: Callable,
     args,
     *,
-    temporary_filename: str = None,
+    temporary_filename: str | None = None,
     open_mode: str = 'w',
     atomic: bool = True,
 ):
     # pylint: disable=unspecified-encoding
-    open_kwargs = dict(encoding='utf-8') if 'b' not in open_mode else {}
+    open_kwargs = {'encoding': 'utf-8'} if 'b' not in open_mode else {}
     if atomic:
         if temporary_filename is None:
             temporary_filename = filename + '.tmp'
@@ -46,11 +46,11 @@ def atomic_lambda_save(
             # This may happen if the temp filesystem is not the same as the final destination's.
             warnings.warn(
                 "Impossible to move the file to its final destination: "
-                f"os.replace({temporary_filename}, {filename}) -> {e}"
+                f"os.replace({temporary_filename}, {filename}) -> {e}", stacklevel=2
             )
             os.remove(temporary_filename)
 
-            warnings.warn(f'Saving {filename} non-atomically instead.')
+            warnings.warn(f'Saving {filename} non-atomically instead.', stacklevel=2)
             with open(filename, open_mode, **open_kwargs) as fd:
                 save_lambda(fd, *args)
     else:
