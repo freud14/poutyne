@@ -92,4 +92,4 @@ jobs:
           uv venv
           uv pip install pytest pytest-cov -e .
       - name: Test with pytest
-        run: uv run pytest
+        run: uv run --no-sync pytest
