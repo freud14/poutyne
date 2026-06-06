@@ -17,6 +17,8 @@ You should have received a copy of the GNU Lesser General Public License along w
 <https://www.gnu.org/licenses/>.
 """
 
+from __future__ import annotations
+
 import itertools
 import os
 from typing import Any
