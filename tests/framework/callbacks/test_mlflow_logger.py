@@ -88,14 +88,14 @@ class MLFlowLoggerTest:
     @patch("poutyne.framework.mlflow_logger.mlflow", None)
     def test_whenMLFowNotInstalled_thenRaiseImportError(self):
         with pytest.raises(ImportError):
-            MLFlowLogger(self.a_experiment_name)
+            MLFlowLogger(experiment_name=self.a_experiment_name)
 
     @patch("poutyne.framework.mlflow_logger._get_git_commit", MagicMock())
     def test_whenNewExperiment_givenAMLFlowInstantiation_thenCreateNewExperiment(self):
         with patch("poutyne.framework.mlflow_logger.MlflowClient") as ml_flow_client_patch:
             ml_flow_client_patch.return_value.create_experiment = self.experiment_mock
 
-            MLFlowLogger(self.a_experiment_name)
+            MLFlowLogger(experiment_name=self.a_experiment_name)
 
             create_experiment_call = [call().create_experiment(self.a_experiment_name, self.none_tracking_uri)]
 
@@ -109,7 +109,7 @@ class MLFlowLoggerTest:
             )
             ml_flow_client_patch.return_value.get_experiment_by_name = MagicMock(return_value=self.experiment_mock)
 
-            MLFlowLogger(self.a_experiment_name)
+            MLFlowLogger(experiment_name=self.a_experiment_name)
 
             create_experiment_calls = [
                 call().create_experiment(self.a_experiment_name, self.none_tracking_uri),
@@ -124,7 +124,7 @@ class MLFlowLoggerTest:
             ml_flow_client_patch.return_value.create_experiment = self.experiment_mock
             ml_flow_client_patch.return_value.create_run = self.run_mock
 
-            mlflow_logger = MLFlowLogger(self.a_experiment_name)
+            mlflow_logger = MLFlowLogger(experiment_name=self.a_experiment_name)
 
             settings_calls = [
                 call().create_experiment(self.a_experiment_name, self.none_tracking_uri),
@@ -140,7 +140,7 @@ class MLFlowLoggerTest:
     def test_whenGitRepo_givenAMLFlowInstantiation_thenLogGitCommit(self, get_git_commit_patch):
         with patch("poutyne.framework.mlflow_logger.MlflowClient") as ml_flow_client_patch:
             ml_flow_client_patch.return_value.create_run = self.run_mock
-            MLFlowLogger(self.a_experiment_name)
+            MLFlowLogger(experiment_name=self.a_experiment_name)
 
             git_logging_call = [call(self.the_working_directory)]
             get_git_commit_patch.assert_has_calls(git_logging_call)
@@ -154,7 +154,7 @@ class MLFlowLoggerTest:
             ml_flow_client_patch.return_value.create_experiment = self.experiment_mock
             ml_flow_client_patch.return_value.create_run = self.run_mock
 
-            mlflow_logger = MLFlowLogger(self.a_experiment_name)
+            mlflow_logger = MLFlowLogger(experiment_name=self.a_experiment_name)
 
             ml_flow_client_calls = []
             for key, value in self.a_log.items():
@@ -168,7 +168,7 @@ class MLFlowLoggerTest:
             ml_flow_client_patch.return_value.create_experiment = self.experiment_mock
             ml_flow_client_patch.return_value.create_run = self.run_mock
 
-            mlflow_logger = MLFlowLogger(self.a_experiment_name)
+            mlflow_logger = MLFlowLogger(experiment_name=self.a_experiment_name)
             mlflow_logger.log_metrics(self.a_log)
 
             ml_flow_client_calls = []
@@ -182,7 +182,7 @@ class MLFlowLoggerTest:
             ml_flow_client_patch.return_value.create_experiment = self.experiment_mock
             ml_flow_client_patch.return_value.create_run = self.run_mock
 
-            mlflow_logger = MLFlowLogger(self.a_experiment_name)
+            mlflow_logger = MLFlowLogger(experiment_name=self.a_experiment_name)
 
             ml_flow_client_calls = []
             for key, value in self.settings_in_dict.items():
@@ -196,7 +196,7 @@ class MLFlowLoggerTest:
             ml_flow_client_patch.return_value.create_experiment = self.experiment_mock
             ml_flow_client_patch.return_value.create_run = self.run_mock
 
-            mlflow_logger = MLFlowLogger(self.a_experiment_name)
+            mlflow_logger = MLFlowLogger(experiment_name=self.a_experiment_name)
             mlflow_logger.log_config_params(self.settings_in_dict)
 
             ml_flow_client_calls = []
@@ -210,7 +210,7 @@ class MLFlowLoggerTest:
             ml_flow_client_patch.return_value.create_experiment = self.experiment_mock
             ml_flow_client_patch.return_value.create_run = self.run_mock
 
-            mlflow_logger = MLFlowLogger(self.a_experiment_name)
+            mlflow_logger = MLFlowLogger(experiment_name=self.a_experiment_name)
             mlflow_logger.log_config_params(self.settings_in_dict_config_no_sequence)
 
             ml_flow_client_calls = self._populate_calls_from_dict(self.settings_in_dict_config_no_sequence)
@@ -222,7 +222,7 @@ class MLFlowLoggerTest:
             ml_flow_client_patch.return_value.create_experiment = self.experiment_mock
             ml_flow_client_patch.return_value.create_run = self.run_mock
 
-            mlflow_logger = MLFlowLogger(self.a_experiment_name)
+            mlflow_logger = MLFlowLogger(experiment_name=self.a_experiment_name)
             mlflow_logger.log_config_params(self.settings_in_dict_config_with_sequence)
 
             ml_flow_client_calls = self._populate_calls_from_dict(self.settings_in_dict_config_with_sequence)
@@ -234,7 +234,7 @@ class MLFlowLoggerTest:
             ml_flow_client_patch.return_value.create_experiment = self.experiment_mock
             ml_flow_client_patch.return_value.create_run = self.run_mock
 
-            mlflow_logger = MLFlowLogger(self.a_experiment_name)
+            mlflow_logger = MLFlowLogger(experiment_name=self.a_experiment_name)
             mlflow_logger.log_params(self.settings_in_dict)
 
             ml_flow_client_calls = []
@@ -248,7 +248,7 @@ class MLFlowLoggerTest:
             ml_flow_client_patch.return_value.create_experiment = self.experiment_mock
             ml_flow_client_patch.return_value.create_run = self.run_mock
 
-            mlflow_logger = MLFlowLogger(self.a_experiment_name)
+            mlflow_logger = MLFlowLogger(experiment_name=self.a_experiment_name)
             mlflow_logger.set_params({"epochs": self.num_epochs})
             mlflow_logger.on_train_end(self.a_log)
 
@@ -261,7 +261,7 @@ class MLFlowLoggerTest:
             ml_flow_client_patch.return_value.create_experiment = self.experiment_mock
             ml_flow_client_patch.return_value.create_run = self.run_mock
 
-            mlflow_logger = MLFlowLogger(self.a_experiment_name)
+            mlflow_logger = MLFlowLogger(experiment_name=self.a_experiment_name)
             mlflow_logger.set_params({"epochs": self.num_epochs})
             mlflow_logger.on_train_end(self.a_log)
 
@@ -275,7 +275,7 @@ class MLFlowLoggerTest:
             ml_flow_client_patch.return_value.create_experiment = self.experiment_mock
             ml_flow_client_patch.return_value.create_run = self.run_mock
 
-            mlflow_logger = MLFlowLogger(self.a_experiment_name)
+            mlflow_logger = MLFlowLogger(experiment_name=self.a_experiment_name)
             mlflow_logger._status_handling()
 
             ml_flow_client_calls = [call().set_terminated(self.a_run_id, status="FAILED")]
@@ -287,7 +287,7 @@ class MLFlowLoggerTest:
             ml_flow_client_patch.return_value.create_experiment = self.experiment_mock
             ml_flow_client_patch.return_value.create_run = self.run_mock
 
-            mlflow_logger = MLFlowLogger(self.a_experiment_name)
+            mlflow_logger = MLFlowLogger(experiment_name=self.a_experiment_name)
             mlflow_logger.set_params({"epochs": self.num_epochs})
             mlflow_logger.on_train_end(self.a_log)
             mlflow_logger.on_test_begin({})  # since we change status at the start of testing
@@ -302,7 +302,7 @@ class MLFlowLoggerTest:
             ml_flow_client_patch.return_value.create_experiment = self.experiment_mock
             ml_flow_client_patch.return_value.create_run = self.run_mock
 
-            mlflow_logger = MLFlowLogger(self.a_experiment_name)
+            mlflow_logger = MLFlowLogger(experiment_name=self.a_experiment_name)
 
             torch.manual_seed(42)
             a_pytorch_network = nn.Linear(1, 1)
@@ -329,7 +329,7 @@ class MLFlowLoggerTest:
             ml_flow_client_patch.return_value.create_experiment = self.experiment_mock
             ml_flow_client_patch.return_value.create_run = self.run_mock
 
-            mlflow_logger = MLFlowLogger(self.a_experiment_name, batch_granularity=True)
+            mlflow_logger = MLFlowLogger(experiment_name=self.a_experiment_name, batch_granularity=True)
 
             torch.manual_seed(42)
             a_pytorch_network = nn.Linear(1, 1)
