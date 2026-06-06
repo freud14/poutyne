@@ -61,7 +61,7 @@ Changelog     = "https://github.com/freud14/poutyne/blob/master/CHANGELOG.md"
 [dependency-groups]
 dev = [
     "astroid==3.2.2",
-    "black[jupyter]~=24.4.2",
+    "black[jupyter]>=25.1.0",
     "flake8==7.1.0",
     "isort~=5.13.2",
     "pylint==3.2.5",
@@ -96,8 +96,8 @@ examples = [
 [tool.black]
 line-length = 120
 skip-string-normalization = true
-required-version = "24"
-extend-exclude = "/(slides)/"
+required-version = "25"
+extend-exclude = "/(slides|examples|tutorials)/"
 
 [tool.isort]
 profile = "black"
