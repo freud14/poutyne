@@ -59,7 +59,7 @@ jobs:
       - name: Install dependencies
         run: uv sync --group docs
       - name: Building doc
-        run: uv run make -C docs clean html
+        run: cd docs && ./rebuild_html_doc.sh
 
   tests:
     runs-on: ${{ inputs.os }}

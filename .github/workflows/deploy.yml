@@ -18,7 +18,7 @@ jobs:
       - name: Install dependencies
         run: uv sync --group docs
       - name: Building doc
-        run: uv run make -C docs clean html
+        run: cd docs && ./rebuild_html_doc.sh
       - name: Deploy
         uses: peaceiris/actions-gh-pages@068dc23d9710f1ba62e86896f84735d869951305
         with:
