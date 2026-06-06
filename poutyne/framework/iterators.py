@@ -33,8 +33,8 @@ class Step:
 def cycle(iterable):  # Equivalent to itertools cycle, without any extra memory requirement
     while True:
         # yield from causes an infinite loop, not sure why.
-        # pylint: disable=use-yield-from
-        yield from iterable
+        for x in iterable:  # noqa: UP028 (yield from causes an infinite loop here)
+            yield x
 
 
 def _get_step_iterator(steps, generator):
