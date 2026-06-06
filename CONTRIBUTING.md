@@ -73,18 +73,22 @@ uv sync --group dev
 
 ## Use a Consistent Coding Style
 
-All of the code is formatted using [black](https://black.readthedocs.io) with the associated [config file](https://github.com/freud14/poutyne/blob/master/pyproject.toml). In order to format the code of your submission, simply run
+All of the code is formatted and linted using [ruff](https://docs.astral.sh/ruff/) with the associated [config file](https://github.com/freud14/poutyne/blob/master/pyproject.toml). In order to format the code of your submission, simply run
 
 ```
-uv run black .
-uv run isort .
+uv run ruff format .
 ```
 
-We also have our own `pylint` [config file](https://github.com/freud14/poutyne/blob/master/.pylintrc). Try not to introduce code incoherences detected by the linting. You can run the linting procedure with
+Try not to introduce code incoherences detected by the linter. You can run the linting procedure with
 
 ```
-uv run pylint poutyne
-uv run pylint tests
+uv run ruff check .
+```
+
+To automatically fix auto-fixable issues, run
+
+```
+uv run ruff check --fix .
 ```
 
 ## Tests
