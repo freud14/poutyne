@@ -94,26 +94,23 @@ class ExperimentCheckpointLoadingTestBase:
         filename = self.checkpoint_paths[0]
         self.test_experiment.load_checkpoint(index)
 
-        assert (
-            self.test_experiment.model.network.state_dict()
-            == torch.load(filename, pickle_module=pickle, map_location="cpu")
+        assert self.test_experiment.model.network.state_dict() == torch.load(
+            filename, pickle_module=pickle, map_location="cpu"
         )
 
     def test_load_checkpoint_best(self):
         filename = self.checkpoint_paths[-1]
         self.test_experiment.load_checkpoint("best")
 
-        assert (
-            self.test_experiment.model.network.state_dict()
-            == torch.load(filename, pickle_module=pickle, map_location="cpu")
+        assert self.test_experiment.model.network.state_dict() == torch.load(
+            filename, pickle_module=pickle, map_location="cpu"
         )
 
     def test_load_checkpoint_last(self):
         self.test_experiment.load_checkpoint("last")
 
-        assert (
-            self.test_experiment.model.network.state_dict()
-            == torch.load(self.last_checkpoint_path, pickle_module=pickle, map_location="cpu")
+        assert self.test_experiment.model.network.state_dict() == torch.load(
+            self.last_checkpoint_path, pickle_module=pickle, map_location="cpu"
         )
 
     def test_load_checkpoint_using_path(self):
@@ -125,9 +122,8 @@ class ExperimentCheckpointLoadingTestBase:
         )  # change the ckpt path
         self.test_experiment.load_checkpoint(cpkt_path)
 
-        assert (
-            self.test_experiment.model.network.state_dict()
-            == torch.load(cpkt_path, pickle_module=pickle, map_location="cpu")
+        assert self.test_experiment.model.network.state_dict() == torch.load(
+            cpkt_path, pickle_module=pickle, map_location="cpu"
         )
 
     def test_load_invalid_checkpoint(self):

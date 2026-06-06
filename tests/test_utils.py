@@ -452,4 +452,3 @@ class GetBatchSizeTest:
             inf_batch_size = get_batch_size([1, 2, 3], [4, 5, 6])
             assert inf_batch_size == 1
             assert len(w) == 0
-

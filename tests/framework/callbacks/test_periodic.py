@@ -66,9 +66,7 @@ class PeriodicSaveTest:
 
     def test_mode_not_min_max_raise_error(self):
         with pytest.raises(ValueError):
-            PeriodicEpochSave(
-                self.save_filename, monitor='val_loss', verbose=True, save_best_only=True, mode='a_mode'
-            )
+            PeriodicEpochSave(self.save_filename, monitor='val_loss', verbose=True, save_best_only=True, mode='a_mode')
 
     def test_incorrect_monitored_metric_name_raise_key_error(self):
         invalid_monitor_metric_name = "invalid_monitor_metric_name"

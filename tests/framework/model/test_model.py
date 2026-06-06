@@ -1406,5 +1406,3 @@ class ModelDatasetMethodsTest(ModelFittingTestCase):
 
         actual_x = self.model.preprocess_input(pack_padded_sequences_vectors)
         assert isinstance(actual_x[0], PackedSequence)
-
-

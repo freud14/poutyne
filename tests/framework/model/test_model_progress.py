@@ -496,17 +496,13 @@ class ModelProgressTest(ModelFittingTestCase):
         # the 5 train steps
         for step, step_update in enumerate(steps_update[: ModelProgressTest.num_steps], start=1):
             progress_Bar = "\u2588" * step * 2 + " " * (20 - step * 2)
-            regex_filled = template_format.format(
-                epoch, step, step / ModelProgressTest.num_steps * 100, progress_Bar
-            )
+            regex_filled = template_format.format(epoch, step, step / ModelProgressTest.num_steps * 100, progress_Bar)
             assert re.search(regex_filled, step_update)
 
         # The 5 val steps
         for step, step_update in enumerate(steps_update[ModelProgressTest.num_steps : -1], start=1):
             progress_Bar = "\u2588" * step * 2 + " " * (20 - step * 2)
-            regex_filled = template_format.format(
-                epoch, step, step / ModelProgressTest.num_steps * 100, progress_Bar
-            )
+            regex_filled = template_format.format(epoch, step, step / ModelProgressTest.num_steps * 100, progress_Bar)
             assert re.search(regex_filled, step_update)
 
         # last print update templating different
@@ -533,17 +529,13 @@ class ModelProgressTest(ModelFittingTestCase):
         # the 5 train steps
         for step, step_update in enumerate(steps_update[: ModelProgressTest.num_steps], start=1):
             progress_Bar = "\u2588" * step * 2 + " " * (20 - step * 2)
-            regex_filled = template_format.format(
-                epoch, step, step / ModelProgressTest.num_steps * 100, progress_Bar
-            )
+            regex_filled = template_format.format(epoch, step, step / ModelProgressTest.num_steps * 100, progress_Bar)
             assert re.search(regex_filled, step_update)
 
         # The 5 val steps
         for step, step_update in enumerate(steps_update[ModelProgressTest.num_steps : -1], start=1):
             progress_Bar = "\u2588" * step * 2 + " " * (20 - step * 2)
-            regex_filled = template_format.format(
-                epoch, step, step / ModelProgressTest.num_steps * 100, progress_Bar
-            )
+            regex_filled = template_format.format(epoch, step, step / ModelProgressTest.num_steps * 100, progress_Bar)
             assert re.search(regex_filled, step_update)
 
         # last print update templating different
@@ -607,9 +599,7 @@ class ModelProgressTest(ModelFittingTestCase):
         template_format = r".*\[37mStep:.*{}\/5.*{:6.2f}\%.*|{}|.*ETA:"
         for step, step_update in enumerate(steps_update[:-1], start=1):
             progress_Bar = "\u2588" * step * 2 + " " * (20 - step * 2)
-            regex_filled = template_format.format(
-                step, step / ModelProgressTest.num_steps * 100, progress_Bar
-            )
+            regex_filled = template_format.format(step, step / ModelProgressTest.num_steps * 100, progress_Bar)
             assert re.search(regex_filled, step_update)
 
         # last print update templating different
@@ -632,9 +622,7 @@ class ModelProgressTest(ModelFittingTestCase):
         template_format = r".*Step:.*{}\/5.*{:6.2f}\%.*|{}|.*ETA:"
         for step, step_update in enumerate(steps_update[:-1], start=1):
             progress_Bar = "\u2588" * step * 2 + " " * (20 - step * 2)
-            regex_filled = template_format.format(
-                step, step / ModelProgressTest.num_steps * 100, progress_Bar
-            )
+            regex_filled = template_format.format(step, step / ModelProgressTest.num_steps * 100, progress_Bar)
             assert re.search(regex_filled, step_update)
 
         # last print update templating different
