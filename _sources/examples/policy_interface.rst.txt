@@ -6,8 +6,8 @@ Interface of ``policy``
 
 .. note::
 
-    - See the notebook `here <https://github.com/GRAAL-Research/poutyne/blob/master/examples/policy_interface.ipynb>`_
-    - Run in `Google Colab <https://colab.research.google.com/github/GRAAL-Research/poutyne/blob/master/examples/policy_interface.ipynb>`_
+    - See the notebook `here <https://github.com/freud14/poutyne/blob/master/examples/policy_interface.ipynb>`_
+    - Run in `Google Colab <https://colab.research.google.com/github/freud14/poutyne/blob/master/examples/policy_interface.ipynb>`_
 
 Let's install the latest version of Poutyne (if it's not already) and import all the needed packages.
 For the first section discussing the ``policy`` API, only the Poutyne import is necessary.

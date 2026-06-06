@@ -10,16 +10,16 @@
 <meta content="https://poutyne.org/_static/logos/poutyne-notext.png" property="og:image" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Here is Poutyne &mdash; Poutyne 1.17.4 documentation</title>
+  <title>Here is Poutyne &mdash; Poutyne 1.18.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
-      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
 
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=6f0e5ab0"></script>
-      <script src="_static/doctools.js?v=9bcbadda"></script>
-      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/documentation_options.js?v=256cef93"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -84,7 +84,7 @@
       <li class="breadcrumb-item active">Here is Poutyne</li>
       <li class="wy-breadcrumbs-aside">
               <!-- User defined GitHub URL -->
-              <a href="https://github.com/GRAAL-Research/poutyne" class="fa fa-github"> Edit on GitHub</a>
+              <a href="https://github.com/freud14/poutyne" class="fa fa-github"> Edit on GitHub</a>
       </li>
   </ul>
   <hr/>
@@ -100,7 +100,7 @@
 <li><p>Train models easily.</p></li>
 <li><p>Use callbacks to save your best model, perform early stopping and much more.</p></li>
 </ul>
-<p>Poutyne is compatible with the <strong>latest version of PyTorch</strong> and  <strong>Python &gt;= 3.8</strong>.</p>
+<p>Poutyne is compatible with the <strong>latest version of PyTorch</strong> and  <strong>Python &gt;= 3.10</strong>.</p>
 <section id="cite">
 <h2>Cite<a class="headerlink" href="#cite" title="Link to this heading"></a></h2>
 <div class="highlight-bib notranslate"><div class="highlight"><pre><span></span><span class="nc">@misc</span><span class="p">{</span><span class="nl">Paradis_Poutyne_A_Simplified_2020</span><span class="p">,</span>
@@ -181,8 +181,8 @@
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">predictions</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">test_x</span><span class="p">)</span>
 </pre></div>
 </div>
-<p><a class="reference external" href="https://github.com/GRAAL-Research/poutyne/blob/master/examples/basic_random_classification.py">See the complete code here.</a> Also, <a class="reference external" href="https://github.com/GRAAL-Research/poutyne/blob/master/examples/basic_random_regression.py">see this</a> for an example for regression.</p>
-<p>One of the strengths Poutyne are <a class="reference internal" href="callbacks.html#callbacks"><span class="std std-ref">callbacks</span></a>. They allow you to save checkpoints, log training statistics and more. See this <a class="reference external" href="https://github.com/GRAAL-Research/poutyne/blob/master/examples/introduction_pytorch_poutyne.ipynb">notebook</a> for an introduction to callbacks. In that vein, Poutyne also offers an <a class="reference internal" href="experiment.html#poutyne.ModelBundle" title="poutyne.ModelBundle"><code class="xref py py-class docutils literal notranslate"><span class="pre">ModelBundle</span></code></a> class that offers automatic checkpointing, logging and more using callbacks under the hood. Here is an example of usage.</p>
+<p><a class="reference external" href="https://github.com/freud14/poutyne/blob/master/examples/basic_random_classification.py">See the complete code here.</a> Also, <a class="reference external" href="https://github.com/freud14/poutyne/blob/master/examples/basic_random_regression.py">see this</a> for an example for regression.</p>
+<p>One of the strengths Poutyne are <a class="reference internal" href="callbacks.html#callbacks"><span class="std std-ref">callbacks</span></a>. They allow you to save checkpoints, log training statistics and more. See this <a class="reference external" href="https://github.com/freud14/poutyne/blob/master/examples/introduction_pytorch_poutyne.ipynb">notebook</a> for an introduction to callbacks. In that vein, Poutyne also offers an <a class="reference internal" href="experiment.html#poutyne.ModelBundle" title="poutyne.ModelBundle"><code class="xref py py-class docutils literal notranslate"><span class="pre">ModelBundle</span></code></a> class that offers automatic checkpointing, logging and more using callbacks under the hood. Here is an example of usage.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">poutyne</span><span class="w"> </span><span class="kn">import</span> <span class="n">ModelBundle</span>
 
 <span class="c1"># Everything is saved in ./saves/my_classification_network</span>
@@ -195,7 +195,7 @@
 <span class="n">model_bundle</span><span class="o">.</span><span class="n">test_data</span><span class="p">(</span><span class="n">test_x</span><span class="p">,</span> <span class="n">test_y</span><span class="p">)</span>
 </pre></div>
 </div>
-<p><a class="reference external" href="https://github.com/GRAAL-Research/poutyne/blob/master/examples/basic_random_classification_with_model_bundle.py">See the complete code here.</a> Also, <a class="reference external" href="https://github.com/GRAAL-Research/poutyne/blob/master/examples/basic_random_regression_with_model_bundle.py">see this</a> for an example for regression.</p>
+<p><a class="reference external" href="https://github.com/freud14/poutyne/blob/master/examples/basic_random_classification_with_model_bundle.py">See the complete code here.</a> Also, <a class="reference external" href="https://github.com/freud14/poutyne/blob/master/examples/basic_random_regression_with_model_bundle.py">see this</a> for an example for regression.</p>
 </section>
 <section id="installation">
 <h1>Installation<a class="headerlink" href="#installation" title="Link to this heading"></a></h1>
@@ -207,12 +207,12 @@
 </div>
 </li>
 <li><p><strong>Install the latest development version of Poutyne:</strong></p>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>-U<span class="w"> </span>git+https://github.com/GRAAL-Research/poutyne.git@dev
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>-U<span class="w"> </span>git+https://github.com/freud14/poutyne.git@dev
 </pre></div>
 </div>
 </li>
 <li><p><strong>Install and develop on top of the provided Docker Image</strong></p>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>docker<span class="w"> </span>pull<span class="w"> </span>ghcr.io/graal-research/poutyne:latest
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>docker<span class="w"> </span>pull<span class="w"> </span>ghcr.io/freud14/poutyne:latest
 </pre></div>
 </div>
 </li>
@@ -228,39 +228,39 @@
 </section>
 <section id="examples">
 <h2>Examples<a class="headerlink" href="#examples" title="Link to this heading"></a></h2>
-<p>Look at notebook files with full working <a class="reference external" href="https://github.com/GRAAL-Research/poutyne/blob/master/examples/">examples</a>:</p>
+<p>Look at notebook files with full working <a class="reference external" href="https://github.com/freud14/poutyne/blob/master/examples/">examples</a>:</p>
 <ul class="simple">
-<li><p><a class="reference external" href="https://github.com/GRAAL-Research/poutyne/blob/master/examples/introduction.ipynb">introduction.ipynb</a>  (<a class="reference external" href="https://github.com/GRAAL-Research/poutyne/blob/master/tutorials/introduction_pytorch_poutyne_tutorial.ipynb">tutorial version</a>) - comparison of Poutyne with bare PyTorch and usage examples of Poutyne callbacks and the ModelBundle class.</p></li>
-<li><p><a class="reference external" href="https://github.com/GRAAL-Research/poutyne/blob/master/examples/tips_and_tricks.ipynb">tips_and_tricks.ipynb</a> -  tips and tricks using Poutyne</p></li>
-<li><p><a class="reference external" href="https://github.com/GRAAL-Research/poutyne/blob/master/examples/sequence_tagging.ipynb">sequence_tagging.ipynb</a> -  Sequence tagging with an RNN</p></li>
-<li><p><a class="reference external" href="https://github.com/GRAAL-Research/poutyne/blob/master/examples/transfer_learning.ipynb">transfer_learning.ipynb</a> - transfer learning on <code class="docutils literal notranslate"><span class="pre">ResNet-18</span></code> on the <a class="reference external" href="http://www.vision.caltech.edu/visipedia/CUB-200-2011.html">CUB-200</a> dataset.</p></li>
-<li><p><a class="reference external" href="https://github.com/GRAAL-Research/poutyne/blob/master/examples/policy_interface.ipynb">policy_interface.ipynb</a> - example of policies</p></li>
-<li><p><a class="reference external" href="https://github.com/GRAAL-Research/poutyne/blob/master/examples/image_reconstruction.ipynb">image_reconstruction.ipynb</a> - example of image reconstruction</p></li>
-<li><p><a class="reference external" href="https://github.com/GRAAL-Research/poutyne/blob/master/examples/classification_and_regression.ipynb">classification_and_regression.ipynb</a> - example of multitask learning with classification and regression</p></li>
-<li><p><a class="reference external" href="https://github.com/GRAAL-Research/poutyne/blob/master/examples/semantic_segmentation.ipynb">semantic_segmentation.ipynb</a> - example of semantic segmentation</p></li>
+<li><p><a class="reference external" href="https://github.com/freud14/poutyne/blob/master/examples/introduction.ipynb">introduction.ipynb</a>  (<a class="reference external" href="https://github.com/freud14/poutyne/blob/master/tutorials/introduction_pytorch_poutyne_tutorial.ipynb">tutorial version</a>) - comparison of Poutyne with bare PyTorch and usage examples of Poutyne callbacks and the ModelBundle class.</p></li>
+<li><p><a class="reference external" href="https://github.com/freud14/poutyne/blob/master/examples/tips_and_tricks.ipynb">tips_and_tricks.ipynb</a> -  tips and tricks using Poutyne</p></li>
+<li><p><a class="reference external" href="https://github.com/freud14/poutyne/blob/master/examples/sequence_tagging.ipynb">sequence_tagging.ipynb</a> -  Sequence tagging with an RNN</p></li>
+<li><p><a class="reference external" href="https://github.com/freud14/poutyne/blob/master/examples/transfer_learning.ipynb">transfer_learning.ipynb</a> - transfer learning on <code class="docutils literal notranslate"><span class="pre">ResNet-18</span></code> on the <a class="reference external" href="http://www.vision.caltech.edu/visipedia/CUB-200-2011.html">CUB-200</a> dataset.</p></li>
+<li><p><a class="reference external" href="https://github.com/freud14/poutyne/blob/master/examples/policy_interface.ipynb">policy_interface.ipynb</a> - example of policies</p></li>
+<li><p><a class="reference external" href="https://github.com/freud14/poutyne/blob/master/examples/image_reconstruction.ipynb">image_reconstruction.ipynb</a> - example of image reconstruction</p></li>
+<li><p><a class="reference external" href="https://github.com/freud14/poutyne/blob/master/examples/classification_and_regression.ipynb">classification_and_regression.ipynb</a> - example of multitask learning with classification and regression</p></li>
+<li><p><a class="reference external" href="https://github.com/freud14/poutyne/blob/master/examples/semantic_segmentation.ipynb">semantic_segmentation.ipynb</a> - example of semantic segmentation</p></li>
 </ul>
 <p>or in <code class="docutils literal notranslate"><span class="pre">Google</span> <span class="pre">Colab</span></code>:</p>
 <ul class="simple">
-<li><p><a class="reference external" href="https://colab.research.google.com/github/GRAAL-Research/poutyne/blob/master/examples/introduction.ipynb">introduction.ipynb</a> (<a class="reference external" href="https://colab.research.google.com/github/GRAAL-Research/poutyne/blob/master/tutorials/introduction_pytorch_poutyne_tutorial.ipynb">tutorial version</a>) - comparison of Poutyne with bare PyTorch and usage examples of Poutyne callbacks and the ModelBundle class.</p></li>
-<li><p><a class="reference external" href="https://colab.research.google.com/github/GRAAL-Research/poutyne/blob/master/examples/tips_and_tricks.ipynb">tips_and_tricks.ipynb</a> -  tips and tricks using Poutyne.</p></li>
-<li><p><a class="reference external" href="https://colab.research.google.com/github/GRAAL-Research/poutyne/blob/master/examples/sequence_tagging.ipynb">sequence_tagging.ipynb</a> -  Sequence tagging with an RNN</p></li>
-<li><p><a class="reference external" href="https://colab.research.google.com/github/GRAAL-Research/poutyne/blob/master/examples/transfer_learning.ipynb">transfer_learning.ipynb</a> - transfer learning on <code class="docutils literal notranslate"><span class="pre">ResNet-18</span></code> on the <a class="reference external" href="http://www.vision.caltech.edu/visipedia/CUB-200-2011.html">CUB-200</a> dataset.</p></li>
-<li><p><a class="reference external" href="https://colab.research.google.com/github/GRAAL-Research/poutyne/blob/master/examples/policy_interface.ipynb">policy_interface.ipynb</a> - example of policies</p></li>
-<li><p><a class="reference external" href="https://colab.research.google.com/github/GRAAL-Research/poutyne/blob/master/examples/image_reconstruction.ipynb">image_reconstruction.ipynb</a> - example of image reconstruction</p></li>
-<li><p><a class="reference external" href="https://colab.research.google.com/github/GRAAL-Research/poutyne/blob/master/examples/classification_and_regression.ipynb">classification_and_regression.ipynb</a> - example of multitask learning with classification and regression</p></li>
-<li><p><a class="reference external" href="https://colab.research.google.com/github/GRAAL-Research/poutyne/blob/master/examples/semantic_segmentation.ipynb">semantic_segmentation.ipynb</a> - example of semantic segmentation</p></li>
+<li><p><a class="reference external" href="https://colab.research.google.com/github/freud14/poutyne/blob/master/examples/introduction.ipynb">introduction.ipynb</a> (<a class="reference external" href="https://colab.research.google.com/github/freud14/poutyne/blob/master/tutorials/introduction_pytorch_poutyne_tutorial.ipynb">tutorial version</a>) - comparison of Poutyne with bare PyTorch and usage examples of Poutyne callbacks and the ModelBundle class.</p></li>
+<li><p><a class="reference external" href="https://colab.research.google.com/github/freud14/poutyne/blob/master/examples/tips_and_tricks.ipynb">tips_and_tricks.ipynb</a> -  tips and tricks using Poutyne.</p></li>
+<li><p><a class="reference external" href="https://colab.research.google.com/github/freud14/poutyne/blob/master/examples/sequence_tagging.ipynb">sequence_tagging.ipynb</a> -  Sequence tagging with an RNN</p></li>
+<li><p><a class="reference external" href="https://colab.research.google.com/github/freud14/poutyne/blob/master/examples/transfer_learning.ipynb">transfer_learning.ipynb</a> - transfer learning on <code class="docutils literal notranslate"><span class="pre">ResNet-18</span></code> on the <a class="reference external" href="http://www.vision.caltech.edu/visipedia/CUB-200-2011.html">CUB-200</a> dataset.</p></li>
+<li><p><a class="reference external" href="https://colab.research.google.com/github/freud14/poutyne/blob/master/examples/policy_interface.ipynb">policy_interface.ipynb</a> - example of policies</p></li>
+<li><p><a class="reference external" href="https://colab.research.google.com/github/freud14/poutyne/blob/master/examples/image_reconstruction.ipynb">image_reconstruction.ipynb</a> - example of image reconstruction</p></li>
+<li><p><a class="reference external" href="https://colab.research.google.com/github/freud14/poutyne/blob/master/examples/classification_and_regression.ipynb">classification_and_regression.ipynb</a> - example of multitask learning with classification and regression</p></li>
+<li><p><a class="reference external" href="https://colab.research.google.com/github/freud14/poutyne/blob/master/examples/semantic_segmentation.ipynb">semantic_segmentation.ipynb</a> - example of semantic segmentation</p></li>
 </ul>
 </section>
 <section id="videos">
 <h2>Videos<a class="headerlink" href="#videos" title="Link to this heading"></a></h2>
 <ul class="simple">
-<li><p><a class="reference external" href="https://youtu.be/gQ3SW5r7HSs">Presentation on Poutyne</a> given at one of the weekly presentations of the Institute Intelligence and Data (IID) of Université Laval. <a class="reference external" href="https://github.com/GRAAL-Research/poutyne/blob/master/slides/poutyne.pdf">Slides</a> and the <a class="reference external" href="https://github.com/GRAAL-Research/poutyne/blob/master/slides/src/">associated Latex source code</a> are also available.</p></li>
+<li><p><a class="reference external" href="https://youtu.be/gQ3SW5r7HSs">Presentation on Poutyne</a> given at one of the weekly presentations of the Institute Intelligence and Data (IID) of Université Laval. <a class="reference external" href="https://github.com/freud14/poutyne/blob/master/slides/poutyne.pdf">Slides</a> and the <a class="reference external" href="https://github.com/freud14/poutyne/blob/master/slides/src/">associated Latex source code</a> are also available.</p></li>
 </ul>
 </section>
 </section>
 <section id="contributing-to-poutyne">
 <h1>Contributing to Poutyne<a class="headerlink" href="#contributing-to-poutyne" title="Link to this heading"></a></h1>
-<p>We welcome user input, whether it is regarding bugs found in the library or feature propositions ! Make sure to have a look at our <a class="reference external" href="https://github.com/GRAAL-Research/poutyne/blob/master/CONTRIBUTING.md">contributing guidelines</a> for more details on this matter.</p>
+<p>We welcome user input, whether it is regarding bugs found in the library or feature propositions ! Make sure to have a look at our <a class="reference external" href="https://github.com/freud14/poutyne/blob/master/CONTRIBUTING.md">contributing guidelines</a> for more details on this matter.</p>
 </section>
 <section id="sponsors">
 <h1>Sponsors<a class="headerlink" href="#sponsors" title="Link to this heading"></a></h1>
@@ -268,7 +268,7 @@
 </section>
 <section id="license">
 <h1>License<a class="headerlink" href="#license" title="Link to this heading"></a></h1>
-<p>Poutyne is LGPLv3 licensed, as found in the <a class="reference external" href="https://github.com/GRAAL-Research/poutyne/blob/master/LICENSE">LICENSE file</a>.</p>
+<p>Poutyne is LGPLv3 licensed, as found in the <a class="reference external" href="https://github.com/freud14/poutyne/blob/master/LICENSE">LICENSE file</a>.</p>
 </section>
 <section id="why-this-name-poutyne">
 <h1>Why this name, Poutyne?<a class="headerlink" href="#why-this-name-poutyne" title="Link to this heading"></a></h1>
@@ -325,7 +325,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2018-2025, Frédérik Paradis.</p>
+    <p>&#169; Copyright 2018-2026, Frédérik Paradis.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
