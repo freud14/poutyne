@@ -7,8 +7,8 @@ Sequence Tagging With an RNN
 ****************************
 
 .. note::
-    - See the notebook `here <https://github.com/GRAAL-Research/poutyne/blob/master/examples/sequence_tagging.ipynb>`_
-    - Run in `Google Colab <https://colab.research.google.com/github/GRAAL-Research/poutyne/blob/master/examples/sequence_tagging.ipynb>`_
+    - See the notebook `here <https://github.com/freud14/poutyne/blob/master/examples/sequence_tagging.ipynb>`_
+    - Run in `Google Colab <https://colab.research.google.com/github/freud14/poutyne/blob/master/examples/sequence_tagging.ipynb>`_
 
 
 In this example, we will do sequence tagging with RNNs using Poutyne.

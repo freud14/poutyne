@@ -6,8 +6,8 @@ Gender Classification and Eyes Location Detection: A Two Task Problem
 
 .. note::
 
-    - See the notebook `here <https://github.com/GRAAL-Research/poutyne/blob/master/examples/classification_and_regression.ipynb>`_
-    - Run in `Google Colab <https://colab.research.google.com/github/GRAAL-Research/poutyne/blob/master/examples/classification_and_regression.ipynb>`_
+    - See the notebook `here <https://github.com/freud14/poutyne/blob/master/examples/classification_and_regression.ipynb>`_
+    - Run in `Google Colab <https://colab.research.google.com/github/freud14/poutyne/blob/master/examples/classification_and_regression.ipynb>`_
 
 In this example, we are going to implement a multi-task problem. We try to identify the gender of the people, as well as locating their eyes in the image. Hence, we have two different tasks: classification (to identify the gender) and regression (to find the location of the eyes). We are going to use a single network (a CNN) to perform both tasks, however, we will need to apply different loss functions, each proper to a specific task. For this example we will need to install a few libraries (such as OpenCV, wget). If you don't have them, they can be installed as below:
 
