@@ -68,7 +68,7 @@ This project uses [uv](https://docs.astral.sh/uv/) for dependency management. In
 Install all development dependencies and the package in editable mode with:
 
 ```
-uv sync --group dev --group test --group docs
+uv sync --group dev
 ```
 
 ## Use a Consistent Coding Style

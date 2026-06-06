@@ -27,7 +27,7 @@ jobs:
         with:
           python-version: ${{ inputs.python-version }}
       - name: Install dependencies
-        run: uv sync --group dev
+        run: uv sync --group lint
       - name: Formatting
         run: |
           uv run black --diff --check .
@@ -42,7 +42,7 @@ jobs:
         with:
           python-version: ${{ inputs.python-version }}
       - name: Install dependencies
-        run: uv sync --group dev --group test
+        run: uv sync --group lint --group test
       - name: PyLint
         run: uv run pylint poutyne/ tests/
       - name: Flake8
