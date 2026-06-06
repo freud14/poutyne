@@ -1,2 +1,2 @@
 #!/bin/sh
-make clean && make html
+uv run make clean && uv run make html
