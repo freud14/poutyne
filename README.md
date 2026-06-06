@@ -1,11 +1,11 @@
-![Poutyne Logo](https://raw.githubusercontent.com/GRAAL-Research/poutyne/master/docs/source/_static/logos/poutyne-dark.png)
+![Poutyne Logo](https://raw.githubusercontent.com/freud14/poutyne/master/docs/source/_static/logos/poutyne-dark.png)
 
 [![poutyne version - PyPI](https://img.shields.io/pypi/v/poutyne)](https://pypi.org/project/poutyne/)
 ![PyPI status](https://img.shields.io/pypi/status/poutyne.svg)
 [![License: LGPL v3](https://img.shields.io/badge/License-LGPL%20v3-blue.svg)](http://www.gnu.org/licenses/lgpl-3.0)
 ![Python version - PyPI](https://img.shields.io/pypi/pyversions/poutyne.svg)
-[![CI/CD](https://github.com/GRAAL-Research/poutyne/actions/workflows/main.yml/badge.svg)](https://github.com/GRAAL-Research/poutyne/actions/workflows/main.yml)
-[![codecov](https://codecov.io/gh/GRAAL-Research/poutyne/branch/master/graph/badge.svg?token=H8D1nZ1wTR)](https://codecov.io/gh/GRAAL-Research/poutyne)
+[![CI/CD](https://github.com/freud14/poutyne/actions/workflows/main.yml/badge.svg)](https://github.com/freud14/poutyne/actions/workflows/main.yml)
+[![codecov](https://codecov.io/gh/freud14/poutyne/branch/master/graph/badge.svg?token=H8D1nZ1wTR)](https://codecov.io/gh/freud14/poutyne)
 [![Downloads](https://pepy.tech/badge/poutyne)](https://pepy.tech/project/poutyne)
 
 ## Here is Poutyne.
@@ -19,7 +19,7 @@ Use Poutyne to:
 
 Read the documentation at [Poutyne.org](https://poutyne.org).
 
-Poutyne is compatible with the **latest version of PyTorch** and **Python >= 3.8**.
+Poutyne is compatible with the **latest version of PyTorch** and **Python >= 3.10**.
 
 ### Cite
 
@@ -117,9 +117,9 @@ Or only predict on new data:
 predictions = model.predict(test_x)
 ```
 
-[See the complete code here.](https://github.com/GRAAL-Research/poutyne/blob/master/examples/basic_random_classification.py) Also, [see this](https://github.com/GRAAL-Research/poutyne/blob/master/examples/basic_random_regression.py) for an example for regression.
+[See the complete code here.](https://github.com/freud14/poutyne/blob/master/examples/basic_random_classification.py) Also, [see this](https://github.com/freud14/poutyne/blob/master/examples/basic_random_regression.py) for an example for regression.
 
-One of the strengths Poutyne are [callbacks](https://poutyne.org/callbacks.html). They allow you to save checkpoints, log training statistics and more. See this [notebook](https://github.com/GRAAL-Research/poutyne/blob/master/examples/introduction_pytorch_poutyne.ipynb) for an introduction to callbacks. In that vein, Poutyne also offers an [ModelBundle class](https://poutyne.org/experiment.html#poutyne.ModelBundle) that offers automatic checkpointing, logging and more using callbacks under the hood. Here is an example of usage.
+One of the strengths Poutyne are [callbacks](https://poutyne.org/callbacks.html). They allow you to save checkpoints, log training statistics and more. See this [notebook](https://github.com/freud14/poutyne/blob/master/examples/introduction_pytorch_poutyne.ipynb) for an introduction to callbacks. In that vein, Poutyne also offers an [ModelBundle class](https://poutyne.org/experiment.html#poutyne.ModelBundle) that offers automatic checkpointing, logging and more using callbacks under the hood. Here is an example of usage.
 
 ```python
 from poutyne import ModelBundle
@@ -134,7 +134,7 @@ model_bundle.train_data(train_x, train_y, validation_data=(valid_x, valid_y), ep
 model_bundle.test_data(test_x, test_y)
 ```
 
-[See the complete code here.](https://github.com/GRAAL-Research/poutyne/blob/master/examples/basic_random_classification_with_model_bundle.py) Also, [see this](https://github.com/GRAAL-Research/poutyne/blob/master/examples/basic_random_regression_with_model_bundle.py) for an example for regression.
+[See the complete code here.](https://github.com/freud14/poutyne/blob/master/examples/basic_random_classification_with_model_bundle.py) Also, [see this](https://github.com/freud14/poutyne/blob/master/examples/basic_random_regression_with_model_bundle.py) for an example for regression.
 
 ---
 
@@ -146,18 +146,22 @@ Before installing Poutyne, you must have the latest version of [PyTorch](https:/
 
 ```sh
 pip install poutyne
+# or with uv
+uv add poutyne
 ```
 
 - **Install the latest development version of Poutyne:**
 
 ```sh
-pip install -U git+https://github.com/GRAAL-Research/poutyne.git@dev
+pip install -U git+https://github.com/freud14/poutyne.git@dev
+# or with uv
+uv add git+https://github.com/freud14/poutyne.git@dev
 ```
 
 - **Install and develop on top of the provided Docker Image**
 
 ```sh
-docker pull ghcr.io/graal-research/poutyne:latest
+docker pull ghcr.io/freud14/poutyne:latest
 ```
 
 ---
@@ -170,37 +174,37 @@ docker pull ghcr.io/graal-research/poutyne:latest
 
 ### Examples
 
-Look at notebook files with full working [examples](https://github.com/GRAAL-Research/poutyne/blob/master/examples/):
+Look at notebook files with full working [examples](https://github.com/freud14/poutyne/blob/master/examples/):
 
-- [introduction.ipynb](https://github.com/GRAAL-Research/poutyne/blob/master/examples/introduction.ipynb) ([tutorial version](https://github.com/GRAAL-Research/poutyne/blob/master/tutorials/introduction_pytorch_poutyne_tutorial.ipynb)) - comparison of Poutyne with bare PyTorch and usage examples of Poutyne callbacks and the ModelBundle class.
-- [tips_and_tricks.ipynb](https://github.com/GRAAL-Research/poutyne/blob/master/examples/tips_and_tricks.ipynb) - tips and tricks using Poutyne
-- [sequence_tagging.ipynb](https://github.com/GRAAL-Research/poutyne/blob/master/examples/sequence_tagging.ipynb) - Sequence tagging with an RNN
-- [transfer_learning.ipynb](https://github.com/GRAAL-Research/poutyne/blob/master/examples/transfer_learning.ipynb) - transfer learning on `ResNet-18` on the [CUB-200](http://www.vision.caltech.edu/visipedia/CUB-200-2011.html) dataset.
-- [policy_interface.ipynb](https://github.com/GRAAL-Research/poutyne/blob/master/examples/policy_interface.ipynb) - example of policies
-- [image_reconstruction.ipynb](https://github.com/GRAAL-Research/poutyne/blob/master/examples/image_reconstruction.ipynb) - example of image reconstruction
-- [classification_and_regression.ipynb](https://github.com/GRAAL-Research/poutyne/blob/master/examples/classification_and_regression.ipynb) - example of multitask learning with classification and regression
-- [semantic_segmentation.ipynb](https://github.com/GRAAL-Research/poutyne/blob/master/examples/semantic_segmentation.ipynb) - example of semantic segmentation
+- [introduction.ipynb](https://github.com/freud14/poutyne/blob/master/examples/introduction.ipynb) ([tutorial version](https://github.com/freud14/poutyne/blob/master/tutorials/introduction_pytorch_poutyne_tutorial.ipynb)) - comparison of Poutyne with bare PyTorch and usage examples of Poutyne callbacks and the ModelBundle class.
+- [tips_and_tricks.ipynb](https://github.com/freud14/poutyne/blob/master/examples/tips_and_tricks.ipynb) - tips and tricks using Poutyne
+- [sequence_tagging.ipynb](https://github.com/freud14/poutyne/blob/master/examples/sequence_tagging.ipynb) - Sequence tagging with an RNN
+- [transfer_learning.ipynb](https://github.com/freud14/poutyne/blob/master/examples/transfer_learning.ipynb) - transfer learning on `ResNet-18` on the [CUB-200](http://www.vision.caltech.edu/visipedia/CUB-200-2011.html) dataset.
+- [policy_interface.ipynb](https://github.com/freud14/poutyne/blob/master/examples/policy_interface.ipynb) - example of policies
+- [image_reconstruction.ipynb](https://github.com/freud14/poutyne/blob/master/examples/image_reconstruction.ipynb) - example of image reconstruction
+- [classification_and_regression.ipynb](https://github.com/freud14/poutyne/blob/master/examples/classification_and_regression.ipynb) - example of multitask learning with classification and regression
+- [semantic_segmentation.ipynb](https://github.com/freud14/poutyne/blob/master/examples/semantic_segmentation.ipynb) - example of semantic segmentation
 
 or in `Google Colab`:
 
-- [introduction.ipynb](https://colab.research.google.com/github/GRAAL-Research/poutyne/blob/master/examples/introduction.ipynb) ([tutorial version](https://colab.research.google.com/github/GRAAL-Research/poutyne/blob/master/tutorials/introduction_pytorch_poutyne_tutorial.ipynb)) - comparison of Poutyne with bare PyTorch and usage examples of Poutyne callbacks and the ModelBundle class.
-- [tips_and_tricks.ipynb](https://colab.research.google.com/github/GRAAL-Research/poutyne/blob/master/examples/tips_and_tricks.ipynb) - tips and tricks using Poutyne
-- [sequence_tagging.ipynb](https://colab.research.google.com/github/GRAAL-Research/poutyne/blob/master/examples/sequence_tagging.ipynb) - Sequence tagging with an RNN
-- [transfer_learning.ipynb](https://colab.research.google.com/github/GRAAL-Research/poutyne/blob/master/examples/transfer_learning.ipynb) - transfer learning on `ResNet-18` on the [CUB-200](http://www.vision.caltech.edu/visipedia/CUB-200-2011.html) dataset.
-- [policy_interface.ipynb](https://colab.research.google.com/github/GRAAL-Research/poutyne/blob/master/examples/policy_interface.ipynb) - example of policies
-- [image_reconstruction.ipynb](https://colab.research.google.com/github/GRAAL-Research/poutyne/blob/master/examples/image_reconstruction.ipynb) - example of image reconstruction
-- [classification_and_regression.ipynb](https://colab.research.google.com/github/GRAAL-Research/poutyne/blob/master/examples/classification_and_regression.ipynb) - example of multitask learning with classification and regression
-- [semantic_segmentation.ipynb](https://colab.research.google.com/github/GRAAL-Research/poutyne/blob/master/examples/semantic_segmentation.ipynb) - example of semantic segmentation
+- [introduction.ipynb](https://colab.research.google.com/github/freud14/poutyne/blob/master/examples/introduction.ipynb) ([tutorial version](https://colab.research.google.com/github/freud14/poutyne/blob/master/tutorials/introduction_pytorch_poutyne_tutorial.ipynb)) - comparison of Poutyne with bare PyTorch and usage examples of Poutyne callbacks and the ModelBundle class.
+- [tips_and_tricks.ipynb](https://colab.research.google.com/github/freud14/poutyne/blob/master/examples/tips_and_tricks.ipynb) - tips and tricks using Poutyne
+- [sequence_tagging.ipynb](https://colab.research.google.com/github/freud14/poutyne/blob/master/examples/sequence_tagging.ipynb) - Sequence tagging with an RNN
+- [transfer_learning.ipynb](https://colab.research.google.com/github/freud14/poutyne/blob/master/examples/transfer_learning.ipynb) - transfer learning on `ResNet-18` on the [CUB-200](http://www.vision.caltech.edu/visipedia/CUB-200-2011.html) dataset.
+- [policy_interface.ipynb](https://colab.research.google.com/github/freud14/poutyne/blob/master/examples/policy_interface.ipynb) - example of policies
+- [image_reconstruction.ipynb](https://colab.research.google.com/github/freud14/poutyne/blob/master/examples/image_reconstruction.ipynb) - example of image reconstruction
+- [classification_and_regression.ipynb](https://colab.research.google.com/github/freud14/poutyne/blob/master/examples/classification_and_regression.ipynb) - example of multitask learning with classification and regression
+- [semantic_segmentation.ipynb](https://colab.research.google.com/github/freud14/poutyne/blob/master/examples/semantic_segmentation.ipynb) - example of semantic segmentation
 
 ### Videos
 
-- [Presentation on Poutyne](https://youtu.be/gQ3SW5r7HSs) given at one of the weekly presentations of the Institute Intelligence and Data (IID) of Université Laval. [Slides](https://github.com/GRAAL-Research/poutyne/blob/master/slides/poutyne.pdf) and the [associated Latex source code](https://github.com/GRAAL-Research/poutyne/blob/master/slides/src/) are also available.
+- [Presentation on Poutyne](https://youtu.be/gQ3SW5r7HSs) given at one of the weekly presentations of the Institute Intelligence and Data (IID) of Université Laval. [Slides](https://github.com/freud14/poutyne/blob/master/slides/poutyne.pdf) and the [associated Latex source code](https://github.com/freud14/poutyne/blob/master/slides/src/) are also available.
 
 ---
 
 ## Contributing to Poutyne
 
-We welcome user input, whether it is regarding bugs found in the library or feature propositions ! Make sure to have a look at our [contributing guidelines](https://github.com/GRAAL-Research/poutyne/blob/master/CONTRIBUTING.md) for more details on this matter.
+We welcome user input, whether it is regarding bugs found in the library or feature propositions ! Make sure to have a look at our [contributing guidelines](https://github.com/freud14/poutyne/blob/master/CONTRIBUTING.md) for more details on this matter.
 
 ---
 
@@ -212,7 +216,7 @@ This project supported by [Frédérik Paradis](https://github.com/freud14/) and 
 
 ## License
 
-Poutyne is LGPLv3 licensed, as found in the [LICENSE file](https://github.com/GRAAL-Research/poutyne/blob/master/LICENSE).
+Poutyne is LGPLv3 licensed, as found in the [LICENSE file](https://github.com/freud14/poutyne/blob/master/LICENSE).
 
 ---
 

@@ -1,7 +1,6 @@
 name: CI/CD
 
 on:
-  push:
   pull_request:
   schedule:
     # Run the tests at 00:00 each week on Sunday
@@ -12,7 +11,7 @@ jobs:
   cicd-pipeline:
     strategy:
       matrix:
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
         os: [ubuntu-latest]
         include:
           - python-version: "3.12"

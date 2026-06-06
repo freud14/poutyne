@@ -8,25 +8,17 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    env:
-      POUTYNE_RELEASE_BUILD: "1"
 
     steps:
-      - uses: actions/checkout@v4
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - uses: actions/checkout@v6
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v8.2.0
         with:
-          python-version: "3.12"
+          python-version: "3.14"
       - name: Install dependencies
-        run: |
-          pip install -r requirements.txt
-          pip install -r docs/requirements.txt
-          python setup.py develop
+        run: uv sync --group docs
       - name: Building doc
-        run: |
-          cd docs
-          ./rebuild_html_doc.sh
-          cd ..
+        run: cd docs && ./rebuild_html_doc.sh
       - name: Deploy
         uses: peaceiris/actions-gh-pages@068dc23d9710f1ba62e86896f84735d869951305
         with:

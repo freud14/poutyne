@@ -1,3 +1,11 @@
+# v1.18
+
+- Migrate to [uv](https://docs.astral.sh/uv/) for dependency management and [asdf](https://asdf-vm.com/) for toolchain versioning.
+- Consolidate all packaging metadata and dependency groups into a single `pyproject.toml` (hatchling build backend).
+- Drop support for Python 3.8 and 3.9; add support for Python 3.13 and 3.14.
+- Transfer repository ownership from GRAAL-Research to freud14.
+- Fix `SKLearnMetrics` sample weight handling for scikit-learn >= 1.6.
+
 # v1.17.2
 
 - np.Inf was deprecated forever and is now gone in Numpy 2.0.
@@ -141,7 +149,7 @@ Breaking changes:
 # v1.1
 
 - There is now a batch metric [`TopKAccuracy`](https://poutyne.org/metrics.html#poutyne.TopKAccuracy) and it is possible to use them as strings for `k` in 1 to 10 and 20, 30, …, 100, e.g. `'top5'`.
-- Add [`fit_dataset`](https://poutyne.org/model.html#poutyne.Model.fit_dataset) , [`evaluate_dataset`](https://poutyne.org/model.html#poutyne.Model.evaluate_dataset) and [`predict_dataset`](https://poutyne.org/model.html#poutyne.Model.predict_dataset) methods which allow to pass PyTorch Datasets and creates DataLoader internally. Here is [an example with MNIST](https://github.com/GRAAL-Research/poutyne/blob/master/examples/basic_mnist_classification.py) .
+- Add [`fit_dataset`](https://poutyne.org/model.html#poutyne.Model.fit_dataset) , [`evaluate_dataset`](https://poutyne.org/model.html#poutyne.Model.evaluate_dataset) and [`predict_dataset`](https://poutyne.org/model.html#poutyne.Model.predict_dataset) methods which allow to pass PyTorch Datasets and creates DataLoader internally. Here is [an example with MNIST](https://github.com/freud14/poutyne/blob/master/examples/basic_mnist_classification.py) .
 - Colors now work correctly in Colab.
 - The default colorscheme was changed so that it looks good in Colab, notebooks and command line. The previous one was not readable in Colab.
 - Checkpointing callbacks now don't use the Python [`tempfile` package](https://docs.python.org/3/library/tempfile.html) anymore for the temporary file. The use of this package caused problem when the temp filesystem was not on the same partition as the final destination of the checkpoint. The temporary file is now created at the same place as the final destination. Thus, in most use cases, this will render the use of the `temporary_filename` argument not necessary. The argument is still available for those who need it.
