@@ -96,7 +96,6 @@ examples = [
 [tool.black]
 line-length = 120
 skip-string-normalization = true
-required-version = "25"
 extend-exclude = "/(slides|examples|tutorials)/"
 
 [tool.isort]
