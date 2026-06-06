@@ -43,13 +43,13 @@ torchvision  = ["torchvision>=0.8.1"]
 pandas       = ["pandas>=2.0.0"]
 mlflow       = ["mlflow>=1.12.1"]
 extras = [
-    "colorama>=0.4.3",
-    "scikit-learn>=0.23.2",
-    "tensorboard>=2.4.0",
-    "tensorboardX>=2.1",
-    "torchvision>=0.8.1",
-    "pandas>=2.0.0",
-    "mlflow>=1.12.1",
+    "poutyne[colorama]",
+    "poutyne[scikit-learn]",
+    "poutyne[tensorboard]",
+    "poutyne[tensorboardX]",
+    "poutyne[torchvision]",
+    "poutyne[pandas]",
+    "poutyne[mlflow]",
 ]
 
 [project.urls]
