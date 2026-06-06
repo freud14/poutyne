@@ -102,7 +102,7 @@ examples = [
 [tool.black]
 line-length = 120
 skip-string-normalization = true
-extend-exclude = "/(slides|examples|tutorials)/"
+extend-exclude = "/(slides)/"
 
 [tool.isort]
 profile = "black"
