@@ -17,14 +17,13 @@ You should have received a copy of the GNU Lesser General Public License along w
 <https://www.gnu.org/licenses/>.
 """
 
-from unittest import TestCase
 from unittest.mock import MagicMock, call, patch
 
 from poutyne import ProgressionCallback
 
 
-class ProgressTest(TestCase):
-    def setUp(self) -> None:
+class ProgressTest:
+    def setup_method(self) -> None:
         self.epochs = 2
         self.num_steps = 10
         self.num_valid_steps = 10

@@ -19,9 +19,7 @@ You should have received a copy of the GNU Lesser General Public License along w
 
 # Because of the way the callbacks are generated, we have to disable linting here.
 # pylint: disable=no-name-in-module
-import unittest
-from unittest import TestCase
-
+import pytest
 import torch
 import torch.nn as nn
 
@@ -29,12 +27,12 @@ from poutyne import CosineAnnealingLR, ExponentialLR, LambdaLR, Model, MultiStep
 from tests.framework.tools import some_data_generator
 
 
-class LRSchedulersTest(TestCase):
+class LRSchedulersTest:
     batch_size = 20
     epochs = 10
     steps_per_epoch = 5
 
-    def setUp(self):
+    def setup_method(self):
         torch.manual_seed(42)
         self.pytorch_network = nn.Linear(1, 1)
         self.loss_function = nn.MSELoss()
@@ -80,9 +78,5 @@ class LRSchedulersTest(TestCase):
         )
 
     def test_exception_is_thrown_on_optimizer_argument(self):
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             StepLR(self.optimizer, step_size=3)
-
-
-if __name__ == '__main__':
-    unittest.main()

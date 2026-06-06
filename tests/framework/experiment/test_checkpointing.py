@@ -21,7 +21,8 @@ import os
 import pickle
 from tempfile import TemporaryDirectory
 from typing import ClassVar
-from unittest import TestCase, skipIf
+
+import pytest
 
 try:
     import pandas  # pylint: disable=unused-import  # noqa: F401
@@ -37,8 +38,9 @@ from tests.framework.experiment.utils import ConstantMetric, ConstantMetricCallb
 from tests.framework.tools import SomeDataGeneratorWithLen
 
 
-@skipIf(not pandas_available, "pandas is not available")
-class BaseExperimentCheckpointLoadingTest:
+@pytest.mark.skipif(not pandas_available, reason="pandas is not available")
+class ExperimentCheckpointLoadingTestBase:
+    __test__ = False
     # pylint: disable=no-member
     NUM_EPOCHS = None
     METRIC_VALUES = None
@@ -46,7 +48,7 @@ class BaseExperimentCheckpointLoadingTest:
     NO_CHECKPOINT_EPOCHS = None
     MONITOR_MODE = None
 
-    def setUp(self):
+    def setup_method(self):
         self.temp_dir_obj = TemporaryDirectory()
         self.test_checkpoints_path = self.temp_dir_obj.name
 
@@ -84,7 +86,7 @@ class BaseExperimentCheckpointLoadingTest:
             monitor_mode=self.MONITOR_MODE,
         )
 
-    def tearDown(self):
+    def teardown_method(self):
         self.temp_dir_obj.cleanup()
 
     def test_load_checkpoint_with_int(self):
@@ -92,26 +94,26 @@ class BaseExperimentCheckpointLoadingTest:
         filename = self.checkpoint_paths[0]
         self.test_experiment.load_checkpoint(index)
 
-        self.assertEqual(
-            self.test_experiment.model.network.state_dict(),
-            torch.load(filename, pickle_module=pickle, map_location="cpu"),
+        assert (
+            self.test_experiment.model.network.state_dict()
+            == torch.load(filename, pickle_module=pickle, map_location="cpu")
         )
 
     def test_load_checkpoint_best(self):
         filename = self.checkpoint_paths[-1]
         self.test_experiment.load_checkpoint("best")
 
-        self.assertEqual(
-            self.test_experiment.model.network.state_dict(),
-            torch.load(filename, pickle_module=pickle, map_location="cpu"),
+        assert (
+            self.test_experiment.model.network.state_dict()
+            == torch.load(filename, pickle_module=pickle, map_location="cpu")
         )
 
     def test_load_checkpoint_last(self):
         self.test_experiment.load_checkpoint("last")
 
-        self.assertEqual(
-            self.test_experiment.model.network.state_dict(),
-            torch.load(self.last_checkpoint_path, pickle_module=pickle, map_location="cpu"),
+        assert (
+            self.test_experiment.model.network.state_dict()
+            == torch.load(self.last_checkpoint_path, pickle_module=pickle, map_location="cpu")
         )
 
     def test_load_checkpoint_using_path(self):
@@ -123,29 +125,30 @@ class BaseExperimentCheckpointLoadingTest:
         )  # change the ckpt path
         self.test_experiment.load_checkpoint(cpkt_path)
 
-        self.assertEqual(
-            self.test_experiment.model.network.state_dict(),
-            torch.load(cpkt_path, pickle_module=pickle, map_location="cpu"),
+        assert (
+            self.test_experiment.model.network.state_dict()
+            == torch.load(cpkt_path, pickle_module=pickle, map_location="cpu")
         )
 
     def test_load_invalid_checkpoint(self):
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             self.test_experiment.load_checkpoint(self.NO_CHECKPOINT_EPOCHS[0])
 
-        with self.assertRaises(FileNotFoundError):
+        with pytest.raises(FileNotFoundError):
             self.test_experiment.load_checkpoint(self.no_checkpoint_paths[0])
 
         temp_dir_obj = TemporaryDirectory()
         test_checkpoints_path = temp_dir_obj.name
         expt = Experiment(test_checkpoints_path, nn.Linear(1, 1), optimizer='sgd', loss_function='mse')
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             expt.load_checkpoint('best')
 
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             expt.load_checkpoint('last')
 
 
-class MonitorMinCheckpointExperimentTest(BaseExperimentCheckpointLoadingTest, TestCase):
+class MonitorMinCheckpointExperimentTest(ExperimentCheckpointLoadingTestBase):
+    __test__ = True
     NUM_EPOCHS = 5
     METRIC_VALUES: ClassVar[list] = [9, 3, 6, 2, 3]
     CHECKPOINT_EPOCHS: ClassVar[list] = [1, 2, 4]
@@ -153,7 +156,8 @@ class MonitorMinCheckpointExperimentTest(BaseExperimentCheckpointLoadingTest, Te
     MONITOR_MODE = "min"
 
 
-class MonitorMaxCheckpointExperimentTest(BaseExperimentCheckpointLoadingTest, TestCase):
+class MonitorMaxCheckpointExperimentTest(ExperimentCheckpointLoadingTestBase):
+    __test__ = True
     NUM_EPOCHS = 5
     METRIC_VALUES: ClassVar[list] = [4, 3, 6, 2, 7]
     CHECKPOINT_EPOCHS: ClassVar[list] = [1, 3, 5]

@@ -17,9 +17,7 @@ You should have received a copy of the GNU Lesser General Public License along w
 <https://www.gnu.org/licenses/>.
 """
 
-import unittest
-from unittest import TestCase
-
+import pytest
 import torch
 import torch.nn as nn
 
@@ -27,10 +25,10 @@ from poutyne import BestModelRestore, Model, torch_to_numpy
 from tests.framework.tools import some_data_generator
 
 
-class BestModelRestoreTest(TestCase):
+class BestModelRestoreTest:
     batch_size = 20
 
-    def setUp(self):
+    def setup_method(self):
         torch.manual_seed(42)
         self.pytorch_network = nn.Linear(1, 1)
         self.loss_function = nn.MSELoss()
@@ -58,14 +56,14 @@ class BestModelRestoreTest(TestCase):
         self._test_restore_with_val_losses(model_restore, val_losses, best_epoch)
 
     def test_mode_not_min_max_raise_error(self):
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             BestModelRestore(monitor='val_loss', mode='invalid_mode')
 
     def test_if_no_best_weights_on_train_end_raise_warnings(self):
         model_restore = BestModelRestore(monitor='val_loss')
         a_log = {}
 
-        with self.assertWarns(UserWarning):
+        with pytest.warns(UserWarning):
             model_restore.on_train_end(a_log)
 
     def _test_restore_with_val_losses(self, checkpointer, val_losses, best_epoch):
@@ -86,7 +84,7 @@ class BestModelRestoreTest(TestCase):
         checkpointer.on_train_end({})
 
         final_weights = torch_to_numpy(self.model.get_weight_copies())
-        self.assertEqual(best_epoch_weights, final_weights)
+        assert best_epoch_weights == final_weights
 
     def _update_model(self, generator):
         self.pytorch_network.zero_grad()
@@ -99,7 +97,3 @@ class BestModelRestoreTest(TestCase):
         self.optimizer.step()
 
         return float(loss)
-
-
-if __name__ == '__main__':
-    unittest.main()

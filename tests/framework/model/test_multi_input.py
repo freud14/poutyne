@@ -35,8 +35,8 @@ def some_data_tensor_generator_multi_input(batch_size):
 
 
 class ModelMultiInputTest(ModelFittingTestCase):
-    def setUp(self):
-        super().setUp()
+    def setup_method(self):
+        super().setup_method()
         torch.manual_seed(42)
         self.pytorch_network = MultiIOModel(num_input=1, num_output=1)
         self.loss_function = nn.MSELoss()
@@ -106,22 +106,22 @@ class ModelMultiInputTest(ModelFittingTestCase):
         x2 = torch.rand(ModelMultiInputTest.batch_size, 1)
         y = torch.rand(ModelMultiInputTest.batch_size, 1)
         loss = self.model.train_on_batch((x1, x2), y)
-        self.assertEqual(type(loss), float)
+        assert type(loss) == float
 
     def test_train_on_batch_with_pred_multi_input(self):
         x1 = torch.rand(ModelMultiInputTest.batch_size, 1)
         x2 = torch.rand(ModelMultiInputTest.batch_size, 1)
         y = torch.rand(ModelMultiInputTest.batch_size, 1)
         loss, pred_y = self.model.train_on_batch((x1, x2), y, return_pred=True)
-        self.assertEqual(type(loss), float)
-        self.assertEqual(pred_y.shape, (ModelMultiInputTest.batch_size, 1))
+        assert type(loss) == float
+        assert pred_y.shape == (ModelMultiInputTest.batch_size, 1)
 
     def test_ndarray_train_on_batch_multi_input(self):
         x1 = np.random.rand(ModelMultiInputTest.batch_size, 1).astype(np.float32)
         x2 = np.random.rand(ModelMultiInputTest.batch_size, 1).astype(np.float32)
         y = np.random.rand(ModelMultiInputTest.batch_size, 1).astype(np.float32)
         loss = self.model.train_on_batch((x1, x2), y)
-        self.assertEqual(type(loss), float)
+        assert type(loss) == float
 
     def test_evaluate_multi_input(self):
         x = (
@@ -130,7 +130,7 @@ class ModelMultiInputTest(ModelFittingTestCase):
         )
         y = torch.rand(ModelMultiInputTest.evaluate_dataset_len, 1)
         loss = self.model.evaluate(x, y, batch_size=ModelMultiInputTest.batch_size)
-        self.assertEqual(type(loss), float)
+        assert type(loss) == float
 
     def test_evaluate_with_pred_multi_input(self):
         x = (
@@ -140,7 +140,7 @@ class ModelMultiInputTest(ModelFittingTestCase):
         y = torch.rand(ModelMultiInputTest.evaluate_dataset_len, 1)
         # We also test the unpacking.
         _, pred_y = self.model.evaluate(x, y, batch_size=ModelMultiInputTest.batch_size, return_pred=True)
-        self.assertEqual(pred_y.shape, (ModelMultiInputTest.evaluate_dataset_len, 1))
+        assert pred_y.shape == (ModelMultiInputTest.evaluate_dataset_len, 1)
 
     def test_evaluate_with_np_array_multi_input(self):
         x1 = np.random.rand(ModelMultiInputTest.evaluate_dataset_len, 1).astype(np.float32)
@@ -148,8 +148,8 @@ class ModelMultiInputTest(ModelFittingTestCase):
         x = (x1, x2)
         y = np.random.rand(ModelMultiInputTest.evaluate_dataset_len, 1).astype(np.float32)
         loss, pred_y = self.model.evaluate(x, y, batch_size=ModelMultiInputTest.batch_size, return_pred=True)
-        self.assertEqual(type(loss), float)
-        self.assertEqual(pred_y.shape, (ModelMultiInputTest.evaluate_dataset_len, 1))
+        assert type(loss) == float
+        assert pred_y.shape == (ModelMultiInputTest.evaluate_dataset_len, 1)
 
     def test_evaluate_data_loader_multi_input(self):
         x1 = torch.rand(ModelMultiInputTest.evaluate_dataset_len, 1)
@@ -158,22 +158,22 @@ class ModelMultiInputTest(ModelFittingTestCase):
         dataset = TensorDataset((x1, x2), y)
         generator = DataLoader(dataset, ModelMultiInputTest.batch_size)
         loss, pred_y = self.model.evaluate_generator(generator, return_pred=True)
-        self.assertEqual(type(loss), float)
-        self.assertEqual(pred_y.shape, (ModelMultiInputTest.evaluate_dataset_len, 1))
+        assert type(loss) == float
+        assert pred_y.shape == (ModelMultiInputTest.evaluate_dataset_len, 1)
 
     def test_evaluate_generator_multi_input(self):
         num_steps = 10
         generator = some_data_tensor_generator_multi_input(ModelMultiInputTest.batch_size)
         loss, pred_y = self.model.evaluate_generator(generator, steps=num_steps, return_pred=True)
-        self.assertEqual(type(loss), float)
-        self.assertEqual(pred_y.shape, (num_steps * ModelMultiInputTest.batch_size, 1))
+        assert type(loss) == float
+        assert pred_y.shape == (num_steps * ModelMultiInputTest.batch_size, 1)
 
     def test_tensor_evaluate_on_batch_multi_input(self):
         x1 = torch.rand(ModelMultiInputTest.batch_size, 1)
         x2 = torch.rand(ModelMultiInputTest.batch_size, 1)
         y = torch.rand(ModelMultiInputTest.batch_size, 1)
         loss = self.model.evaluate_on_batch((x1, x2), y)
-        self.assertEqual(type(loss), float)
+        assert type(loss) == float
 
     def test_predict_multi_input(self):
         x = (
@@ -181,25 +181,25 @@ class ModelMultiInputTest(ModelFittingTestCase):
             torch.rand(ModelMultiInputTest.evaluate_dataset_len, 1),
         )
         pred_y = self.model.predict(x, batch_size=ModelMultiInputTest.batch_size)
-        self.assertEqual(pred_y.shape, (ModelMultiInputTest.evaluate_dataset_len, 1))
+        assert pred_y.shape == (ModelMultiInputTest.evaluate_dataset_len, 1)
 
     def test_predict_with_np_array_multi_input(self):
         x1 = np.random.rand(ModelMultiInputTest.evaluate_dataset_len, 1).astype(np.float32)
         x2 = np.random.rand(ModelMultiInputTest.evaluate_dataset_len, 1).astype(np.float32)
         x = (x1, x2)
         pred_y = self.model.predict(x, batch_size=ModelMultiInputTest.batch_size)
-        self.assertEqual(pred_y.shape, (ModelMultiInputTest.evaluate_dataset_len, 1))
+        assert pred_y.shape == (ModelMultiInputTest.evaluate_dataset_len, 1)
 
     def test_predict_generator_multi_input(self):
         num_steps = 10
         generator = some_data_tensor_generator_multi_input(ModelMultiInputTest.batch_size)
         generator = (x for x, _ in generator)
         pred_y = self.model.predict_generator(generator, steps=num_steps)
-        self.assertEqual(type(pred_y), np.ndarray)
-        self.assertEqual(pred_y.shape, (num_steps * ModelMultiInputTest.batch_size, 1))
+        assert type(pred_y) == np.ndarray
+        assert pred_y.shape == (num_steps * ModelMultiInputTest.batch_size, 1)
 
     def test_tensor_predict_on_batch_multi_input(self):
         x1 = torch.rand(ModelMultiInputTest.batch_size, 1)
         x2 = torch.rand(ModelMultiInputTest.batch_size, 1)
         pred_y = self.model.predict_on_batch((x1, x2))
-        self.assertEqual(pred_y.shape, (ModelMultiInputTest.batch_size, 1))
+        assert pred_y.shape == (ModelMultiInputTest.batch_size, 1)

@@ -16,18 +16,3 @@ of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser Gener
 You should have received a copy of the GNU Lesser General Public License along with Poutyne. If not, see
 <https://www.gnu.org/licenses/>.
 """
-
-import io
-import sys
-from unittest import TestCase
-
-
-class CaptureOutputBase(TestCase):
-    def _capture_output(self) -> None:
-        self.test_out = io.StringIO()
-        self.original_output = sys.stdout
-        sys.stdout = self.test_out
-
-    def assertStdoutContains(self, values: list) -> None:
-        for value in values:
-            self.assertIn(value, self.test_out.getvalue().strip())

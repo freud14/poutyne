@@ -20,8 +20,9 @@ You should have received a copy of the GNU Lesser General Public License along w
 # pylint: disable=too-many-locals,too-many-lines
 
 from math import ceil
-from unittest import main, skipIf
 from unittest.mock import ANY, MagicMock, Mock, call
+
+import pytest
 
 try:
     import colorama  # pylint: disable=unused-import  # noqa: F401
@@ -88,8 +89,8 @@ class IterableMock:
 class ModelTest(ModelFittingTestCase):
     # pylint: disable=too-many-public-methods
 
-    def setUp(self):
-        super().setUp()
+    def setup_method(self):
+        super().setup_method()
         torch.manual_seed(42)
         self.pytorch_network = nn.Linear(1, 1)
         self.loss_function = nn.MSELoss()
@@ -167,8 +168,8 @@ class ModelTest(ModelFittingTestCase):
         )
         mocked_optim_model.fit_generator(train_generator, None, epochs=1, steps_per_epoch=1, batches_per_step=1)
 
-        self.assertEqual(1, mocked_optimizer.step.call_count)
-        self.assertEqual(1, mocked_optimizer.zero_grad.call_count)
+        assert mocked_optimizer.step.call_count == 1
+        assert mocked_optimizer.zero_grad.call_count == 1
 
     def test_correct_optim_calls__valid_n_batches_per_step(self):
         n_batches = 5
@@ -187,8 +188,8 @@ class ModelTest(ModelFittingTestCase):
         )
         mocked_optim_model.fit_generator(list(zip(x, y)), None, epochs=1, batches_per_step=n_batches)
 
-        self.assertEqual(1, mocked_optimizer.step.call_count)
-        self.assertEqual(1, mocked_optimizer.zero_grad.call_count)
+        assert mocked_optimizer.step.call_count == 1
+        assert mocked_optimizer.zero_grad.call_count == 1
 
     def test_fitting_generator_n_batches_per_step(self):
         total_batch_size = 6
@@ -214,7 +215,7 @@ class ModelTest(ModelFittingTestCase):
 
             returned_params = self.model.get_weight_copies()
 
-            self.assertEqual(returned_params.keys(), expected_params.keys())
+            assert returned_params.keys() == expected_params.keys()
             for k in expected_params:
                 np.testing.assert_almost_equal(returned_params[k].numpy(), expected_params[k].numpy(), decimal=4)
 
@@ -236,7 +237,7 @@ class ModelTest(ModelFittingTestCase):
 
         returned_params = self.model.get_weight_copies()
 
-        self.assertEqual(returned_params.keys(), expected_params.keys())
+        assert returned_params.keys() == expected_params.keys()
         for k in expected_params:
             np.testing.assert_almost_equal(returned_params[k].numpy(), expected_params[k].numpy(), decimal=4)
 
@@ -271,7 +272,7 @@ class ModelTest(ModelFittingTestCase):
 
             returned_params = self.model.get_weight_copies()
 
-            self.assertEqual(returned_params.keys(), expected_params.keys())
+            assert returned_params.keys() == expected_params.keys()
             for k in expected_params:
                 np.testing.assert_almost_equal(returned_params[k].numpy(), expected_params[k].numpy(), decimal=4)
 
@@ -355,8 +356,8 @@ class ModelTest(ModelFittingTestCase):
         expected_valid_calls = ['__len__'] + (
             ['__iter__'] + ['__next__'] * valid_real_steps_per_epoch
         ) * ModelTest.epochs
-        self.assertEqual(mock_train_generator.calls, expected_train_calls)
-        self.assertEqual(mock_valid_generator.calls, expected_valid_calls)
+        assert mock_train_generator.calls == expected_train_calls
+        assert mock_valid_generator.calls == expected_valid_calls
 
     def test_fitting_generator_calls_with_longer_validation_set(self):
         train_real_steps_per_epoch = 30
@@ -386,8 +387,8 @@ class ModelTest(ModelFittingTestCase):
         expected_valid_calls = ['__len__'] + (
             ['__iter__'] + ['__next__'] * valid_real_steps_per_epoch
         ) * ModelTest.epochs
-        self.assertEqual(mock_train_generator.calls, expected_train_calls)
-        self.assertEqual(mock_valid_generator.calls, expected_valid_calls)
+        assert mock_train_generator.calls == expected_train_calls
+        assert mock_valid_generator.calls == expected_valid_calls
 
     def test_fitting_with_tensor(self):
         train_real_steps_per_epoch = 30
@@ -501,54 +502,54 @@ class ModelTest(ModelFittingTestCase):
         x = torch.rand(ModelTest.batch_size, 1)
         y = torch.rand(ModelTest.batch_size, 1)
         loss, metrics = self.model.train_on_batch(x, y)
-        self.assertEqual(type(loss), float)
-        self.assertEqual(type(metrics), np.ndarray)
-        self.assertEqual(metrics.tolist(), self.batch_metrics_values)
+        assert type(loss) == float
+        assert type(metrics) == np.ndarray
+        assert metrics.tolist() == self.batch_metrics_values
 
     def test_train_on_batch_with_pred(self):
         x = torch.rand(ModelTest.batch_size, 1)
         y = torch.rand(ModelTest.batch_size, 1)
         loss, metrics, pred_y = self.model.train_on_batch(x, y, return_pred=True)
-        self.assertEqual(type(loss), float)
-        self.assertEqual(type(metrics), np.ndarray)
-        self.assertEqual(metrics.tolist(), self.batch_metrics_values)
-        self.assertEqual(pred_y.shape, (ModelTest.batch_size, 1))
+        assert type(loss) == float
+        assert type(metrics) == np.ndarray
+        assert metrics.tolist() == self.batch_metrics_values
+        assert pred_y.shape == (ModelTest.batch_size, 1)
 
     def test_ndarray_train_on_batch(self):
         x = np.random.rand(ModelTest.batch_size, 1).astype(np.float32)
         y = np.random.rand(ModelTest.batch_size, 1).astype(np.float32)
         loss, metrics = self.model.train_on_batch(x, y)
-        self.assertEqual(type(loss), float)
-        self.assertEqual(type(metrics), np.ndarray)
-        self.assertEqual(metrics.tolist(), self.batch_metrics_values)
+        assert type(loss) == float
+        assert type(metrics) == np.ndarray
+        assert metrics.tolist() == self.batch_metrics_values
 
     def test_train_on_batch_with_return_dict(self):
         x = torch.rand(ModelTest.batch_size, 1)
         y = torch.rand(ModelTest.batch_size, 1)
         logs = self.model.train_on_batch(x, y, return_dict_format=True)
-        self.assertEqual(set(logs.keys()), {'loss', *self.batch_metrics_names})
+        assert set(logs.keys()) == {'loss', *self.batch_metrics_names}
 
     def test_train_on_batch_with_return_dict_and_pred(self):
         x = torch.rand(ModelTest.batch_size, 1)
         y = torch.rand(ModelTest.batch_size, 1)
         logs, pred_y = self.model.train_on_batch(x, y, return_dict_format=True, return_pred=True)
-        self.assertEqual(set(logs.keys()), {'loss', *self.batch_metrics_names})
-        self.assertEqual(pred_y.shape, (ModelTest.batch_size, 1))
+        assert set(logs.keys()) == {'loss', *self.batch_metrics_names}
+        assert pred_y.shape == (ModelTest.batch_size, 1)
 
     def test_evaluate(self):
         x = torch.rand(ModelTest.evaluate_dataset_len, 1)
         y = torch.rand(ModelTest.evaluate_dataset_len, 1)
         loss, metrics = self.model.evaluate(x, y, batch_size=ModelTest.batch_size)
-        self.assertEqual(type(loss), float)
-        self.assertEqual(type(metrics), np.ndarray)
-        self.assertEqual(metrics.tolist(), self.batch_metrics_values + self.epoch_metrics_values)
+        assert type(loss) == float
+        assert type(metrics) == np.ndarray
+        assert metrics.tolist() == self.batch_metrics_values + self.epoch_metrics_values
 
     def test_evaluate_with_pred(self):
         x = torch.rand(ModelTest.evaluate_dataset_len, 1)
         y = torch.rand(ModelTest.evaluate_dataset_len, 1)
         # We also test the unpacking.
         _, _, pred_y = self.model.evaluate(x, y, batch_size=ModelTest.batch_size, return_pred=True)
-        self.assertEqual(pred_y.shape, (ModelTest.evaluate_dataset_len, 1))
+        assert pred_y.shape == (ModelTest.evaluate_dataset_len, 1)
 
     def test_evaluate_with_pred_without_convert_to_numpy(self):
         x = torch.rand(ModelTest.evaluate_dataset_len, 1)
@@ -557,8 +558,8 @@ class ModelTest(ModelFittingTestCase):
         _, _, pred_y = self.model.evaluate(
             x, y, batch_size=ModelTest.batch_size, return_pred=True, convert_to_numpy=False
         )
-        self.assertTrue(torch.is_tensor(pred_y))
-        self.assertEqual(pred_y.shape, (ModelTest.evaluate_dataset_len, 1))
+        assert torch.is_tensor(pred_y)
+        assert pred_y.shape == (ModelTest.evaluate_dataset_len, 1)
 
     def test_evaluate_with_callback(self):
         x = torch.rand(ModelTest.evaluate_dataset_len, 1)
@@ -567,7 +568,7 @@ class ModelTest(ModelFittingTestCase):
         _, _, pred_y = self.model.evaluate(
             x, y, batch_size=ModelTest.batch_size, return_pred=True, callbacks=[self.mock_callback]
         )
-        self.assertEqual(pred_y.shape, (ModelTest.evaluate_dataset_len, 1))
+        assert pred_y.shape == (ModelTest.evaluate_dataset_len, 1)
 
     def test_evaluate_with_return_dict(self):
         x = torch.rand(ModelTest.evaluate_dataset_len, 1)
@@ -584,16 +585,16 @@ class ModelTest(ModelFittingTestCase):
         )
 
         self._test_return_dict_logs(logs)
-        self.assertEqual(pred_y.shape, (ModelTest.evaluate_dataset_len, 1))
+        assert pred_y.shape == (ModelTest.evaluate_dataset_len, 1)
 
     def test_evaluate_with_np_array(self):
         x = np.random.rand(ModelTest.evaluate_dataset_len, 1).astype(np.float32)
         y = np.random.rand(ModelTest.evaluate_dataset_len, 1).astype(np.float32)
         loss, metrics, pred_y = self.model.evaluate(x, y, batch_size=ModelTest.batch_size, return_pred=True)
-        self.assertEqual(type(loss), float)
-        self.assertEqual(type(metrics), np.ndarray)
-        self.assertEqual(metrics.tolist(), self.batch_metrics_values + self.epoch_metrics_values)
-        self.assertEqual(pred_y.shape, (ModelTest.evaluate_dataset_len, 1))
+        assert type(loss) == float
+        assert type(metrics) == np.ndarray
+        assert metrics.tolist() == self.batch_metrics_values + self.epoch_metrics_values
+        assert pred_y.shape == (ModelTest.evaluate_dataset_len, 1)
 
     def test_evaluate_data_loader(self):
         x = torch.rand(ModelTest.evaluate_dataset_len, 1)
@@ -601,27 +602,27 @@ class ModelTest(ModelFittingTestCase):
         dataset = TensorDataset(x, y)
         generator = DataLoader(dataset, ModelTest.batch_size)
         loss, metrics, pred_y = self.model.evaluate_generator(generator, return_pred=True)
-        self.assertEqual(type(loss), float)
-        self.assertEqual(type(metrics), np.ndarray)
-        self.assertEqual(metrics.tolist(), self.batch_metrics_values + self.epoch_metrics_values)
-        self.assertEqual(pred_y.shape, (ModelTest.evaluate_dataset_len, 1))
+        assert type(loss) == float
+        assert type(metrics) == np.ndarray
+        assert metrics.tolist() == self.batch_metrics_values + self.epoch_metrics_values
+        assert pred_y.shape == (ModelTest.evaluate_dataset_len, 1)
 
     def test_evaluate_generator(self):
         num_steps = 10
         generator = some_data_tensor_generator(ModelTest.batch_size)
         loss, metrics, pred_y = self.model.evaluate_generator(generator, steps=num_steps, return_pred=True)
-        self.assertEqual(type(loss), float)
-        self.assertEqual(type(metrics), np.ndarray)
-        self.assertEqual(metrics.tolist(), self.batch_metrics_values + self.epoch_metrics_values)
-        self.assertEqual(type(pred_y), np.ndarray)
-        self.assertEqual(pred_y.shape, (num_steps * ModelTest.batch_size, 1))
+        assert type(loss) == float
+        assert type(metrics) == np.ndarray
+        assert metrics.tolist() == self.batch_metrics_values + self.epoch_metrics_values
+        assert type(pred_y) == np.ndarray
+        assert pred_y.shape == (num_steps * ModelTest.batch_size, 1)
 
     def test_evaluate_generator_with_stop_iteration(self):
         test_generator = SomeDataGeneratorUsingStopIteration(ModelTest.batch_size, 10)
 
         loss, _ = self.model.evaluate_generator(test_generator)
 
-        self.assertEqual(type(loss), float)
+        assert type(loss) == float
 
     def test_evaluate_generator_with_callback(self):
         num_steps = 10
@@ -646,8 +647,8 @@ class ModelTest(ModelFittingTestCase):
         )
 
         self._test_return_dict_logs(logs)
-        self.assertEqual(type(pred_y), np.ndarray)
-        self.assertEqual(pred_y.shape, (num_steps * ModelTest.batch_size, 1))
+        assert type(pred_y) == np.ndarray
+        assert pred_y.shape == (num_steps * ModelTest.batch_size, 1)
 
     def test_evaluate_generator_with_return_dict_and_ground_truth(self):
         num_steps = 10
@@ -657,8 +658,8 @@ class ModelTest(ModelFittingTestCase):
         )
 
         self._test_return_dict_logs(logs)
-        self.assertEqual(type(true_y), np.ndarray)
-        self.assertEqual(true_y.shape, (num_steps * ModelTest.batch_size, 1))
+        assert type(true_y) == np.ndarray
+        assert true_y.shape == (num_steps * ModelTest.batch_size, 1)
 
     def test_evaluate_generator_with_return_dict_and_pred_and_ground_truth(self):
         num_steps = 10
@@ -668,10 +669,10 @@ class ModelTest(ModelFittingTestCase):
         )
 
         self._test_return_dict_logs(logs)
-        self.assertEqual(type(pred_y), np.ndarray)
-        self.assertEqual(type(true_y), np.ndarray)
-        self.assertEqual(pred_y.shape, (num_steps * ModelTest.batch_size, 1))
-        self.assertEqual(true_y.shape, (num_steps * ModelTest.batch_size, 1))
+        assert type(pred_y) == np.ndarray
+        assert type(true_y) == np.ndarray
+        assert pred_y.shape == (num_steps * ModelTest.batch_size, 1)
+        assert true_y.shape == (num_steps * ModelTest.batch_size, 1)
 
     def test_evaluate_generator_with_return_dict_and_pred_and_ground_truth_without_convert_to_numpy(self):
         num_steps = 10
@@ -686,10 +687,10 @@ class ModelTest(ModelFittingTestCase):
         )
 
         self._test_return_dict_logs(logs)
-        self.assertTrue(torch.is_tensor(pred_y))
-        self.assertTrue(torch.is_tensor(true_y))
-        self.assertEqual(pred_y.shape, (num_steps * ModelTest.batch_size, 1))
-        self.assertEqual(true_y.shape, (num_steps * ModelTest.batch_size, 1))
+        assert torch.is_tensor(pred_y)
+        assert torch.is_tensor(true_y)
+        assert pred_y.shape == (num_steps * ModelTest.batch_size, 1)
+        assert true_y.shape == (num_steps * ModelTest.batch_size, 1)
 
     def test_evaluate_generator_with_ground_truth(self):
         num_steps = 10
@@ -697,13 +698,13 @@ class ModelTest(ModelFittingTestCase):
         loss, metrics, pred_y, true_y = self.model.evaluate_generator(
             generator, steps=num_steps, return_pred=True, return_ground_truth=True
         )
-        self.assertEqual(type(loss), float)
-        self.assertEqual(type(metrics), np.ndarray)
-        self.assertEqual(metrics.tolist(), self.batch_metrics_values + self.epoch_metrics_values)
-        self.assertEqual(type(pred_y), np.ndarray)
-        self.assertEqual(type(true_y), np.ndarray)
-        self.assertEqual(pred_y.shape, (num_steps * ModelTest.batch_size, 1))
-        self.assertEqual(true_y.shape, (num_steps * ModelTest.batch_size, 1))
+        assert type(loss) == float
+        assert type(metrics) == np.ndarray
+        assert metrics.tolist() == self.batch_metrics_values + self.epoch_metrics_values
+        assert type(pred_y) == np.ndarray
+        assert type(true_y) == np.ndarray
+        assert pred_y.shape == (num_steps * ModelTest.batch_size, 1)
+        assert true_y.shape == (num_steps * ModelTest.batch_size, 1)
 
     def test_evaluate_generator_with_no_concatenation(self):
         num_steps = 10
@@ -711,27 +712,27 @@ class ModelTest(ModelFittingTestCase):
         loss, metrics, pred_y, true_y = self.model.evaluate_generator(
             generator, steps=num_steps, return_pred=True, return_ground_truth=True, concatenate_returns=False
         )
-        self.assertEqual(type(loss), float)
-        self.assertEqual(type(metrics), np.ndarray)
-        self.assertEqual(metrics.tolist(), self.batch_metrics_values + self.epoch_metrics_values)
+        assert type(loss) == float
+        assert type(metrics) == np.ndarray
+        assert metrics.tolist() == self.batch_metrics_values + self.epoch_metrics_values
 
-        self.assertEqual(type(pred_y), list)
+        assert type(pred_y) == list
         for pred in pred_y:
-            self.assertEqual(type(pred), np.ndarray)
-            self.assertEqual(pred.shape, (ModelTest.batch_size, 1))
-        self.assertEqual(type(true_y), list)
+            assert type(pred) == np.ndarray
+            assert pred.shape == (ModelTest.batch_size, 1)
+        assert type(true_y) == list
         for true in true_y:
-            self.assertEqual(type(true), np.ndarray)
-            self.assertEqual(true.shape, (ModelTest.batch_size, 1))
+            assert type(true) == np.ndarray
+            assert true.shape == (ModelTest.batch_size, 1)
 
     def test_evaluate_with_only_one_metric(self):
         model = Model(self.pytorch_network, self.optimizer, self.loss_function, batch_metrics=self.batch_metrics[:1])
         x = torch.rand(ModelTest.evaluate_dataset_len, 1)
         y = torch.rand(ModelTest.evaluate_dataset_len, 1)
         loss, first_metric = model.evaluate(x, y, batch_size=ModelTest.batch_size)
-        self.assertEqual(type(loss), float)
-        self.assertEqual(type(first_metric), float)
-        self.assertEqual(first_metric, some_metric_1_value)
+        assert type(loss) == float
+        assert type(first_metric) == float
+        assert first_metric == some_metric_1_value
 
     def test_metrics_integration(self):
         mock_metric = Mock(SomeBatchMetric, wraps=SomeBatchMetric())
@@ -751,16 +752,16 @@ class ModelTest(ModelFittingTestCase):
         expected_calls = self._get_batch_metrics_expected_on_calls_when_training(
             epochs=ModelTest.epochs, steps=ModelTest.steps_per_epoch, valid_steps=ModelTest.steps_per_epoch
         )
-        self.assertEqual(len(mock_metric.mock_calls), len(expected_calls))
-        self.assertEqual(mock_metric.mock_calls, expected_calls)
+        assert len(mock_metric.mock_calls) == len(expected_calls)
+        assert mock_metric.mock_calls == expected_calls
 
-        self.assertEqual(len(mock_loss_fn.mock_calls), len(expected_calls))
-        self.assertEqual(mock_loss_fn.mock_calls, expected_calls)
+        assert len(mock_loss_fn.mock_calls) == len(expected_calls)
+        assert mock_loss_fn.mock_calls == expected_calls
 
         generator = some_data_tensor_generator(ModelTest.batch_size)
         loss, (mse, _) = model.evaluate_generator(generator, steps=num_steps)
-        self.assertIsInstance(loss, float)
-        self.assertIsInstance(mse, float)
+        assert isinstance(loss, float)
+        assert isinstance(mse, float)
 
     def test_epoch_metrics_integration(self):
         some_metric = SomeMetric()
@@ -781,14 +782,14 @@ class ModelTest(ModelFittingTestCase):
         actual_value = logs[-1]['some_metric']
         val_actual_value = logs[-1]['val_some_metric']
         expected_value = ModelTest.steps_per_epoch
-        self.assertEqual(val_actual_value, expected_value)
-        self.assertEqual(actual_value, expected_value)
+        assert val_actual_value == expected_value
+        assert actual_value == expected_value
 
         expected_calls = self._get_epoch_metrics_expected_on_calls_when_training(
             epochs=ModelTest.epochs, steps=ModelTest.steps_per_epoch, valid_steps=ModelTest.steps_per_epoch
         )
-        self.assertEqual(len(mock_metric.mock_calls), len(expected_calls))
-        self.assertEqual(mock_metric.mock_calls, expected_calls)
+        assert len(mock_metric.mock_calls) == len(expected_calls)
+        assert mock_metric.mock_calls == expected_calls
 
     def _get_batch_metrics_expected_on_calls_when_training(self, epochs, steps, has_valid=True, valid_steps=None):
         call_list = []
@@ -819,45 +820,45 @@ class ModelTest(ModelFittingTestCase):
         x = torch.rand(ModelTest.evaluate_dataset_len, 1)
         y = torch.rand(ModelTest.evaluate_dataset_len, 1)
         loss = model.evaluate(x, y, batch_size=ModelTest.batch_size)
-        self.assertEqual(type(loss), float)
+        assert type(loss) == float
 
     def test_tensor_evaluate_on_batch(self):
         x = torch.rand(ModelTest.batch_size, 1)
         y = torch.rand(ModelTest.batch_size, 1)
         loss, metrics = self.model.evaluate_on_batch(x, y)
-        self.assertEqual(type(loss), float)
-        self.assertEqual(type(metrics), np.ndarray)
-        self.assertEqual(metrics.tolist(), self.batch_metrics_values)
+        assert type(loss) == float
+        assert type(metrics) == np.ndarray
+        assert metrics.tolist() == self.batch_metrics_values
 
     def test_evaluate_on_batch_with_pred(self):
         x = torch.rand(ModelTest.batch_size, 1)
         y = torch.rand(ModelTest.batch_size, 1)
         loss, metrics, pred_y = self.model.evaluate_on_batch(x, y, return_pred=True)
-        self.assertEqual(type(loss), float)
-        self.assertEqual(type(metrics), np.ndarray)
-        self.assertEqual(metrics.tolist(), self.batch_metrics_values)
-        self.assertEqual(pred_y.shape, (ModelTest.batch_size, 1))
+        assert type(loss) == float
+        assert type(metrics) == np.ndarray
+        assert metrics.tolist() == self.batch_metrics_values
+        assert pred_y.shape == (ModelTest.batch_size, 1)
 
     def test_ndarray_evaluate_on_batch(self):
         x = np.random.rand(ModelTest.batch_size, 1).astype(np.float32)
         y = np.random.rand(ModelTest.batch_size, 1).astype(np.float32)
         loss, metrics = self.model.evaluate_on_batch(x, y)
-        self.assertEqual(type(loss), float)
-        self.assertEqual(type(metrics), np.ndarray)
-        self.assertEqual(metrics.tolist(), self.batch_metrics_values)
+        assert type(loss) == float
+        assert type(metrics) == np.ndarray
+        assert metrics.tolist() == self.batch_metrics_values
 
     def test_evaluate_on_batch_with_return_dict(self):
         x = torch.rand(ModelTest.batch_size, 1)
         y = torch.rand(ModelTest.batch_size, 1)
         logs = self.model.evaluate_on_batch(x, y, return_dict_format=True)
-        self.assertEqual(set(logs.keys()), {'loss', *self.batch_metrics_names})
+        assert set(logs.keys()) == {'loss', *self.batch_metrics_names}
 
     def test_evaluate_on_batch_with_return_dict_and_pred(self):
         x = torch.rand(ModelTest.batch_size, 1)
         y = torch.rand(ModelTest.batch_size, 1)
         logs, pred_y = self.model.evaluate_on_batch(x, y, return_dict_format=True, return_pred=True)
-        self.assertEqual(set(logs.keys()), {'loss', *self.batch_metrics_names})
-        self.assertEqual(pred_y.shape, (ModelTest.batch_size, 1))
+        assert set(logs.keys()) == {'loss', *self.batch_metrics_names}
+        assert pred_y.shape == (ModelTest.batch_size, 1)
 
     def test_evaluate_on_batch_with_return_dict_and_pred_without_convert_to_numpy(self):
         x = torch.rand(ModelTest.batch_size, 1)
@@ -865,68 +866,68 @@ class ModelTest(ModelFittingTestCase):
         logs, pred_y = self.model.evaluate_on_batch(
             x, y, return_dict_format=True, return_pred=True, convert_to_numpy=False
         )
-        self.assertEqual(set(logs.keys()), {'loss', *self.batch_metrics_names})
-        self.assertTrue(torch.is_tensor(pred_y))
-        self.assertEqual(pred_y.shape, (ModelTest.batch_size, 1))
+        assert set(logs.keys()) == {'loss', *self.batch_metrics_names}
+        assert torch.is_tensor(pred_y)
+        assert pred_y.shape == (ModelTest.batch_size, 1)
 
     def test_predict(self):
         x = torch.rand(ModelTest.evaluate_dataset_len, 1)
         pred_y = self.model.predict(x, batch_size=ModelTest.batch_size)
-        self.assertEqual(pred_y.shape, (ModelTest.evaluate_dataset_len, 1))
+        assert pred_y.shape == (ModelTest.evaluate_dataset_len, 1)
 
     def test_predict_with_np_array(self):
         x = np.random.rand(ModelTest.evaluate_dataset_len, 1).astype(np.float32)
         pred_y = self.model.predict(x, batch_size=ModelTest.batch_size)
-        self.assertEqual(type(pred_y), np.ndarray)
-        self.assertEqual(pred_y.shape, (ModelTest.evaluate_dataset_len, 1))
+        assert type(pred_y) == np.ndarray
+        assert pred_y.shape == (ModelTest.evaluate_dataset_len, 1)
 
     def test_predict_without_convert_to_numpy(self):
         x = torch.rand(ModelTest.evaluate_dataset_len, 1)
         pred_y = self.model.predict(x, batch_size=ModelTest.batch_size, convert_to_numpy=False)
-        self.assertTrue(torch.is_tensor(pred_y))
-        self.assertEqual(pred_y.shape, (ModelTest.evaluate_dataset_len, 1))
+        assert torch.is_tensor(pred_y)
+        assert pred_y.shape == (ModelTest.evaluate_dataset_len, 1)
 
     def test_predict_data_loader(self):
         x = torch.rand(ModelTest.evaluate_dataset_len, 1)
         generator = DataLoader(x, ModelTest.batch_size)
         pred_y = self.model.predict_generator(generator)
-        self.assertEqual(type(pred_y), np.ndarray)
-        self.assertEqual(pred_y.shape, (ModelTest.evaluate_dataset_len, 1))
+        assert type(pred_y) == np.ndarray
+        assert pred_y.shape == (ModelTest.evaluate_dataset_len, 1)
 
     def test_predict_generator(self):
         num_steps = 10
         generator = some_data_tensor_generator(ModelTest.batch_size)
         generator = (x for x, _ in generator)
         pred_y = self.model.predict_generator(generator, steps=num_steps)
-        self.assertEqual(type(pred_y), np.ndarray)
-        self.assertEqual(pred_y.shape, (num_steps * ModelTest.batch_size, 1))
+        assert type(pred_y) == np.ndarray
+        assert pred_y.shape == (num_steps * ModelTest.batch_size, 1)
 
     def test_predict_generator_with_no_concatenation(self):
         num_steps = 10
         generator = some_data_tensor_generator(ModelTest.batch_size)
         generator = (x for x, _ in generator)
         pred_y = self.model.predict_generator(generator, steps=num_steps, concatenate_returns=False)
-        self.assertEqual(type(pred_y), list)
+        assert type(pred_y) == list
         for pred in pred_y:
-            self.assertEqual(type(pred), np.ndarray)
-            self.assertEqual(pred.shape, (ModelTest.batch_size, 1))
+            assert type(pred) == np.ndarray
+            assert pred.shape == (ModelTest.batch_size, 1)
 
     def test_predict_generator_with_has_ground_truth(self):
         num_steps = 10
         generator = some_data_tensor_generator(ModelTest.batch_size)
         pred_y = self.model.predict_generator(generator, steps=num_steps, has_ground_truth=True)
-        self.assertEqual(type(pred_y), np.ndarray)
-        self.assertEqual(pred_y.shape, (num_steps * ModelTest.batch_size, 1))
+        assert type(pred_y) == np.ndarray
+        assert pred_y.shape == (num_steps * ModelTest.batch_size, 1)
 
     def test_predict_generator_with_ground_truth(self):
         num_steps = 10
         generator = some_data_tensor_generator(ModelTest.batch_size)
         pred_y, true_y = self.model.predict_generator(generator, steps=num_steps, return_ground_truth=True)
 
-        self.assertEqual(type(pred_y), np.ndarray)
-        self.assertEqual(type(true_y), np.ndarray)
-        self.assertEqual(pred_y.shape, (num_steps * ModelTest.batch_size, 1))
-        self.assertEqual(true_y.shape, (num_steps * ModelTest.batch_size, 1))
+        assert type(pred_y) == np.ndarray
+        assert type(true_y) == np.ndarray
+        assert pred_y.shape == (num_steps * ModelTest.batch_size, 1)
+        assert true_y.shape == (num_steps * ModelTest.batch_size, 1)
 
     def test_predict_generator_with_ground_truth_tensor_without_convert_to_numpy(self):
         num_steps = 10
@@ -935,10 +936,10 @@ class ModelTest(ModelFittingTestCase):
             generator, steps=num_steps, return_ground_truth=True, convert_to_numpy=False
         )
 
-        self.assertTrue(torch.is_tensor(pred_y))
-        self.assertTrue(torch.is_tensor(true_y))
-        self.assertEqual(pred_y.shape, (num_steps * ModelTest.batch_size, 1))
-        self.assertEqual(true_y.shape, (num_steps * ModelTest.batch_size, 1))
+        assert torch.is_tensor(pred_y)
+        assert torch.is_tensor(true_y)
+        assert pred_y.shape == (num_steps * ModelTest.batch_size, 1)
+        assert true_y.shape == (num_steps * ModelTest.batch_size, 1)
 
     def test_predict_generator_with_ground_truth_and_no_concatenation(self):
         num_steps = 10
@@ -947,32 +948,32 @@ class ModelTest(ModelFittingTestCase):
             generator, steps=num_steps, return_ground_truth=True, concatenate_returns=False
         )
 
-        self.assertEqual(type(pred_y), list)
+        assert type(pred_y) == list
         for pred in pred_y:
-            self.assertEqual(type(pred), np.ndarray)
-            self.assertEqual(pred.shape, (ModelTest.batch_size, 1))
-        self.assertEqual(type(true_y), list)
+            assert type(pred) == np.ndarray
+            assert pred.shape == (ModelTest.batch_size, 1)
+        assert type(true_y) == list
         for true in true_y:
-            self.assertEqual(type(true), np.ndarray)
-            self.assertEqual(true.shape, (ModelTest.batch_size, 1))
+            assert type(true) == np.ndarray
+            assert true.shape == (ModelTest.batch_size, 1)
 
     def test_tensor_predict_on_batch(self):
         x = torch.rand(ModelTest.batch_size, 1)
         pred_y = self.model.predict_on_batch(x)
-        self.assertEqual(pred_y.shape, (ModelTest.batch_size, 1))
+        assert pred_y.shape == (ModelTest.batch_size, 1)
 
     def test_ndarray_predict_on_batch(self):
         x = np.random.rand(ModelTest.batch_size, 1).astype(np.float32)
         pred_y = self.model.predict_on_batch(x)
-        self.assertEqual(pred_y.shape, (ModelTest.batch_size, 1))
+        assert pred_y.shape == (ModelTest.batch_size, 1)
 
     def test_predict_on_batch_without_convert_to_numpy(self):
         x = torch.rand(ModelTest.batch_size, 1)
         pred_y = self.model.predict_on_batch(x, convert_to_numpy=False)
-        self.assertTrue(torch.is_tensor(pred_y))
-        self.assertEqual(pred_y.shape, (ModelTest.batch_size, 1))
+        assert torch.is_tensor(pred_y)
+        assert pred_y.shape == (ModelTest.batch_size, 1)
 
-    @skipIf(not torch.cuda.is_available(), "no gpu available")
+    @pytest.mark.skipif(not torch.cuda.is_available(), reason="no gpu available")
     def test_cpu_cuda(self):
         train_generator = some_data_tensor_generator(ModelTest.batch_size)
         valid_generator = some_data_tensor_generator(ModelTest.batch_size)
@@ -1030,7 +1031,7 @@ class ModelTest(ModelFittingTestCase):
                 validation_steps=ModelTest.steps_per_epoch,
             )
 
-    @skipIf(not torch.cuda.is_available(), "no gpu available")
+    @pytest.mark.skipif(not torch.cuda.is_available(), reason="no gpu available")
     def test_capturable_true_optimizer_with_cuda(self):
         self.optimizer = torch.optim.Adam(self.pytorch_network.parameters(), lr=1e-3, capturable=True)
         self.model = Model(
@@ -1055,7 +1056,7 @@ class ModelTest(ModelFittingTestCase):
                 validation_steps=ModelTest.steps_per_epoch,
             )
 
-    @skipIf(not torch.cuda.is_available(), "no gpu available")
+    @pytest.mark.skipif(not torch.cuda.is_available(), reason="no gpu available")
     def test_capturable_false_optimizer_with_cuda(self):
         self.optimizer = torch.optim.Adam(self.pytorch_network.parameters(), lr=1e-3, capturable=False)
         self.model = Model(
@@ -1080,7 +1081,7 @@ class ModelTest(ModelFittingTestCase):
                 validation_steps=ModelTest.steps_per_epoch,
             )
 
-    @skipIf(not torch.cuda.is_available(), "no gpu available")
+    @pytest.mark.skipif(not torch.cuda.is_available(), reason="no gpu available")
     def test_back_and_forth_cuda_cpu_with_different_optimizers(self):
         train_generator = some_data_tensor_generator(ModelTest.batch_size)
         valid_generator = some_data_tensor_generator(ModelTest.batch_size)
@@ -1089,56 +1090,55 @@ class ModelTest(ModelFittingTestCase):
             if optimizer in ['sparseadam', 'lbfgs']:
                 continue
 
-            with self.subTest(optimizer=optimizer):
-                self.model = Model(
-                    self.pytorch_network,
-                    optimizer,
-                    self.loss_function,
-                    batch_metrics=self.batch_metrics,
-                    epoch_metrics=self.epoch_metrics,
+            self.model = Model(
+                self.pytorch_network,
+                optimizer,
+                self.loss_function,
+                batch_metrics=self.batch_metrics,
+                epoch_metrics=self.epoch_metrics,
+            )
+            # The context manager is also used here because of this bug:
+            # https://github.com/pytorch/pytorch/issues/7320
+            with torch.cuda.device(ModelTest.cuda_device):
+                self.model.cuda(ModelTest.cuda_device)
+                self._test_device(torch.device('cuda:' + str(ModelTest.cuda_device)))
+                self.model.fit_generator(
+                    train_generator,
+                    valid_generator,
+                    epochs=ModelTest.epochs,
+                    steps_per_epoch=ModelTest.steps_per_epoch,
+                    validation_steps=ModelTest.steps_per_epoch,
                 )
-                # The context manager is also used here because of this bug:
-                # https://github.com/pytorch/pytorch/issues/7320
-                with torch.cuda.device(ModelTest.cuda_device):
-                    self.model.cuda(ModelTest.cuda_device)
-                    self._test_device(torch.device('cuda:' + str(ModelTest.cuda_device)))
-                    self.model.fit_generator(
-                        train_generator,
-                        valid_generator,
-                        epochs=ModelTest.epochs,
-                        steps_per_epoch=ModelTest.steps_per_epoch,
-                        validation_steps=ModelTest.steps_per_epoch,
-                    )
 
-                    self.model.cpu()
-                    self._test_device(torch.device('cpu'))
-                    self.model.fit_generator(
-                        train_generator,
-                        valid_generator,
-                        epochs=ModelTest.epochs,
-                        steps_per_epoch=ModelTest.steps_per_epoch,
-                        validation_steps=ModelTest.steps_per_epoch,
-                    )
+                self.model.cpu()
+                self._test_device(torch.device('cpu'))
+                self.model.fit_generator(
+                    train_generator,
+                    valid_generator,
+                    epochs=ModelTest.epochs,
+                    steps_per_epoch=ModelTest.steps_per_epoch,
+                    validation_steps=ModelTest.steps_per_epoch,
+                )
 
-                    self.model.to(torch.device('cuda:' + str(ModelTest.cuda_device)))
-                    self._test_device(torch.device('cuda:' + str(ModelTest.cuda_device)))
-                    self.model.fit_generator(
-                        train_generator,
-                        valid_generator,
-                        epochs=ModelTest.epochs,
-                        steps_per_epoch=ModelTest.steps_per_epoch,
-                        validation_steps=ModelTest.steps_per_epoch,
-                    )
+                self.model.to(torch.device('cuda:' + str(ModelTest.cuda_device)))
+                self._test_device(torch.device('cuda:' + str(ModelTest.cuda_device)))
+                self.model.fit_generator(
+                    train_generator,
+                    valid_generator,
+                    epochs=ModelTest.epochs,
+                    steps_per_epoch=ModelTest.steps_per_epoch,
+                    validation_steps=ModelTest.steps_per_epoch,
+                )
 
-                    self.model.to(torch.device('cpu'))
-                    self._test_device(torch.device('cpu'))
-                    self.model.fit_generator(
-                        train_generator,
-                        valid_generator,
-                        epochs=ModelTest.epochs,
-                        steps_per_epoch=ModelTest.steps_per_epoch,
-                        validation_steps=ModelTest.steps_per_epoch,
-                    )
+                self.model.to(torch.device('cpu'))
+                self._test_device(torch.device('cpu'))
+                self.model.fit_generator(
+                    train_generator,
+                    valid_generator,
+                    epochs=ModelTest.epochs,
+                    steps_per_epoch=ModelTest.steps_per_epoch,
+                    validation_steps=ModelTest.steps_per_epoch,
+                )
 
 
 class SomeDataset(Dataset):
@@ -1156,8 +1156,8 @@ class SomeDataset(Dataset):
 
 
 class ModelDatasetMethodsTest(ModelFittingTestCase):
-    def setUp(self):
-        super().setUp()
+    def setup_method(self):
+        super().setup_method()
         torch.manual_seed(42)
         self.train_dataset = SomeDataset(5000)
         self.valid_dataset = SomeDataset(1000)
@@ -1213,19 +1213,19 @@ class ModelDatasetMethodsTest(ModelFittingTestCase):
         loss, metrics, pred_y = self.model.evaluate_dataset(
             self.test_dataset, batch_size=ModelTest.batch_size, steps=num_steps, return_pred=True
         )
-        self.assertEqual(type(loss), float)
-        self.assertEqual(type(metrics), np.ndarray)
-        self.assertEqual(metrics.tolist(), self.batch_metrics_values + self.epoch_metrics_values)
-        self.assertEqual(type(pred_y), np.ndarray)
-        self.assertEqual(pred_y.shape, (num_steps * ModelTest.batch_size, 10))
+        assert type(loss) == float
+        assert type(metrics) == np.ndarray
+        assert metrics.tolist() == self.batch_metrics_values + self.epoch_metrics_values
+        assert type(pred_y) == np.ndarray
+        assert pred_y.shape == (num_steps * ModelTest.batch_size, 10)
 
-    @skipIf(not colorama_available, "colorama is not available")
-    def test_evaluate_dataset_with_progress_bar_coloring(self):
+    @pytest.mark.skipif(not colorama_available, reason="colorama is not available")
+    def test_evaluate_dataset_with_progress_bar_coloring(self, capsys):
         num_steps = 10
-        self._capture_output()
-
         self.model.evaluate_dataset(self.test_dataset, batch_size=ModelTest.batch_size, steps=num_steps)
-        self.assertStdoutContains(["%", "[32m", "[35m", "[36m", "[94m", "\u2588"])
+        captured = capsys.readouterr()
+        for value in ["%", "[32m", "[35m", "[36m", "[94m", "\u2588"]:
+            assert value in captured.out.strip()
 
     def test_evaluate_dataset_with_callback(self):
         num_steps = 10
@@ -1253,8 +1253,8 @@ class ModelDatasetMethodsTest(ModelFittingTestCase):
             return_pred=True,
         )
 
-        self.assertEqual(type(pred_y), np.ndarray)
-        self.assertEqual(pred_y.shape, (num_steps * ModelTest.batch_size, 10))
+        assert type(pred_y) == np.ndarray
+        assert pred_y.shape == (num_steps * ModelTest.batch_size, 10)
         self._test_return_dict_logs(logs)
 
     def test_evaluate_dataset_with_return_dict_and_ground_truth(self):
@@ -1267,8 +1267,8 @@ class ModelDatasetMethodsTest(ModelFittingTestCase):
             return_ground_truth=True,
         )
 
-        self.assertEqual(type(true_y), np.ndarray)
-        self.assertEqual(true_y.shape, (num_steps * ModelTest.batch_size,))
+        assert type(true_y) == np.ndarray
+        assert true_y.shape == (num_steps * ModelTest.batch_size,)
         self._test_return_dict_logs(logs)
 
     def test_evaluate_dataset_with_return_dict_and_pred_and_ground_truth(self):
@@ -1282,10 +1282,10 @@ class ModelDatasetMethodsTest(ModelFittingTestCase):
             return_ground_truth=True,
         )
 
-        self.assertEqual(type(pred_y), np.ndarray)
-        self.assertEqual(type(true_y), np.ndarray)
-        self.assertEqual(pred_y.shape, (num_steps * ModelTest.batch_size, 10))
-        self.assertEqual(true_y.shape, (num_steps * ModelTest.batch_size,))
+        assert type(pred_y) == np.ndarray
+        assert type(true_y) == np.ndarray
+        assert pred_y.shape == (num_steps * ModelTest.batch_size, 10)
+        assert true_y.shape == (num_steps * ModelTest.batch_size,)
         self._test_return_dict_logs(logs)
 
     def test_evaluate_dataset_with_return_dict_and_pred_and_ground_truth_without_convert_to_numpy(self):
@@ -1300,10 +1300,10 @@ class ModelDatasetMethodsTest(ModelFittingTestCase):
             convert_to_numpy=False,
         )
 
-        self.assertTrue(torch.is_tensor(pred_y))
-        self.assertTrue(torch.is_tensor(true_y))
-        self.assertEqual(pred_y.shape, (num_steps * ModelTest.batch_size, 10))
-        self.assertEqual(true_y.shape, (num_steps * ModelTest.batch_size,))
+        assert torch.is_tensor(pred_y)
+        assert torch.is_tensor(true_y)
+        assert pred_y.shape == (num_steps * ModelTest.batch_size, 10)
+        assert true_y.shape == (num_steps * ModelTest.batch_size,)
         self._test_return_dict_logs(logs)
 
     def test_evaluate_dataset_with_ground_truth(self):
@@ -1315,13 +1315,13 @@ class ModelDatasetMethodsTest(ModelFittingTestCase):
             return_pred=True,
             return_ground_truth=True,
         )
-        self.assertEqual(type(loss), float)
-        self.assertEqual(type(metrics), np.ndarray)
-        self.assertEqual(metrics.tolist(), self.batch_metrics_values + self.epoch_metrics_values)
-        self.assertEqual(type(pred_y), np.ndarray)
-        self.assertEqual(type(true_y), np.ndarray)
-        self.assertEqual(pred_y.shape, (num_steps * ModelTest.batch_size, 10))
-        self.assertEqual(true_y.shape, (num_steps * ModelTest.batch_size,))
+        assert type(loss) == float
+        assert type(metrics) == np.ndarray
+        assert metrics.tolist() == self.batch_metrics_values + self.epoch_metrics_values
+        assert type(pred_y) == np.ndarray
+        assert type(true_y) == np.ndarray
+        assert pred_y.shape == (num_steps * ModelTest.batch_size, 10)
+        assert true_y.shape == (num_steps * ModelTest.batch_size,)
 
     def test_predict_dataset(self):
         class PredictDataset(Dataset):
@@ -1339,16 +1339,16 @@ class ModelDatasetMethodsTest(ModelFittingTestCase):
         pred_y = self.model.predict_dataset(
             PredictDataset(self.test_dataset), batch_size=ModelTest.batch_size, steps=num_steps
         )
-        self.assertEqual(type(pred_y), np.ndarray)
-        self.assertEqual(pred_y.shape, (num_steps * ModelTest.batch_size, 10))
+        assert type(pred_y) == np.ndarray
+        assert pred_y.shape == (num_steps * ModelTest.batch_size, 10)
 
     def test_predict_dataset_with_has_ground_truth(self):
         num_steps = 10
         pred_y = self.model.predict_dataset(
             self.test_dataset, has_ground_truth=True, batch_size=ModelTest.batch_size, steps=num_steps
         )
-        self.assertEqual(type(pred_y), np.ndarray)
-        self.assertEqual(pred_y.shape, (num_steps * ModelTest.batch_size, 10))
+        assert type(pred_y) == np.ndarray
+        assert pred_y.shape == (num_steps * ModelTest.batch_size, 10)
 
     def test_predict_dataset_with_ground_truth(self):
         num_steps = 10
@@ -1356,10 +1356,10 @@ class ModelDatasetMethodsTest(ModelFittingTestCase):
             self.test_dataset, batch_size=ModelTest.batch_size, steps=num_steps, return_ground_truth=True
         )
 
-        self.assertEqual(type(pred_y), np.ndarray)
-        self.assertEqual(type(true_y), np.ndarray)
-        self.assertEqual(pred_y.shape, (num_steps * ModelTest.batch_size, 10))
-        self.assertEqual(true_y.shape, (num_steps * ModelTest.batch_size,))
+        assert type(pred_y) == np.ndarray
+        assert type(true_y) == np.ndarray
+        assert pred_y.shape == (num_steps * ModelTest.batch_size, 10)
+        assert true_y.shape == (num_steps * ModelTest.batch_size,)
 
     def test_predict_dataset_with_ground_truth_without_convert_to_numpy(self):
         num_steps = 10
@@ -1371,10 +1371,10 @@ class ModelDatasetMethodsTest(ModelFittingTestCase):
             convert_to_numpy=False,
         )
 
-        self.assertTrue(torch.is_tensor(pred_y))
-        self.assertTrue(torch.is_tensor(true_y))
-        self.assertEqual(pred_y.shape, (num_steps * ModelTest.batch_size, 10))
-        self.assertEqual(true_y.shape, (num_steps * ModelTest.batch_size,))
+        assert torch.is_tensor(pred_y)
+        assert torch.is_tensor(true_y)
+        assert pred_y.shape == (num_steps * ModelTest.batch_size, 10)
+        assert true_y.shape == (num_steps * ModelTest.batch_size,)
 
     def test_predict_dataset_with_ground_truth_and_no_concatenation(self):
         num_steps = 10
@@ -1386,27 +1386,25 @@ class ModelDatasetMethodsTest(ModelFittingTestCase):
             concatenate_returns=False,
         )
 
-        self.assertEqual(type(pred_y), list)
+        assert type(pred_y) == list
         for pred in pred_y:
-            self.assertEqual(type(pred), np.ndarray)
-            self.assertEqual(pred.shape, (ModelTest.batch_size, 10))
-        self.assertEqual(type(true_y), list)
+            assert type(pred) == np.ndarray
+            assert pred.shape == (ModelTest.batch_size, 10)
+        assert type(true_y) == list
         for true in true_y:
-            self.assertEqual(type(true), np.ndarray)
-            self.assertEqual(true.shape, (ModelTest.batch_size,))
+            assert type(true) == np.ndarray
+            assert true.shape == (ModelTest.batch_size,)
 
     def test_preprocess_input_with_packed_sequence_return_packed_sequence_in_tuple(self):
         x = MagicMock(spec=PackedSequence)
 
         actual_x = self.model.preprocess_input(x)
-        self.assertTrue(isinstance(actual_x, tuple))
+        assert isinstance(actual_x, tuple)
 
     def test_preprocess_input_integration_with_packed_sequence(self):
         pack_padded_sequences_vectors = populate_packed_sequence()
 
         actual_x = self.model.preprocess_input(pack_padded_sequences_vectors)
-        self.assertTrue(isinstance(actual_x[0], PackedSequence))
+        assert isinstance(actual_x[0], PackedSequence)
 
 
-if __name__ == '__main__':
-    main()

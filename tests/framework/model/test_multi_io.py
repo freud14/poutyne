@@ -35,8 +35,8 @@ def some_data_tensor_generator_multi_io(batch_size):
 
 
 class ModelMultiIOTest(ModelFittingTestCase):
-    def setUp(self):
-        super().setUp()
+    def setup_method(self):
+        super().setup_method()
         torch.manual_seed(42)
         self.pytorch_network = MultiIOModel(num_input=2, num_output=2)
         self.loss_function = nn.MSELoss()
@@ -107,7 +107,7 @@ class ModelMultiIOTest(ModelFittingTestCase):
         y1 = torch.rand(ModelMultiIOTest.batch_size, 1)
         y2 = torch.rand(ModelMultiIOTest.batch_size, 1)
         loss = self.model.train_on_batch((x1, x2), (y1, y2))
-        self.assertEqual(type(loss), float)
+        assert type(loss) == float
 
     def test_ndarray_train_on_batch_multi_io(self):
         x1 = np.random.rand(ModelMultiIOTest.batch_size, 1).astype(np.float32)
@@ -115,7 +115,7 @@ class ModelMultiIOTest(ModelFittingTestCase):
         y1 = np.random.rand(ModelMultiIOTest.batch_size, 1).astype(np.float32)
         y2 = np.random.rand(ModelMultiIOTest.batch_size, 1).astype(np.float32)
         loss = self.model.train_on_batch((x1, x2), (y1, y2))
-        self.assertEqual(type(loss), float)
+        assert type(loss) == float
 
     def test_evaluate_with_pred_multi_io(self):
         x = (torch.rand(ModelMultiIOTest.evaluate_dataset_len, 1), torch.rand(ModelMultiIOTest.evaluate_dataset_len, 1))
@@ -123,13 +123,13 @@ class ModelMultiIOTest(ModelFittingTestCase):
         # We also test the unpacking.
         _, pred_y = self.model.evaluate(x, y, batch_size=ModelMultiIOTest.batch_size, return_pred=True)
         for pred in pred_y:
-            self.assertEqual(pred.shape, (ModelMultiIOTest.evaluate_dataset_len, 1))
+            assert pred.shape == (ModelMultiIOTest.evaluate_dataset_len, 1)
 
     def test_tensor_evaluate_on_batch_multi_io(self):
         y = (torch.rand(ModelMultiIOTest.batch_size, 1), torch.rand(ModelMultiIOTest.batch_size, 1))
         x = (torch.rand(ModelMultiIOTest.batch_size, 1), torch.rand(ModelMultiIOTest.batch_size, 1))
         loss = self.model.evaluate_on_batch(x, y)
-        self.assertEqual(type(loss), float)
+        assert type(loss) == float
 
     def test_predict_with_np_array_multi_io(self):
         x1 = np.random.rand(ModelMultiIOTest.evaluate_dataset_len, 1).astype(np.float32)
@@ -137,7 +137,7 @@ class ModelMultiIOTest(ModelFittingTestCase):
         x = (x1, x2)
         pred_y = self.model.predict(x, batch_size=ModelMultiIOTest.batch_size)
         for pred in pred_y:
-            self.assertEqual(pred.shape, (ModelMultiIOTest.evaluate_dataset_len, 1))
+            assert pred.shape == (ModelMultiIOTest.evaluate_dataset_len, 1)
 
     def test_predict_generator_multi_io(self):
         num_steps = 10
@@ -146,7 +146,7 @@ class ModelMultiIOTest(ModelFittingTestCase):
         pred_y = self.model.predict_generator(generator, steps=num_steps)
 
         for pred in pred_y:
-            self.assertEqual(pred.shape, (num_steps * ModelMultiIOTest.batch_size, 1))
+            assert pred.shape == (num_steps * ModelMultiIOTest.batch_size, 1)
 
     def test_tensor_predict_on_batch_multi_io(self):
         x = (torch.rand(ModelMultiIOTest.batch_size, 1), torch.rand(ModelMultiIOTest.batch_size, 1))

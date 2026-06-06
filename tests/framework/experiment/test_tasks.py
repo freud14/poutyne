@@ -19,7 +19,8 @@ You should have received a copy of the GNU Lesser General Public License along w
 
 import os
 from tempfile import TemporaryDirectory
-from unittest import TestCase, skipIf
+
+import pytest
 
 try:
     import pandas  # pylint: disable=unused-import  # noqa: F401
@@ -33,13 +34,13 @@ from torch import nn
 from poutyne import Experiment, FBeta, acc
 
 
-@skipIf(not pandas_available, "pandas is not available")
-class ExperimentTasksTest(TestCase):
-    def setUp(self):
+@pytest.mark.skipif(not pandas_available, reason="pandas is not available")
+class ExperimentTasksTest:
+    def setup_method(self):
         self.temp_dir_obj = TemporaryDirectory()
         self.test_checkpoints_path = os.path.join(self.temp_dir_obj.name, 'expt')
 
-    def tearDown(self):
+    def teardown_method(self):
         self.temp_dir_obj.cleanup()
 
     def test_task_classif(self):
@@ -60,13 +61,13 @@ class ExperimentTasksTest(TestCase):
         self._test_task_classif(expt)
 
     def _test_task_classif(self, expt):
-        self.assertEqual(expt.monitor_metric, 'val_acc')
-        self.assertEqual(expt.monitor_mode, 'max')
-        self.assertEqual(expt.model.loss_function.func, F.cross_entropy)
-        self.assertEqual(len(expt.model.batch_metrics), 1)
-        self.assertEqual(expt.model.batch_metrics[0].func, acc)
-        self.assertEqual(len(expt.model.epoch_metrics), 1)
-        self.assertIsInstance(expt.model.epoch_metrics[0], FBeta)
+        assert expt.monitor_metric == 'val_acc'
+        assert expt.monitor_mode == 'max'
+        assert expt.model.loss_function.func == F.cross_entropy
+        assert len(expt.model.batch_metrics) == 1
+        assert expt.model.batch_metrics[0].func == acc
+        assert len(expt.model.epoch_metrics) == 1
+        assert isinstance(expt.model.epoch_metrics[0], FBeta)
 
     def test_task_regr(self):
         expt = Experiment(
@@ -86,8 +87,8 @@ class ExperimentTasksTest(TestCase):
         self._test_task_regr(expt)
 
     def _test_task_regr(self, expt):
-        self.assertEqual(expt.monitor_metric, 'val_loss')
-        self.assertEqual(expt.monitor_mode, 'min')
-        self.assertEqual(expt.model.loss_function.func, F.mse_loss)
-        self.assertEqual(len(expt.model.batch_metrics), 0)
-        self.assertEqual(len(expt.model.epoch_metrics), 0)
+        assert expt.monitor_metric == 'val_loss'
+        assert expt.monitor_mode == 'min'
+        assert expt.model.loss_function.func == F.mse_loss
+        assert len(expt.model.batch_metrics) == 0
+        assert len(expt.model.epoch_metrics) == 0

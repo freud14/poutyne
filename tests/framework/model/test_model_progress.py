@@ -17,8 +17,9 @@ You should have received a copy of the GNU Lesser General Public License along w
 <https://www.gnu.org/licenses/>.
 """
 
-from unittest import skipIf
+import re
 
+import pytest
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
@@ -44,13 +45,24 @@ except ImportError:
     color = None
 
 
-class ModelFittingTestCaseProgress(ModelFittingTestCase):
+class ModelProgressTest(ModelFittingTestCase):
     # pylint: disable=too-many-public-methods
     num_steps = 5
     TIME_REGEX = r"((([0-9]+d)?[0-9]{1,2}h)?[0-9]{1,2}m)?[0-9]{1,2}\.[0-9]{2}s"
 
-    def setUp(self):
-        super().setUp()
+    @pytest.fixture(autouse=True)
+    def _capsys(self, capsys):
+        self.capsys = capsys
+
+    def _get_captured(self):
+        # Cache so multiple assertStdout* calls in one test see the same output.
+        if not hasattr(self, '_captured_out') or self._captured_out is None:
+            self._captured_out = self.capsys.readouterr().out
+        return self._captured_out
+
+    def setup_method(self):
+        self._captured_out = None
+        super().setup_method()
         self.train_generator = some_data_tensor_generator(ModelFittingTestCase.batch_size)
         self.valid_generator = some_data_tensor_generator(ModelFittingTestCase.batch_size)
         self.test_generator = some_data_tensor_generator(ModelFittingTestCase.batch_size)
@@ -88,17 +100,17 @@ class ModelFittingTestCaseProgress(ModelFittingTestCase):
             epoch_metrics=self.epoch_metrics,
         )
 
-        self._capture_output()
-
-    def assertStdoutContains(self, values):
+    def assert_stdout_contains(self, values):
+        out = self._get_captured()
         for value in values:
-            self.assertIn(value, self.test_out.getvalue().strip())
+            assert value in out.strip()
 
-    def assertStdoutNotContains(self, values):
+    def assert_stdout_not_contains(self, values):
+        out = self._get_captured()
         for value in values:
-            self.assertNotIn(value, self.test_out.getvalue().strip())
+            assert value not in out.strip()
 
-    @skipIf(color is None, "Unable to import colorama")
+    @pytest.mark.skipif(color is None, reason="Unable to import colorama")
     def test_fitting_with_default_coloring(self):
         _ = self.model.fit_generator(
             self.train_generator,
@@ -109,7 +121,7 @@ class ModelFittingTestCaseProgress(ModelFittingTestCase):
             callbacks=[self.mock_callback],
         )
 
-        self.assertStdoutContains(["[32m", "[35m", "[36m", "[94m"])
+        self.assert_stdout_contains(["[32m", "[35m", "[36m", "[94m"])
 
     def test_fitting_with_progress_bar_show_epoch(self):
         _ = self.model.fit_generator(
@@ -121,7 +133,7 @@ class ModelFittingTestCaseProgress(ModelFittingTestCase):
             callbacks=[self.mock_callback],
         )
 
-        self.assertStdoutContains(["Epoch", "1/5", "2/5"])
+        self.assert_stdout_contains(["Epoch", "1/5", "2/5"])
 
     def test_fitting_with_progress_bar_show_steps(self):
         _ = self.model.fit_generator(
@@ -133,7 +145,7 @@ class ModelFittingTestCaseProgress(ModelFittingTestCase):
             callbacks=[self.mock_callback],
         )
 
-        self.assertStdoutContains(["steps", f"{ModelFittingTestCase.steps_per_epoch}"])
+        self.assert_stdout_contains(["steps", f"{ModelFittingTestCase.steps_per_epoch}"])
 
     def test_fitting_with_progress_bar_show_train_val_final_steps(self):
         _ = self.model.fit_generator(
@@ -145,7 +157,7 @@ class ModelFittingTestCaseProgress(ModelFittingTestCase):
             callbacks=[self.mock_callback],
         )
 
-        self.assertStdoutContains(["Val steps", "Train steps"])
+        self.assert_stdout_contains(["Val steps", "Train steps"])
 
     def test_fitting_with_no_progress_bar_dont_show_epoch(self):
         _ = self.model.fit_generator(
@@ -158,9 +170,9 @@ class ModelFittingTestCaseProgress(ModelFittingTestCase):
             verbose=False,
         )
 
-        self.assertStdoutNotContains(["Epoch", "1/5", "2/5"])
+        self.assert_stdout_not_contains(["Epoch", "1/5", "2/5"])
 
-    @skipIf(color is None, "Unable to import colorama")
+    @pytest.mark.skipif(color is None, reason="Unable to import colorama")
     def test_fitting_with_user_coloring(self):
         coloring = {
             "text_color": 'BLACK',
@@ -179,9 +191,9 @@ class ModelFittingTestCaseProgress(ModelFittingTestCase):
             progress_options={"coloring": coloring},
         )
 
-        self.assertStdoutContains(["[30m"])
+        self.assert_stdout_contains(["[30m"])
 
-    @skipIf(color is None, "Unable to import colorama")
+    @pytest.mark.skipif(color is None, reason="Unable to import colorama")
     def test_fitting_with_user_partial_coloring(self):
         _ = self.model.fit_generator(
             self.train_generator,
@@ -193,10 +205,10 @@ class ModelFittingTestCaseProgress(ModelFittingTestCase):
             progress_options={"coloring": {"text_color": 'BLACK', "ratio_color": "BLACK"}},
         )
 
-        self.assertStdoutContains(["[30m", "[32m", "[35m", "[94m"])
+        self.assert_stdout_contains(["[30m", "[32m", "[35m", "[94m"])
 
     def test_fitting_with_user_coloring_invalid(self):
-        with self.assertRaises(KeyError):
+        with pytest.raises(KeyError):
             _ = self.model.fit_generator(
                 self.train_generator,
                 self.valid_generator,
@@ -218,9 +230,9 @@ class ModelFittingTestCaseProgress(ModelFittingTestCase):
             progress_options={"coloring": False},
         )
 
-        self.assertStdoutNotContains(["[32m", "[35m", "[36m", "[94m"])
+        self.assert_stdout_not_contains(["[32m", "[35m", "[36m", "[94m"])
 
-    @skipIf(color is None, "Unable to import colorama")
+    @pytest.mark.skipif(color is None, reason="Unable to import colorama")
     def test_fitting_with_progress_bar_default_color(self):
         _ = self.model.fit_generator(
             self.train_generator,
@@ -232,9 +244,9 @@ class ModelFittingTestCaseProgress(ModelFittingTestCase):
             progress_options={"coloring": True, "progress_bar": True},
         )
 
-        self.assertStdoutContains(["%", "[32m", "[35m", "[36m", "[94m", "\u2588"])
+        self.assert_stdout_contains(["%", "[32m", "[35m", "[36m", "[94m", "\u2588"])
 
-    @skipIf(color is None, "Unable to import colorama")
+    @pytest.mark.skipif(color is None, reason="Unable to import colorama")
     def test_fitting_with_progress_bar_user_color(self):
         coloring = {
             "text_color": 'BLACK',
@@ -253,7 +265,7 @@ class ModelFittingTestCaseProgress(ModelFittingTestCase):
             progress_options={"coloring": coloring, "progress_bar": True},
         )
 
-        self.assertStdoutContains(["%", "[30m", "\u2588"])
+        self.assert_stdout_contains(["%", "[30m", "\u2588"])
 
     def test_fitting_with_progress_bar_no_color(self):
         _ = self.model.fit_generator(
@@ -266,8 +278,8 @@ class ModelFittingTestCaseProgress(ModelFittingTestCase):
             progress_options={"coloring": False, "progress_bar": True},
         )
 
-        self.assertStdoutContains(["%", "\u2588"])
-        self.assertStdoutNotContains(["[32m", "[35m", "[36m", "[94m"])
+        self.assert_stdout_contains(["%", "\u2588"])
+        self.assert_stdout_not_contains(["[32m", "[35m", "[36m", "[94m"])
 
     def test_fitting_with_no_progress_bar(self):
         _ = self.model.fit_generator(
@@ -280,8 +292,8 @@ class ModelFittingTestCaseProgress(ModelFittingTestCase):
             progress_options={"coloring": False, "progress_bar": False},
         )
 
-        self.assertStdoutNotContains(["%", "\u2588"])
-        self.assertStdoutNotContains(["[32m", "[35m", "[36m", "[94m"])
+        self.assert_stdout_not_contains(["%", "\u2588"])
+        self.assert_stdout_not_contains(["[32m", "[35m", "[36m", "[94m"])
 
     def test_progress_bar_with_step_is_none(self):
         train_generator = SomeDataGeneratorUsingStopIteration(ModelFittingTestCase.batch_size, 10)
@@ -293,8 +305,8 @@ class ModelFittingTestCaseProgress(ModelFittingTestCase):
             progress_options={"coloring": False, "progress_bar": True},
         )
 
-        self.assertStdoutContains(["s/step"])
-        self.assertStdoutNotContains(["[32m", "[35m", "[36m", "[94m", "\u2588", "%"])
+        self.assert_stdout_contains(["s/step"])
+        self.assert_stdout_not_contains(["[32m", "[35m", "[36m", "[94m", "\u2588", "%"])
 
     def test_evaluate_without_progress_output(self):
         x = torch.rand(ModelFittingTestCase.evaluate_dataset_len, 1)
@@ -302,18 +314,18 @@ class ModelFittingTestCaseProgress(ModelFittingTestCase):
 
         _, _ = self.model.evaluate(x, y, batch_size=ModelFittingTestCase.batch_size, verbose=False)
 
-        self.assertStdoutNotContains(["[32m", "[35m", "[36m", "[94m"])
+        self.assert_stdout_not_contains(["[32m", "[35m", "[36m", "[94m"])
 
-    @skipIf(color is None, "Unable to import colorama")
+    @pytest.mark.skipif(color is None, reason="Unable to import colorama")
     def test_evaluate_with_default_coloring(self):
         x = torch.rand(ModelFittingTestCase.evaluate_dataset_len, 1)
         y = torch.rand(ModelFittingTestCase.evaluate_dataset_len, 1)
 
         _, _ = self.model.evaluate(x, y, batch_size=ModelFittingTestCase.batch_size)
 
-        self.assertStdoutContains(["[32m", "[35m", "[36m", "[94m"])
+        self.assert_stdout_contains(["[32m", "[35m", "[36m", "[94m"])
 
-    @skipIf(color is None, "Unable to import colorama")
+    @pytest.mark.skipif(color is None, reason="Unable to import colorama")
     def test_evaluate_with_user_coloring(self):
         x = torch.rand(ModelFittingTestCase.evaluate_dataset_len, 1)
         y = torch.rand(ModelFittingTestCase.evaluate_dataset_len, 1)
@@ -330,9 +342,9 @@ class ModelFittingTestCaseProgress(ModelFittingTestCase):
             x, y, batch_size=ModelFittingTestCase.batch_size, progress_options={"coloring": coloring}
         )
 
-        self.assertStdoutContains(["[30m"])
+        self.assert_stdout_contains(["[30m"])
 
-    @skipIf(color is None, "Unable to import colorama")
+    @pytest.mark.skipif(color is None, reason="Unable to import colorama")
     def test_evaluate_with_user_partial_coloring(self):
         x = torch.rand(ModelFittingTestCase.evaluate_dataset_len, 1)
         y = torch.rand(ModelFittingTestCase.evaluate_dataset_len, 1)
@@ -343,13 +355,13 @@ class ModelFittingTestCaseProgress(ModelFittingTestCase):
             batch_size=ModelFittingTestCase.batch_size,
             progress_options={"coloring": {"text_color": 'BLACK', "ratio_color": "BLACK"}},
         )
-        self.assertStdoutContains(["[30m", "[32m", "[35m", "[94m"])
+        self.assert_stdout_contains(["[30m", "[32m", "[35m", "[94m"])
 
     def test_evaluate_with_user_coloring_invalid(self):
         x = torch.rand(ModelFittingTestCase.evaluate_dataset_len, 1)
         y = torch.rand(ModelFittingTestCase.evaluate_dataset_len, 1)
 
-        with self.assertRaises(KeyError):
+        with pytest.raises(KeyError):
             _, _ = self.model.evaluate(
                 x,
                 y,
@@ -365,9 +377,9 @@ class ModelFittingTestCaseProgress(ModelFittingTestCase):
             x, y, batch_size=ModelFittingTestCase.batch_size, progress_options={"coloring": False}
         )
 
-        self.assertStdoutNotContains(["[32m", "[35m", "[36m", "[94m"])
+        self.assert_stdout_not_contains(["[32m", "[35m", "[36m", "[94m"])
 
-    @skipIf(color is None, "Unable to import colorama")
+    @pytest.mark.skipif(color is None, reason="Unable to import colorama")
     def test_evaluate_with_progress_bar_default_coloring(self):
         x = torch.rand(ModelFittingTestCase.evaluate_dataset_len, 1)
         y = torch.rand(ModelFittingTestCase.evaluate_dataset_len, 1)
@@ -376,9 +388,9 @@ class ModelFittingTestCaseProgress(ModelFittingTestCase):
             x, y, batch_size=ModelFittingTestCase.batch_size, progress_options={"coloring": True, "progress_bar": True}
         )
 
-        self.assertStdoutContains(["%", "[32m", "[35m", "[36m", "[94m", "\u2588"])
+        self.assert_stdout_contains(["%", "[32m", "[35m", "[36m", "[94m", "\u2588"])
 
-    @skipIf(color is None, "Unable to import colorama")
+    @pytest.mark.skipif(color is None, reason="Unable to import colorama")
     def test_evaluate_with_progress_bar_user_coloring(self):
         x = torch.rand(ModelFittingTestCase.evaluate_dataset_len, 1)
         y = torch.rand(ModelFittingTestCase.evaluate_dataset_len, 1)
@@ -398,9 +410,9 @@ class ModelFittingTestCaseProgress(ModelFittingTestCase):
             progress_options={"coloring": coloring, "progress_bar": True},
         )
 
-        self.assertStdoutContains(["%", "[30m", "\u2588"])
+        self.assert_stdout_contains(["%", "[30m", "\u2588"])
 
-    @skipIf(color is None, "Unable to import colorama")
+    @pytest.mark.skipif(color is None, reason="Unable to import colorama")
     def test_evaluate_with_progress_bar_user_no_color(self):
         x = torch.rand(ModelFittingTestCase.evaluate_dataset_len, 1)
         y = torch.rand(ModelFittingTestCase.evaluate_dataset_len, 1)
@@ -409,8 +421,8 @@ class ModelFittingTestCaseProgress(ModelFittingTestCase):
             x, y, batch_size=ModelFittingTestCase.batch_size, progress_options={"coloring": False, "progress_bar": True}
         )
 
-        self.assertStdoutContains(["%", "\u2588"])
-        self.assertStdoutNotContains(["[32m", "[35m", "[36m", "[94m"])
+        self.assert_stdout_contains(["%", "\u2588"])
+        self.assert_stdout_not_contains(["[32m", "[35m", "[36m", "[94m"])
 
     def test_evaluate_with_no_progress_bar(self):
         x = torch.rand(ModelFittingTestCase.evaluate_dataset_len, 1)
@@ -423,10 +435,10 @@ class ModelFittingTestCaseProgress(ModelFittingTestCase):
             progress_options={"coloring": False, "progress_bar": False},
         )
 
-        self.assertStdoutNotContains(["%", "\u2588"])
-        self.assertStdoutNotContains(["[32m", "[35m", "[36m", "[94m"])
+        self.assert_stdout_not_contains(["%", "\u2588"])
+        self.assert_stdout_not_contains(["[32m", "[35m", "[36m", "[94m"])
 
-    @skipIf(color is None, "Unable to import colorama")
+    @pytest.mark.skipif(color is None, reason="Unable to import colorama")
     def test_evaluate_data_loader_with_progress_bar_coloring(self):
         x = torch.rand(ModelFittingTestCase.evaluate_dataset_len, 1)
         y = torch.rand(ModelFittingTestCase.evaluate_dataset_len, 1)
@@ -435,27 +447,27 @@ class ModelFittingTestCaseProgress(ModelFittingTestCase):
 
         _, _ = self.model.evaluate_generator(generator, verbose=True)
 
-        self.assertStdoutContains(["%", "[32m", "[35m", "[36m", "[94m", "\u2588"])
+        self.assert_stdout_contains(["%", "[32m", "[35m", "[36m", "[94m", "\u2588"])
 
-    @skipIf(color is None, "Unable to import colorama")
+    @pytest.mark.skipif(color is None, reason="Unable to import colorama")
     def test_evaluate_generator_with_progress_bar_coloring(self):
         generator = some_data_tensor_generator(ModelFittingTestCase.batch_size)
 
-        _, _ = self.model.evaluate_generator(generator, steps=ModelFittingTestCaseProgress.num_steps, verbose=True)
+        _, _ = self.model.evaluate_generator(generator, steps=ModelProgressTest.num_steps, verbose=True)
 
-        self.assertStdoutContains(["%", "[32m", "[35m", "[36m", "[94m", "\u2588"])
+        self.assert_stdout_contains(["%", "[32m", "[35m", "[36m", "[94m", "\u2588"])
 
-    @skipIf(color is None, "Unable to import colorama")
+    @pytest.mark.skipif(color is None, reason="Unable to import colorama")
     def test_evaluate_generator_with_callback_and_progress_bar_coloring(self):
         generator = some_data_tensor_generator(ModelFittingTestCase.batch_size)
 
         _, _ = self.model.evaluate_generator(
-            generator, steps=ModelFittingTestCaseProgress.num_steps, callbacks=[self.mock_callback], verbose=True
+            generator, steps=ModelProgressTest.num_steps, callbacks=[self.mock_callback], verbose=True
         )
 
-        self.assertStdoutContains(["%", "[32m", "[35m", "[36m", "[94m", "\u2588"])
+        self.assert_stdout_contains(["%", "[32m", "[35m", "[36m", "[94m", "\u2588"])
 
-    @skipIf(color is None, "Unable to import colorama")
+    @pytest.mark.skipif(color is None, reason="Unable to import colorama")
     def test_fitting_complete_display_test_with_progress_bar_coloring(self):
         # we use the same color for all components for simplicity
         coloring = {
@@ -469,107 +481,107 @@ class ModelFittingTestCaseProgress(ModelFittingTestCase):
             self.train_generator,
             self.valid_generator,
             epochs=1,
-            steps_per_epoch=ModelFittingTestCaseProgress.num_steps,
-            validation_steps=ModelFittingTestCaseProgress.num_steps,
+            steps_per_epoch=ModelProgressTest.num_steps,
+            validation_steps=ModelProgressTest.num_steps,
             callbacks=[self.mock_callback],
             progress_options={"coloring": coloring, "progress_bar": False},
         )
 
         # We split per step update
-        steps_update = self.test_out.getvalue().strip().split("\r")
+        steps_update = self.capsys.readouterr().out.strip().split("\r")
 
         # we don't validate the templating of metrics since tested before
         template_format = r".*Epoch:.*{}\/1.*\[37mStep:.*{}\/5.*{:6.2f}\%.*|{}|.*ETA:"
         epoch = 1
         # the 5 train steps
-        for step, step_update in enumerate(steps_update[: ModelFittingTestCaseProgress.num_steps], start=1):
+        for step, step_update in enumerate(steps_update[: ModelProgressTest.num_steps], start=1):
             progress_Bar = "\u2588" * step * 2 + " " * (20 - step * 2)
             regex_filled = template_format.format(
-                epoch, step, step / ModelFittingTestCaseProgress.num_steps * 100, progress_Bar
+                epoch, step, step / ModelProgressTest.num_steps * 100, progress_Bar
             )
-            self.assertRegex(step_update, regex_filled)
+            assert re.search(regex_filled, step_update)
 
         # The 5 val steps
-        for step, step_update in enumerate(steps_update[ModelFittingTestCaseProgress.num_steps : -1], start=1):
+        for step, step_update in enumerate(steps_update[ModelProgressTest.num_steps : -1], start=1):
             progress_Bar = "\u2588" * step * 2 + " " * (20 - step * 2)
             regex_filled = template_format.format(
-                epoch, step, step / ModelFittingTestCaseProgress.num_steps * 100, progress_Bar
+                epoch, step, step / ModelProgressTest.num_steps * 100, progress_Bar
             )
-            self.assertRegex(step_update, regex_filled)
+            assert re.search(regex_filled, step_update)
 
         # last print update templating different
-        last_print_regex = r".*\[37mTrain steps:.*5.*Val steps:.*5.*" + ModelFittingTestCaseProgress.TIME_REGEX
-        self.assertRegex(steps_update[-1], last_print_regex)
+        last_print_regex = r".*\[37mTrain steps:.*5.*Val steps:.*5.*" + ModelProgressTest.TIME_REGEX
+        assert re.search(last_print_regex, steps_update[-1])
 
     def test_fitting_complete_display_test_with_progress_bar_no_coloring(self):
         _ = self.model.fit_generator(
             self.train_generator,
             self.valid_generator,
             epochs=1,
-            steps_per_epoch=ModelFittingTestCaseProgress.num_steps,
-            validation_steps=ModelFittingTestCaseProgress.num_steps,
+            steps_per_epoch=ModelProgressTest.num_steps,
+            validation_steps=ModelProgressTest.num_steps,
             callbacks=[self.mock_callback],
             progress_options={"coloring": False, "progress_bar": True},
         )
 
         # We split per step update
-        steps_update = self.test_out.getvalue().strip().split("\r")
+        steps_update = self.capsys.readouterr().out.strip().split("\r")
 
         # we don't validate the templating of metrics since tested before
         template_format = r".*Epoch:.*{}\/1.*Step:.*{}\/5.*{:6.2f}\%.*|{}|.*ETA:"
         epoch = 1
         # the 5 train steps
-        for step, step_update in enumerate(steps_update[: ModelFittingTestCaseProgress.num_steps], start=1):
+        for step, step_update in enumerate(steps_update[: ModelProgressTest.num_steps], start=1):
             progress_Bar = "\u2588" * step * 2 + " " * (20 - step * 2)
             regex_filled = template_format.format(
-                epoch, step, step / ModelFittingTestCaseProgress.num_steps * 100, progress_Bar
+                epoch, step, step / ModelProgressTest.num_steps * 100, progress_Bar
             )
-            self.assertRegex(step_update, regex_filled)
+            assert re.search(regex_filled, step_update)
 
         # The 5 val steps
-        for step, step_update in enumerate(steps_update[ModelFittingTestCaseProgress.num_steps : -1], start=1):
+        for step, step_update in enumerate(steps_update[ModelProgressTest.num_steps : -1], start=1):
             progress_Bar = "\u2588" * step * 2 + " " * (20 - step * 2)
             regex_filled = template_format.format(
-                epoch, step, step / ModelFittingTestCaseProgress.num_steps * 100, progress_Bar
+                epoch, step, step / ModelProgressTest.num_steps * 100, progress_Bar
             )
-            self.assertRegex(step_update, regex_filled)
+            assert re.search(regex_filled, step_update)
 
         # last print update templating different
-        last_print_regex = r".*Train steps:.*5.*Val steps:.*5.*" + ModelFittingTestCaseProgress.TIME_REGEX
-        self.assertRegex(steps_update[-1], last_print_regex)
+        last_print_regex = r".*Train steps:.*5.*Val steps:.*5.*" + ModelProgressTest.TIME_REGEX
+        assert re.search(last_print_regex, steps_update[-1])
 
     def test_fitting_complete_display_test_with_no_progress_bar_no_coloring(self):
         _ = self.model.fit_generator(
             self.train_generator,
             self.valid_generator,
             epochs=1,
-            steps_per_epoch=ModelFittingTestCaseProgress.num_steps,
-            validation_steps=ModelFittingTestCaseProgress.num_steps,
+            steps_per_epoch=ModelProgressTest.num_steps,
+            validation_steps=ModelProgressTest.num_steps,
             callbacks=[self.mock_callback],
             progress_options={"coloring": False, "progress_bar": False},
         )
 
         # We split per step update
-        steps_update = self.test_out.getvalue().strip().split("\r")
+        steps_update = self.capsys.readouterr().out.strip().split("\r")
 
         # we don't validate the templating of metrics since tested before
         template_format = r".*Epoch:.*{}\/1.*Step:.*{}\/5.*ETA:"
         epoch = 1
         # the 5 train steps
-        for step, step_update in enumerate(steps_update[: ModelFittingTestCaseProgress.num_steps], start=1):
-            regex_filled = template_format.format(epoch, step, step / ModelFittingTestCaseProgress.num_steps * 100)
-            self.assertRegex(step_update, regex_filled)
+        for step, step_update in enumerate(steps_update[: ModelProgressTest.num_steps], start=1):
+            regex_filled = template_format.format(epoch, step, step / ModelProgressTest.num_steps * 100)
+            assert re.search(regex_filled, step_update)
 
         # The 5 val steps
-        for step, step_update in enumerate(steps_update[ModelFittingTestCaseProgress.num_steps : -1], start=1):
-            regex_filled = template_format.format(epoch, step, step / ModelFittingTestCaseProgress.num_steps * 100)
-            self.assertRegex(step_update, regex_filled)
+        for step, step_update in enumerate(steps_update[ModelProgressTest.num_steps : -1], start=1):
+            regex_filled = template_format.format(epoch, step, step / ModelProgressTest.num_steps * 100)
+            assert re.search(regex_filled, step_update)
 
         # last print update templating different
-        last_print_regex = r".*Train steps:.*5.*Val steps:.*5.*" + ModelFittingTestCaseProgress.TIME_REGEX
-        self.assertRegex(steps_update[-1], last_print_regex)
+        last_print_regex = r".*Train steps:.*5.*Val steps:.*5.*" + ModelProgressTest.TIME_REGEX
+        assert re.search(last_print_regex, steps_update[-1])
 
-    @skipIf(color is None, "Unable to import colorama")
+    @pytest.mark.skipif(color is None, reason="Unable to import colorama")
     def test_evaluate_complete_display_test_with_progress_bar_coloring(self):
         # we use the same color for all components for simplicity
         coloring = {
@@ -582,84 +594,84 @@ class ModelFittingTestCaseProgress(ModelFittingTestCase):
 
         _, _ = self.model.evaluate_generator(
             self.test_generator,
-            steps=ModelFittingTestCaseProgress.num_steps,
+            steps=ModelProgressTest.num_steps,
             callbacks=[self.mock_callback],
             verbose=True,
             progress_options={"coloring": coloring, "progress_bar": True},
         )
 
         # We split per step update
-        steps_update = self.test_out.getvalue().strip().split("\r")
+        steps_update = self.capsys.readouterr().out.strip().split("\r")
 
         # we don't validate the templating of metrics since tested before
         template_format = r".*\[37mStep:.*{}\/5.*{:6.2f}\%.*|{}|.*ETA:"
         for step, step_update in enumerate(steps_update[:-1], start=1):
             progress_Bar = "\u2588" * step * 2 + " " * (20 - step * 2)
             regex_filled = template_format.format(
-                step, step / ModelFittingTestCaseProgress.num_steps * 100, progress_Bar
+                step, step / ModelProgressTest.num_steps * 100, progress_Bar
             )
-            self.assertRegex(step_update, regex_filled)
+            assert re.search(regex_filled, step_update)
 
         # last print update templating different
-        last_print_regex = r".*\[37mTest steps:.*5.*" + ModelFittingTestCaseProgress.TIME_REGEX
-        self.assertRegex(steps_update[-1], last_print_regex)
+        last_print_regex = r".*\[37mTest steps:.*5.*" + ModelProgressTest.TIME_REGEX
+        assert re.search(last_print_regex, steps_update[-1])
 
     def test_evaluate_complete_display_test_with_progress_bar_no_coloring(self):
         _, _ = self.model.evaluate_generator(
             self.test_generator,
-            steps=ModelFittingTestCaseProgress.num_steps,
+            steps=ModelProgressTest.num_steps,
             callbacks=[self.mock_callback],
             verbose=True,
             progress_options={"coloring": False, "progress_bar": True},
         )
 
         # We split per step update
-        steps_update = self.test_out.getvalue().strip().split("\r")
+        steps_update = self.capsys.readouterr().out.strip().split("\r")
 
         # we don't validate the templating of metrics since tested before
         template_format = r".*Step:.*{}\/5.*{:6.2f}\%.*|{}|.*ETA:"
         for step, step_update in enumerate(steps_update[:-1], start=1):
             progress_Bar = "\u2588" * step * 2 + " " * (20 - step * 2)
             regex_filled = template_format.format(
-                step, step / ModelFittingTestCaseProgress.num_steps * 100, progress_Bar
+                step, step / ModelProgressTest.num_steps * 100, progress_Bar
             )
-            self.assertRegex(step_update, regex_filled)
+            assert re.search(regex_filled, step_update)
 
         # last print update templating different
-        last_print_regex = r".*Test steps:.*5.*" + ModelFittingTestCaseProgress.TIME_REGEX
-        self.assertRegex(steps_update[-1], last_print_regex)
+        last_print_regex = r".*Test steps:.*5.*" + ModelProgressTest.TIME_REGEX
+        assert re.search(last_print_regex, steps_update[-1])
 
     def test_evaluate_complete_display_test_with_no_progress_bar_no_coloring(self):
         _, _ = self.model.evaluate_generator(
             self.test_generator,
-            steps=ModelFittingTestCaseProgress.num_steps,
+            steps=ModelProgressTest.num_steps,
             callbacks=[self.mock_callback],
             verbose=True,
             progress_options={"coloring": False, "progress_bar": False},
         )
 
         # We split per step update
-        steps_update = self.test_out.getvalue().strip().split("\r")
+        steps_update = self.capsys.readouterr().out.strip().split("\r")
 
         # we don't validate the templating of metrics since tested before
         template_format = r".*Step:.*{}\/5.*ETA:"
         for step, step_update in enumerate(steps_update[:-1], start=1):
-            regex_filled = template_format.format(step, step / ModelFittingTestCaseProgress.num_steps * 100)
-            self.assertRegex(step_update, regex_filled)
+            regex_filled = template_format.format(step, step / ModelProgressTest.num_steps * 100)
+            assert re.search(regex_filled, step_update)
 
         # last print update templating different
-        last_print_regex = r".*Test steps:.*5.*" + ModelFittingTestCaseProgress.TIME_REGEX
-        self.assertRegex(steps_update[-1], last_print_regex)
+        last_print_regex = r".*Test steps:.*5.*" + ModelProgressTest.TIME_REGEX
+        assert re.search(last_print_regex, steps_update[-1])
 
-    @skipIf(color is None, "Unable to import colorama")
+    @pytest.mark.skipif(color is None, reason="Unable to import colorama")
     def test_predict_dataset_with_default_coloring(self):
         x = torch.rand(ModelFittingTestCase.evaluate_dataset_len, 1)
 
         self.model.predict_dataset(x)
 
-        self.assertStdoutContains(["[32m", "[35m", "[36m"])
+        self.assert_stdout_contains(["[32m", "[35m", "[36m"])
 
-    @skipIf(color is None, "Unable to import colorama")
+    @pytest.mark.skipif(color is None, reason="Unable to import colorama")
     def test_predict_dataset_with_user_coloring(self):
         x = torch.rand(ModelFittingTestCase.evaluate_dataset_len, 1)
 
@@ -673,12 +685,12 @@ class ModelFittingTestCaseProgress(ModelFittingTestCase):
 
         self.model.predict_dataset(x, progress_options={"coloring": coloring, "progress_bar": True})
 
-        self.assertStdoutContains(["[30m"])
+        self.assert_stdout_contains(["[30m"])
 
     def test_predict_dataset_with_user_coloring_invalid(self):
         x = torch.rand(ModelFittingTestCase.evaluate_dataset_len, 1)
 
-        with self.assertRaises(KeyError):
+        with pytest.raises(KeyError):
             self.model.predict_dataset(
                 x,
                 batch_size=ModelFittingTestCase.batch_size,
@@ -690,9 +702,9 @@ class ModelFittingTestCaseProgress(ModelFittingTestCase):
 
         self.model.predict_dataset(x, batch_size=ModelFittingTestCase.batch_size, progress_options={"coloring": False})
 
-        self.assertStdoutNotContains(["[32m", "[35m", "[36m"])
+        self.assert_stdout_not_contains(["[32m", "[35m", "[36m"])
 
-    @skipIf(color is None, "Unable to import colorama")
+    @pytest.mark.skipif(color is None, reason="Unable to import colorama")
     def test_predict_dataset_with_progress_bar_default_coloring(self):
         x = torch.rand(ModelFittingTestCase.evaluate_dataset_len, 1)
 
@@ -700,9 +712,9 @@ class ModelFittingTestCaseProgress(ModelFittingTestCase):
             x, batch_size=ModelFittingTestCase.batch_size, progress_options={"coloring": True, "progress_bar": True}
         )
 
-        self.assertStdoutContains(["%", "[32m", "[35m", "[36m", "\u2588"])
+        self.assert_stdout_contains(["%", "[32m", "[35m", "[36m", "\u2588"])
 
-    @skipIf(color is None, "Unable to import colorama")
+    @pytest.mark.skipif(color is None, reason="Unable to import colorama")
     def test_predict_dataset_with_progress_bar_user_coloring(self):
         x = torch.rand(ModelFittingTestCase.evaluate_dataset_len, 1)
 
@@ -718,9 +730,9 @@ class ModelFittingTestCaseProgress(ModelFittingTestCase):
             x, batch_size=ModelFittingTestCase.batch_size, progress_options={"coloring": coloring, "progress_bar": True}
         )
 
-        self.assertStdoutContains(["%", "[30m", "\u2588"])
+        self.assert_stdout_contains(["%", "[30m", "\u2588"])
 
-    @skipIf(color is None, "Unable to import colorama")
+    @pytest.mark.skipif(color is None, reason="Unable to import colorama")
     def test_predict_dataset_with_progress_bar_user_no_color(self):
         x = torch.rand(ModelFittingTestCase.evaluate_dataset_len, 1)
 
@@ -728,8 +740,8 @@ class ModelFittingTestCaseProgress(ModelFittingTestCase):
             x, batch_size=ModelFittingTestCase.batch_size, progress_options={"coloring": False, "progress_bar": True}
         )
 
-        self.assertStdoutContains(["%", "\u2588"])
-        self.assertStdoutNotContains(["[32m", "[35m", "[36m"])
+        self.assert_stdout_contains(["%", "\u2588"])
+        self.assert_stdout_not_contains(["[32m", "[35m", "[36m"])
 
     def test_predict_dataset_with_no_progress_bar(self):
         x = torch.rand(ModelFittingTestCase.evaluate_dataset_len, 1)
@@ -738,10 +750,10 @@ class ModelFittingTestCaseProgress(ModelFittingTestCase):
             x, batch_size=ModelFittingTestCase.batch_size, progress_options={"coloring": False, "progress_bar": False}
         )
 
-        self.assertStdoutNotContains(["%", "\u2588"])
-        self.assertStdoutNotContains(["[32m", "[35m", "[36m"])
+        self.assert_stdout_not_contains(["%", "\u2588"])
+        self.assert_stdout_not_contains(["[32m", "[35m", "[36m"])
 
-    @skipIf(color is None, "Unable to import colorama")
+    @pytest.mark.skipif(color is None, reason="Unable to import colorama")
     def test_predict_dataset_complete_display_predict_with_progress_bar_coloring(self):
         x = torch.rand(ModelFittingTestCase.evaluate_dataset_len, 1)
         # we use the same color for all components for simplicity
@@ -756,8 +768,8 @@ class ModelFittingTestCaseProgress(ModelFittingTestCase):
         self.model.predict_dataset(x, verbose=True, progress_options={"coloring": coloring, "progress_bar": True})
 
         # We split per step update
-        steps_update = self.test_out.getvalue().strip().split("\r")
+        steps_update = self.capsys.readouterr().out.strip().split("\r")
 
         # last print update templating different
-        last_print_regex = r".*\[37mPrediction steps:.*" + ModelFittingTestCaseProgress.TIME_REGEX
-        self.assertRegex(steps_update[-1], last_print_regex)
+        last_print_regex = r".*\[37mPrediction steps:.*" + ModelProgressTest.TIME_REGEX
+        assert re.search(last_print_regex, steps_update[-1])

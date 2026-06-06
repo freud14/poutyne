@@ -18,12 +18,11 @@ You should have received a copy of the GNU Lesser General Public License along w
 """
 
 import os
-import unittest
 from tempfile import TemporaryDirectory
 from typing import IO
-from unittest import TestCase
 from unittest.mock import MagicMock, call
 
+import pytest
 import torch
 import torch.nn as nn
 
@@ -44,10 +43,10 @@ class PeriodicEpochSave(PeriodicSaveCallback):
         self.restored_epoch_number = int(fd.read())
 
 
-class PeriodicSaveTest(TestCase):
+class PeriodicSaveTest:
     batch_size = 20
 
-    def setUp(self):
+    def setup_method(self):
         torch.manual_seed(42)
         self.pytorch_network = nn.Linear(1, 1)
         self.loss_function = nn.MSELoss()
@@ -56,7 +55,7 @@ class PeriodicSaveTest(TestCase):
         self.temp_dir_obj = TemporaryDirectory()
         self.save_filename = os.path.join(self.temp_dir_obj.name, 'my_checkpoint_{epoch}.ckpt')
 
-    def tearDown(self):
+    def teardown_method(self):
         self.temp_dir_obj.cleanup()
 
     def test_integration(self):
@@ -66,10 +65,9 @@ class PeriodicSaveTest(TestCase):
         self.model.fit_generator(train_gen, valid_gen, epochs=10, steps_per_epoch=5, callbacks=[saver])
 
     def test_mode_not_min_max_raise_error(self):
-        with self.assertRaises(ValueError):
-            invalid_mode = "a_mode"
+        with pytest.raises(ValueError):
             PeriodicEpochSave(
-                self.save_filename, monitor='val_loss', verbose=True, save_best_only=True, mode=invalid_mode
+                self.save_filename, monitor='val_loss', verbose=True, save_best_only=True, mode='a_mode'
             )
 
     def test_incorrect_monitored_metric_name_raise_key_error(self):
@@ -80,7 +78,7 @@ class PeriodicSaveTest(TestCase):
 
         an_epoch_number = 1
         a_log_dict = {"epoch": 1, 'acc': 1.0, 'another_metric_name': 1.0}
-        with self.assertRaises(KeyError):
+        with pytest.raises(KeyError):
             periodic_epoch_save.on_epoch_end(an_epoch_number, a_log_dict)
 
     def test_integration_correct_monitored_metric_name(self):
@@ -110,8 +108,8 @@ class PeriodicSaveTest(TestCase):
             save_filename, monitor='val_loss', verbose=True, period=1, temporary_filename=tmp_filename
         )
         self.model.fit_generator(train_gen, valid_gen, epochs=10, steps_per_epoch=5, callbacks=[saver])
-        self.assertFalse(os.path.isfile(tmp_filename))
-        self.assertTrue(os.path.isfile(save_filename))
+        assert not os.path.isfile(tmp_filename)
+        assert os.path.isfile(save_filename)
 
     def test_temporary_filename_arg_with_differing_save_filename(self):
         epochs = 10
@@ -123,9 +121,9 @@ class PeriodicSaveTest(TestCase):
             save_filename, monitor='val_loss', verbose=True, period=1, temporary_filename=tmp_filename
         )
         self.model.fit_generator(train_gen, valid_gen, epochs=epochs, steps_per_epoch=5, callbacks=[saver])
-        self.assertFalse(os.path.isfile(tmp_filename))
+        assert not os.path.isfile(tmp_filename)
         for i in range(1, epochs + 1):
-            self.assertTrue(os.path.isfile(save_filename.format(epoch=i)))
+            assert os.path.isfile(save_filename.format(epoch=i))
 
     def test_non_atomic_write(self):
         save_filename = os.path.join(self.temp_dir_obj.name, 'my_checkpoint.ckpt')
@@ -133,7 +131,7 @@ class PeriodicSaveTest(TestCase):
         valid_gen = some_data_generator(PeriodicSaveTest.batch_size)
         saver = PeriodicEpochSave(save_filename, monitor='val_loss', verbose=True, period=1, atomic_write=False)
         self.model.fit_generator(train_gen, valid_gen, epochs=10, steps_per_epoch=5, callbacks=[saver])
-        self.assertTrue(os.path.isfile(save_filename))
+        assert os.path.isfile(save_filename)
 
     def test_save_best_only(self):
         saver = PeriodicEpochSave(self.save_filename, monitor='val_loss', verbose=True, save_best_only=True)
@@ -187,12 +185,12 @@ class PeriodicSaveTest(TestCase):
         self._test_saver_with_val_losses(saver, val_losses, has_checkpoints)
 
     def test_keep_only_last_best_without_save_best_only(self):
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             PeriodicEpochSave(
                 self.save_filename, monitor='val_loss', verbose=True, save_best_only=False, keep_only_last_best=True
             )
 
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             PeriodicEpochSave(self.save_filename, monitor='val_loss', verbose=True, keep_only_last_best=True)
 
     def test_save_best_only_with_restore_best(self):
@@ -204,22 +202,22 @@ class PeriodicSaveTest(TestCase):
         has_checkpoints = [True, True, False, False, True, False]
         self._test_saver_with_val_losses(checkpointer, val_losses, has_checkpoints)
 
-        self.assertEqual(5, checkpointer.restored_epoch_number)
-        self.assertEqual(5, checkpointer.last_saved_epoch_number)
+        assert checkpointer.restored_epoch_number == 5
+        assert checkpointer.last_saved_epoch_number == 5
 
     def test_restore_best_without_save_best_only(self):
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             PeriodicEpochSave(
                 self.save_filename, monitor='val_loss', verbose=True, save_best_only=False, restore_best=True
             )
 
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             PeriodicEpochSave(self.save_filename, monitor='val_loss', verbose=True, restore_best=True)
 
     def test_on_train_end_with_restore_best_without_training_raise_warning(self):
         checkpointer = PeriodicEpochSave(self.save_filename, monitor='val_loss', save_best_only=True, restore_best=True)
         a_log = {}
-        with self.assertWarns(UserWarning):
+        with pytest.warns(UserWarning):
             checkpointer.on_train_end(a_log)
 
     def _test_saver_with_val_losses(self, saver, val_losses, has_checkpoints, keep_only_last_best=False):
@@ -237,20 +235,20 @@ class PeriodicSaveTest(TestCase):
             saver.on_epoch_end(epoch, {'epoch': epoch, 'loss': loss, 'val_loss': val_loss})
 
             filename = self.save_filename.format(epoch=epoch)
-            self.assertEqual(has_checkpoint, os.path.isfile(filename))
+            assert has_checkpoint == os.path.isfile(filename)
             if has_checkpoint:
                 with open(filename, encoding='utf-8') as f:
-                    self.assertEqual(f'{epoch}\n', f.read())
+                    assert f'{epoch}\n' == f.read()
                 best_checkpoint_filenames.append(os.path.realpath(filename))
 
         files = [os.path.realpath(os.path.join(self.temp_dir_obj.name, f)) for f in os.listdir(self.temp_dir_obj.name)]
         if keep_only_last_best:
-            self.assertEqual(1, len(files))
-            self.assertEqual(files[0], best_checkpoint_filenames[-1])
+            assert len(files) == 1
+            assert files[0] == best_checkpoint_filenames[-1]
         else:
             best_checkpoint_filenames = set(best_checkpoint_filenames)
-            self.assertEqual(len(best_checkpoint_filenames), len(files))
-            self.assertEqual(best_checkpoint_filenames, set(files))
+            assert len(best_checkpoint_filenames) == len(files)
+            assert best_checkpoint_filenames == set(files)
 
         saver.on_train_end({})
 
@@ -267,8 +265,8 @@ class PeriodicSaveTest(TestCase):
         return float(loss)
 
 
-class PeriodicSaveLambdaTest(TestCase):
-    def setUp(self) -> None:
+class PeriodicSaveLambdaTest:
+    def setup_method(self) -> None:
         self.a_filename = "a_file_name"
 
     def test_given_a_fun_save_file_use_function(self):
@@ -298,7 +296,3 @@ class PeriodicSaveLambdaTest(TestCase):
 
         a_restore_mock_function.assert_called()
         a_restore_mock_function.assert_has_calls([call(2)])
-
-
-if __name__ == '__main__':
-    unittest.main()

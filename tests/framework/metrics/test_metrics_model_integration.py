@@ -22,11 +22,10 @@ You should have received a copy of the GNU Lesser General Public License along w
 # Bug with PyTorch source code makes torch.tensor as not callable for pylint.
 # pylint: disable=not-callable
 import os
-import unittest
-from unittest import skipIf
 from unittest.mock import ANY
 
 import numpy as np
+import pytest
 import torch
 import torch.nn as nn
 import torchmetrics
@@ -83,7 +82,7 @@ def get_const_batch_metric(value):
     return const_batch_metric
 
 
-class MetricsModelIntegrationTest(unittest.TestCase):
+class MetricsModelIntegrationTest:
     # pylint: disable=too-many-public-methods
     epochs = 2
     steps_per_epoch = 3
@@ -91,7 +90,7 @@ class MetricsModelIntegrationTest(unittest.TestCase):
 
     cuda_device = int(os.environ.get('CUDA_DEVICE', '0'))
 
-    def setUp(self):
+    def setup_method(self):
         torch.manual_seed(42)
         self.pytorch_network = nn.Sequential(nn.Linear(1, 1), nn.Flatten(0))
         self.loss_function = nn.MSELoss()
@@ -174,7 +173,7 @@ class MetricsModelIntegrationTest(unittest.TestCase):
         model = Model(self.pytorch_network, self.optimizer, self.loss_function, epoch_metrics=[epoch_metric])
         self._test_history(model, self.metric_names, self.metric_values)
 
-    @skipIf(not torch.cuda.is_available(), "no gpu available")
+    @pytest.mark.skipif(not torch.cuda.is_available(), reason="no gpu available")
     def test_batch_metrics_with_multiple_names_returned_by_tensor_on_gpu(self):
         with torch.cuda.device(MetricsModelIntegrationTest.cuda_device):
             batch_metric = get_const_batch_metric(torch.tensor(self.metric_values).cuda())
@@ -187,7 +186,7 @@ class MetricsModelIntegrationTest(unittest.TestCase):
             model.cuda()
             self._test_history(model, self.metric_names, self.metric_values)
 
-    @skipIf(not torch.cuda.is_available(), "no gpu available")
+    @pytest.mark.skipif(not torch.cuda.is_available(), reason="no gpu available")
     def test_epoch_metrics_with_multiple_names_returned_by_tensor_on_gpu(self):
         with torch.cuda.device(MetricsModelIntegrationTest.cuda_device):
             epoch_metric = ConstMetric(torch.tensor(self.metric_values).cuda())
@@ -295,7 +294,7 @@ class MetricsModelIntegrationTest(unittest.TestCase):
         )
         self._test_history(model, expected_names, [1, 2])
 
-    @skipIf(not torch.cuda.is_available(), "no gpu available")
+    @pytest.mark.skipif(not torch.cuda.is_available(), reason="no gpu available")
     def test_torch_metrics_on_gpu(self):
         with torch.cuda.device(MetricsModelIntegrationTest.cuda_device):
             expected_names = ['r2_score', 'spearman_corr_coef']
@@ -318,10 +317,10 @@ class MetricsModelIntegrationTest(unittest.TestCase):
         )
         for logs in history:
             for name, value in zip(names, values):
-                self.assertIn(name, logs)
-                self.assertEqual(value, logs[name])
-                self.assertIn('val_' + name, logs)
-                self.assertEqual(value, logs['val_' + name])
+                assert name in logs
+                assert value == logs[name]
+                assert 'val_' + name in logs
+                assert value == logs['val_' + name]
 
     def test_epoch_metrics_with_str_str_tuple(self):
         dataset_size = MetricsModelIntegrationTest.batch_size * MetricsModelIntegrationTest.steps_per_epoch
@@ -342,58 +341,58 @@ class MetricsModelIntegrationTest(unittest.TestCase):
         )
         for logs in history:
             for name in names:
-                self.assertIn(name, logs)
-                self.assertEqual(ANY, logs[name])
-                self.assertIn('val_' + name, logs)
-                self.assertEqual(ANY, logs['val_' + name])
+                assert name in logs
+                assert logs[name] == ANY
+                assert 'val_' + name in logs
+                assert logs['val_' + name] == ANY
 
 
-class MetricsRenamingTest(unittest.TestCase):
+class MetricsRenamingTest:
     def test_batch_metrics(self):
         actual = rename_doubles(['a', 'a'], [])
         expected = ['a1', 'a2'], []
-        self.assertEqual(expected, actual)
+        assert expected == actual
 
         actual = rename_doubles(['a', 'b', 'a', 'a', 'c', 'd'], [])
         expected = ['a1', 'b', 'a2', 'a3', 'c', 'd'], []
-        self.assertEqual(expected, actual)
+        assert expected == actual
 
     def test_epoch_metrics(self):
         actual = rename_doubles([], ['a', 'a'])
         expected = [], ['a1', 'a2']
-        self.assertEqual(expected, actual)
+        assert expected == actual
 
         actual = rename_doubles([], ['a', 'b', 'a', 'a', 'c', 'd'])
         expected = [], ['a1', 'b', 'a2', 'a3', 'c', 'd']
-        self.assertEqual(expected, actual)
+        assert expected == actual
 
     def test_nested_batch_metrics(self):
         actual = rename_doubles([['a', 'a']], [])
         expected = [['a1', 'a2']], []
-        self.assertEqual(expected, actual)
+        assert expected == actual
 
         actual = rename_doubles([['a', 'b'], 'b'], [])
         expected = [['a', 'b1'], 'b2'], []
-        self.assertEqual(expected, actual)
+        assert expected == actual
 
     def test_nested_epoch_metrics(self):
         actual = rename_doubles([], [['a', 'a']])
         expected = [], [['a1', 'a2']]
-        self.assertEqual(expected, actual)
+        assert expected == actual
 
         actual = rename_doubles([], [['a', 'b'], 'b'])
         expected = [], [['a', 'b1'], 'b2']
-        self.assertEqual(expected, actual)
+        assert expected == actual
 
     def test_nested_batch_epoch_metrics(self):
         actual = rename_doubles([['a']], [['a']])
         expected = [['a1']], [['a2']]
-        self.assertEqual(expected, actual)
+        assert expected == actual
 
         actual = rename_doubles([['a', 'b']], [['c', 'a']])
         expected = [['a1', 'b']], [['c', 'a2']]
-        self.assertEqual(expected, actual)
+        assert expected == actual
 
         actual = rename_doubles(['a', 'b', ['b', 'a'], 'c', 'a', 'd'], ['e', ['c', 'a'], 'f', 'a'])
         expected = ['a1', 'b1', ['b2', 'a2'], 'c1', 'a3', 'd'], ['e', ['c2', 'a4'], 'f', 'a5']
-        self.assertEqual(expected, actual)
+        assert expected == actual

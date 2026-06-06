@@ -17,8 +17,6 @@ You should have received a copy of the GNU Lesser General Public License along w
 <https://www.gnu.org/licenses/>.
 """
 
-import unittest
-from unittest import TestCase
 from unittest.mock import ANY, MagicMock, call
 
 import torch
@@ -28,12 +26,12 @@ from poutyne import Callback, CallbackList, DelayCallback, Model
 from tests.framework.tools import some_data_generator
 
 
-class DelayCallbackTest(TestCase):
+class DelayCallbackTest:
     epochs = 10
     steps_per_epoch = 5
     batch_size = 20
 
-    def setUp(self):
+    def setup_method(self):
         torch.manual_seed(42)
         self.pytorch_network = nn.Linear(1, 1)
         self.loss_function = nn.MSELoss()
@@ -79,11 +77,11 @@ class DelayCallbackTest(TestCase):
         call_list.append(call.on_train_end({}))
 
         method_calls = self.mock_callback.method_calls
-        self.assertIn(call.set_model(self.model), method_calls[:2])
-        self.assertIn(call.set_params(params), method_calls[:2])
+        assert call.set_model(self.model) in method_calls[:2]
+        assert call.set_params(params) in method_calls[:2]
 
-        self.assertEqual(len(method_calls), len(call_list) + 2)
-        self.assertEqual(method_calls[2:], call_list)
+        assert len(method_calls) == len(call_list) + 2
+        assert method_calls[2:] == call_list
 
     def test_batch_delay_in_middle_of_epoch(self):
         self._test_batch_delay(epoch_delay=5, batch_in_epoch_delay=3)
@@ -96,10 +94,10 @@ class DelayCallbackTest(TestCase):
 
     def test_proper_init_with_callback_element(self):
         delay_callback = DelayCallback([self.mock_callback])
-        self.assertTrue(isinstance(delay_callback.callbacks, CallbackList))
+        assert isinstance(delay_callback.callbacks, CallbackList)
 
         delay_callback = DelayCallback(self.mock_callback)
-        self.assertTrue(isinstance(delay_callback.callbacks, CallbackList))
+        assert isinstance(delay_callback.callbacks, CallbackList)
 
     def _test_batch_delay(self, epoch_delay, batch_in_epoch_delay):
         batch_delay = epoch_delay * DelayCallbackTest.steps_per_epoch + batch_in_epoch_delay
@@ -137,12 +135,8 @@ class DelayCallbackTest(TestCase):
         call_list.append(call.on_train_end({}))
 
         method_calls = self.mock_callback.method_calls
-        self.assertIn(call.set_model(self.model), method_calls[:2])
-        self.assertIn(call.set_params(params), method_calls[:2])
+        assert call.set_model(self.model) in method_calls[:2]
+        assert call.set_params(params) in method_calls[:2]
 
-        self.assertEqual(len(method_calls), len(call_list) + 2)
-        self.assertEqual(method_calls[2:], call_list)
-
-
-if __name__ == '__main__':
-    unittest.main()
+        assert len(method_calls) == len(call_list) + 2
+        assert method_calls[2:] == call_list
