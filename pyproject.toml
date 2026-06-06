@@ -61,7 +61,7 @@ Changelog     = "https://github.com/freud14/poutyne/blob/master/CHANGELOG.md"
 [dependency-groups]
 dev = [
     "astroid==3.2.2",
-    "black[jupyter]>=25.1.0",
+    "black[jupyter]~=25.1",
     "flake8==7.1.0",
     "isort~=5.13.2",
     "pylint==3.2.5",
