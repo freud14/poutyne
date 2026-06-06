@@ -22,5 +22,10 @@ from .framework import *
 from .layers import *
 from .plotting import *
 from .utils import *
-from .version import __version__
+from importlib.metadata import PackageNotFoundError, version as _pkg_version
+
+try:
+    __version__ = _pkg_version("poutyne")
+except PackageNotFoundError:
+    __version__ = "unknown"
 from .warning_manager import *

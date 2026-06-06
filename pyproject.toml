@@ -1,8 +1,103 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "poutyne"
+version = "1.17.4"
+description = "A simplified framework and utilities for PyTorch."
+readme = "README.md"
+license = { text = "LGPL-3.0-or-later" }
+authors = [{ name = "Frédérik Paradis", email = "fredy_14@live.fr" }]
+requires-python = ">=3.10"
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Education",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Software Development :: Libraries",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+    "lightning_utilities",
+    "numpy",
+    "torch",
+    "torchmetrics",
+]
+
+[project.optional-dependencies]
+colorama     = ["colorama>=0.4.3"]
+scikit-learn = ["scikit-learn>=0.23.2"]
+tensorboard  = ["tensorboard>=2.4.0"]
+tensorboardX = ["tensorboardX>=2.1"]
+torchvision  = ["torchvision>=0.8.1"]
+pandas       = ["pandas>=2.0.0"]
+mlflow       = ["mlflow>=1.12.1"]
+extras = [
+    "colorama>=0.4.3",
+    "scikit-learn>=0.23.2",
+    "tensorboard>=2.4.0",
+    "tensorboardX>=2.1",
+    "torchvision>=0.8.1",
+    "pandas>=2.0.0",
+    "mlflow>=1.12.1",
+]
+
+[project.urls]
+Homepage      = "https://poutyne.org"
+Repository    = "https://github.com/freud14/poutyne"
+"Bug Tracker" = "https://github.com/freud14/poutyne/issues"
+Changelog     = "https://github.com/freud14/poutyne/blob/master/CHANGELOG.md"
+
+[dependency-groups]
+dev = [
+    "astroid==3.2.2",
+    "black[jupyter]~=24.4.2",
+    "flake8==7.1.0",
+    "isort~=5.13.2",
+    "pylint==3.2.5",
+]
+test = [
+    "pytest",
+    "pytest-cov",
+    "scikit-learn",
+    "tensorboard",
+    "tensorboardX",
+    "colorama",
+    "torchvision",
+    "pandas",
+    "mlflow",
+    "omegaconf",
+    "matplotlib",
+    "pillow",
+    "wandb",
+]
+docs = [
+    "sphinx",
+    "sphinx_rtd_theme",
+]
+examples = [
+    "colorama",
+    "fasttext~=0.9.2",
+    "requests",
+    "torchvision",
+    "torchmetrics",
+]
+
 [tool.black]
 line-length = 120
 skip-string-normalization = true
-required-version = '24'
-extend-exclude = '/(slides)/'
+required-version = "24"
+extend-exclude = "/(slides)/"
 
 [tool.isort]
 profile = "black"
@@ -10,7 +105,5 @@ line_length = 120
 extend_skip = ["examples", "slides"]
 
 [tool.pytest.ini_options]
-addopts = '--cov --cov-report html --cov-report xml'
-testpaths = [
-    "tests",
-]
+addopts = "--cov --cov-report html --cov-report xml"
+testpaths = ["tests"]

@@ -65,7 +65,7 @@ class SKLearnMetricsTest(TestCase):
         self.multiclass_classification_true[self.multiclass_errors_indices] = torch.randint(
             3, (len(self.multiclass_errors_indices),)
         )
-        self.sample_weight = torch.rand((SKLearnMetricsTest.num_examples, 1))
+        self.sample_weight = torch.rand(SKLearnMetricsTest.num_examples)
 
     def _get_data_loader(self, *tensors):
         return DataLoader(TensorDataset(*tensors), batch_size=SKLearnMetricsTest.batch_size)

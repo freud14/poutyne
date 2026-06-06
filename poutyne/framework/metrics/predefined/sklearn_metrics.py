@@ -123,7 +123,7 @@ class SKLearnMetrics(Metric):
         if isinstance(y_true, (tuple, list)):
             y_true, sample_weight = y_true
 
-            sample_weight = sample_weight.cpu().numpy()
+            sample_weight = sample_weight.cpu().numpy().squeeze()
             self.sample_weight_list.append(sample_weight)
 
         y_true = y_true.cpu().numpy()

@@ -19,7 +19,7 @@ Pull requests are the best way to propose changes to the codebase. We actively w
 1. Fork the repo and create your branch from the **`dev` branch**.
 2. If you've added code that should be tested, you **must** ensure it is properly tested.
 3. If you've changed APIs, update the documentation.
-4. Ensure the Travis test suite passes.
+4. Ensure the GitHub Actions test suite passes.
 5. Make sure your code lints.
 6. Submit that pull request!
 
@@ -29,7 +29,7 @@ In short, when you submit code changes, your submissions are understood to be un
 
 ## Write bug reports with detail, background, and sample code
 
-We use GitHub issues to track public bugs. Report a bug by [opening a new issue](https://github.com/GRAAL-Research/poutyne/issues). You should use one of our [proposed templates](https://github.com/GRAAL-Research/poutyne/tree/master/.github/ISSUE_TEMPLATE) when appropriate; they are integrated with GitHub and do most of the formatting for you. It's that easy!
+We use GitHub issues to track public bugs. Report a bug by [opening a new issue](https://github.com/freud14/poutyne/issues). You should use one of our [proposed templates](https://github.com/freud14/poutyne/tree/master/.github/ISSUE_TEMPLATE) when appropriate; they are integrated with GitHub and do most of the formatting for you. It's that easy!
 
 **Great Bug Reports** tend to have:
 
@@ -51,7 +51,7 @@ We use GitHub issues to track enhancement requests. Before you create an enhance
 
 - Check the documentation to make sure your feature does not already exist.
 
-- Do a [quick search](https://github.com/GRAAL-Research/poutyne/issues) to see whether your enhancement has already been suggested.
+- Do a [quick search](https://github.com/freud14/poutyne/issues) to see whether your enhancement has already been suggested.
 
 When creating your enhancement request, please:
 
@@ -63,40 +63,28 @@ When creating your enhancement request, please:
 
 ## Prerequisites
 
-We created three requirements files to install all the tools used for the development of the library. `tests/requirements.txt` define the requirements for the tests, `styling_requirements.txt` for the styling and `docs/requirements.txt` for the documentation.
+This project uses [uv](https://docs.astral.sh/uv/) for dependency management. Install it via [asdf](https://asdf-vm.com/) (recommended) or the [standalone installer](https://docs.astral.sh/uv/getting-started/installation/).
 
-You can install all the requirements with
-
-```
-pip install -r tests/requirements.txt
-pip install -r styling_requirements.txt
-pip install -r docs/requirements.txt
-```
-
-Also, you should run `python setup.py develop` to build the project and be able to build the documentation.
+Install all development dependencies and the package in editable mode with:
 
 ```
-python setup.py develop
+uv sync --group dev --group test --group docs
 ```
 
 ## Use a Consistent Coding Style
 
-All of the code is formatted using [black](https://black.readthedocs.io) with the associated [config file](https://github.com/GRAAL-Research/poutyne/blob/master/pyproject.toml). In order to format the code of your submission, simply run
-
-> See the [styling requirements](https://github.com/GRAAL-Research/poutyne/blob/master/styling_requirements.txt) for the proper black and isort version to use.
+All of the code is formatted using [black](https://black.readthedocs.io) with the associated [config file](https://github.com/freud14/poutyne/blob/master/pyproject.toml). In order to format the code of your submission, simply run
 
 ```
-black .
-isort .
+uv run black .
+uv run isort .
 ```
 
-We also have our own `pylint` [config file](https://github.com/GRAAL-Research/poutyne/blob/master/.pylintrc). Try not to introduce code incoherences detected by the linting. You can run the linting procedure with
-
-> See the [styling requirements](https://github.com/GRAAL-Research/poutyne/blob/master/styling_requirements.txt) for the proper pylint version to use.
+We also have our own `pylint` [config file](https://github.com/freud14/poutyne/blob/master/.pylintrc). Try not to introduce code incoherences detected by the linting. You can run the linting procedure with
 
 ```
-pylint poutyne
-pylint tests
+uv run pylint poutyne
+uv run pylint tests
 ```
 
 ## Tests
@@ -106,7 +94,7 @@ If your pull request introduces a new feature, please deliver it with tests that
 For any pull request submitted, **ALL** of the tests must succeed. You can run the tests with
 
 ```
-pytest tests
+uv run pytest tests
 ```
 
 ## Documentation

@@ -22,52 +22,42 @@ jobs:
     runs-on: ${{ inputs.os }}
     steps:
       - uses: actions/checkout@v4
-      - name: Set up Python ${{ inputs.python-version }}
-        uses: actions/setup-python@v5
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v4
         with:
           python-version: ${{ inputs.python-version }}
       - name: Install dependencies
-        run: |
-          pip install -r styling_requirements.txt
+        run: uv sync --group dev
       - name: Formatting
         run: |
-          black --diff --check .
-          isort --diff --check .
+          uv run black --diff --check .
+          uv run isort --diff --check .
 
   linting:
     runs-on: ${{ inputs.os }}
     steps:
       - uses: actions/checkout@v4
-      - name: Set up Python ${{ inputs.python-version }}
-        uses: actions/setup-python@v5
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v4
         with:
           python-version: ${{ inputs.python-version }}
       - name: Install dependencies
-        run: |
-          pip install -r requirements.txt
-          pip install -r styling_requirements.txt
-          pip install -r tests/requirements.txt
-          pip install -e .
+        run: uv sync --group dev --group test
       - name: PyLint
-        run: |
-          pylint poutyne/ tests/
+        run: uv run pylint poutyne/ tests/
       - name: Flake8
-        run: |
-          flake8 poutyne/ tests/
+        run: uv run flake8 poutyne/ tests/
 
   docs:
     runs-on: ${{ inputs.os }}
     steps:
       - uses: actions/checkout@v4
-      - name: Set up Python ${{ inputs.python-version }}
-        uses: actions/setup-python@v5
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v4
         with:
           python-version: ${{ inputs.python-version }}
       - name: Install dependencies
-        run: |
-          pip install -r requirements.txt
-          pip install -r docs/requirements.txt
-          pip install -e .
+        run: uv sync --group docs
       - name: Building doc
         run: |
           cd docs
@@ -78,18 +68,14 @@ jobs:
     runs-on: ${{ inputs.os }}
     steps:
       - uses: actions/checkout@v4
-      - name: Set up Python ${{ inputs.python-version }}
-        uses: actions/setup-python@v5
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v4
         with:
           python-version: ${{ inputs.python-version }}
       - name: Install dependencies
-        run: |
-          pip install -r requirements.txt
-          pip install -r tests/requirements.txt
-          pip install -e .
+        run: uv sync --group test
       - name: Test with pytest
-        run: |
-          pytest
+        run: uv run pytest
       - name: Upload Codecov
         uses: codecov/codecov-action@v4
         with:
@@ -100,14 +86,13 @@ jobs:
     runs-on: ${{ inputs.os }}
     steps:
       - uses: actions/checkout@v4
-      - name: Set up Python ${{ inputs.python-version }}
-        uses: actions/setup-python@v5
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v4
         with:
           python-version: ${{ inputs.python-version }}
       - name: Install dependencies
         run: |
-          pip install pytest pytest-cov
-          pip install -e .
+          uv pip install pytest pytest-cov
+          uv pip install -e .
       - name: Test with pytest
-        run: |
-          pytest
+        run: uv run pytest

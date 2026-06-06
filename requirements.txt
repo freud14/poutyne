@@ -1,4 +1,0 @@
-lightning_utilities
-numpy
-torch
-torchmetrics

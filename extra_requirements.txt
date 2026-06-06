@@ -1,7 +1,0 @@
-scikit-learn
-tensorboard
-tensorboardX
-colorama
-torchvision
-pandas
-mlflow

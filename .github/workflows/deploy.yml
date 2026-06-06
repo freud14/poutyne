@@ -8,20 +8,15 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    env:
-      POUTYNE_RELEASE_BUILD: "1"
 
     steps:
       - uses: actions/checkout@v4
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v4
         with:
-          python-version: "3.12"
+          python-version: "3.14"
       - name: Install dependencies
-        run: |
-          pip install -r requirements.txt
-          pip install -r docs/requirements.txt
-          python setup.py develop
+        run: uv sync --group docs
       - name: Building doc
         run: |
           cd docs
