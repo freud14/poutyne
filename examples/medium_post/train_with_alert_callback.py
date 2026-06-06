@@ -7,8 +7,8 @@ from notif.notificator import EmailNotificator  # pip install notif
 from torch.utils.data import random_split
 from torchvision.datasets import MNIST
 from torchvision.transforms import ToTensor
-from poutyne import Experiment, Callback
 
+from poutyne import Callback, Experiment
 
 # Instanciate the MNIST dataset
 train_valid_dataset = MNIST('./datasets', train=True, download=True, transform=ToTensor())

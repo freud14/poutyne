@@ -3,7 +3,8 @@ import torch.nn as nn
 from torch.utils.data import random_split
 from torchvision.datasets import MNIST
 from torchvision.transforms import ToTensor
-from poutyne import Model, Metric
+
+from poutyne import Metric, Model
 
 # Instanciate the MNIST dataset
 train_valid_dataset = MNIST('./datasets', train=True, download=True, transform=ToTensor())

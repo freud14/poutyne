@@ -1,9 +1,9 @@
 import torch
 import torch.nn as nn
+import torchmetrics
 from torch.utils.data import random_split
 from torchvision.datasets import MNIST
 from torchvision.transforms import ToTensor
-import torchmetrics
 
 # Import the Poutyne Model
 from poutyne import Model

@@ -97,7 +97,7 @@ examples = [
 
 [tool.ruff]
 line-length = 120
-exclude = ["examples", "slides"]
+exclude = ["slides"]
 
 [tool.ruff.lint]
 select = ["E", "W", "F", "I", "PL"]
@@ -110,6 +110,7 @@ ignore = [
 
 [tool.ruff.lint.per-file-ignores]
 "__init__.py" = ["F401", "F403"]
+"examples/**" = ["PLW2901"]  # x = x.to(device) is an intentional PyTorch idiom
 
 [tool.ruff.format]
 quote-style = "preserve"
