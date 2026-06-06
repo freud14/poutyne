@@ -7,5 +7,5 @@ class MnistLogistic(nn.Module):
                                     math.sqrt(784)) # W
         self.bias = nn.Parameter(torch.zeros(10)) # b
 
-    def forward(self, xb):
+    def forward(self, xb: torch.Tensor) -> torch.Tensor:
         return xb.matmul(self.weights) + self.bias # xW + b
