@@ -21,7 +21,8 @@ You should have received a copy of the GNU Lesser General Public License along w
 import os
 import pickle
 import warnings
-from typing import Any, Callable, Dict, List, Tuple, Union
+from collections.abc import Callable
+from typing import Any
 
 try:
     import pandas as pd
@@ -86,8 +87,8 @@ class ModelBundle:
         *,
         logging: bool = True,
         monitoring: bool = True,
-        monitor_metric: Union[str, None] = None,
-        monitor_mode: Union[str, None] = None,
+        monitor_metric: str | None = None,
+        monitor_mode: str | None = None,
         _is_direct=True,
     ) -> None:
         if _is_direct:
@@ -112,16 +113,16 @@ class ModelBundle:
         directory: str,
         network: torch.nn.Module,
         *,
-        device: Union[torch.device, List[torch.device], List[str], None, str] = None,
+        device: torch.device | list[torch.device] | list[str] | None | str = None,
         logging: bool = True,
-        optimizer: Union[torch.optim.Optimizer, str] = 'sgd',
-        loss_function: Union[Callable, str] = None,
-        batch_metrics: Union[List, None] = None,
-        epoch_metrics: Union[List, None] = None,
+        optimizer: torch.optim.Optimizer | str = 'sgd',
+        loss_function: Callable | str | None = None,
+        batch_metrics: list | None = None,
+        epoch_metrics: list | None = None,
         monitoring: bool = True,
-        monitor_metric: Union[str, None] = None,
-        monitor_mode: Union[str, None] = None,
-        task: Union[str, None] = None,
+        monitor_metric: str | None = None,
+        monitor_mode: str | None = None,
+        task: str | None = None,
     ):
         # pylint: disable=line-too-long
         """
@@ -130,7 +131,7 @@ class ModelBundle:
         Args:
             directory (str): Path to the model bundle's working directory. Will be used for automatic logging.
             network (torch.nn.Module): A PyTorch network.
-            device (Union[torch.torch.device, List[torch.torch.device], str, None]): The device to which the model is
+            device (torch.device | list[torch.device] | str | None): The device to which the model is
                 sent or for multi-GPUs, the list of devices to which the model is to be sent. When using a string for a
                 multiple GPUs, the option is "all", for "take them all." By default, the current device is used as the
                 main one. If None, the model will be kept on its current device.
@@ -139,10 +140,10 @@ class ModelBundle:
                 callbacks will be inserted to output training and testing stats as well as to save model checkpoints,
                 for example, automatically. See :func:`~ModelBundle.train()` and :func:`~ModelBundle.test()` for more
                 details. (Default value = True)
-            optimizer (Union[torch.optim.Optimizer, str]): If Pytorch Optimizer, must already be initialized.
+            optimizer (torch.optim.Optimizer | str): If Pytorch Optimizer, must already be initialized.
                 If str, should be the optimizer's name in Pytorch (i.e. 'Adam' for torch.optim.Adam).
                 (Default value = 'sgd')
-            loss_function(Union[Callable, str], optional) It can be any PyTorch
+            loss_function(Callable | str, optional) It can be any PyTorch
                 loss layer or custom loss function. It can also be a string with the same name as a PyTorch
                 loss function (either the functional or object name). The loss function must have the signature
                 ``loss_function(input, target)`` where ``input`` is the prediction of the network and ``target``
@@ -150,8 +151,9 @@ class ModelBundle:
                 loss function or the default loss function associated with the ``task``.
                 (Default value = None)
             batch_metrics (list): List of functions with the same signature as a loss function or objects with the same
-                signature as either :class:`~poutyne.Metric` or :class:`torchmetrics.Metric <torchmetrics.Metric>`. It can
-                also be a string with the same name as a PyTorch loss function (either the functional or object name).
+                signature as either :class:`~poutyne.Metric` or
+                :class:`torchmetrics.Metric <torchmetrics.Metric>`. It can also be a string with the same name as a
+                PyTorch loss function (either the functional or object name).
                 Some metrics, such as  'accuracy' (or just 'acc'), are also available as strings. See :ref:`metrics` and
                 the `TorchMetrics documentation <https://torchmetrics.readthedocs.io/en/latest/references/modules.html>`__
                 for available metrics.
@@ -159,12 +161,13 @@ class ModelBundle:
                 Batch metric are computed on computed for each batch.
                 (Default value = None)
 
-                .. warning:: When using this argument, the metrics are computed for each batch. This can significantly slow
-                    down the compuations depending on the metrics used. This mostly happens on non-decomposable metrics
-                    such as :class:`torchmetrics.AUROC <torchmetrics.AUROC>` where an ordering of the elements is necessary
-                    to compute the metric. In such case, we advise to use them as epoch metrics instead.
+                .. warning:: When using this argument, the metrics are computed for each batch. This can significantly
+                    slow down the compuations depending on the metrics used. This mostly happens on non-decomposable
+                    metrics such as :class:`torchmetrics.AUROC <torchmetrics.AUROC>` where an ordering of the elements
+                    is necessary to compute the metric. In such case, we advise to use them as epoch metrics instead.
             epoch_metrics (list): List of functions with the same signature as a loss function or objects with the same
-                signature as either :class:`~poutyne.Metric` or :class:`torchmetrics.Metric <torchmetrics.Metric>`. It can
+                signature as either :class:`~poutyne.Metric` or
+                :class:`torchmetrics.Metric <torchmetrics.Metric>`. It can
                 also be a string with the same name as a PyTorch loss function (either the functional or object name).
                 Some metrics, such as  'accuracy' (or just 'acc'), are also available as strings. See :ref:`metrics` and
                 the `TorchMetrics documentation <https://torchmetrics.readthedocs.io/en/latest/references/modules.html>`__
@@ -235,9 +238,11 @@ class ModelBundle:
                 Epoch 1/5 0.09s Step 25/25: loss: 6.351375, acc: 1.375000, val_loss: 6.236106, val_acc: 5.000000
                 Epoch 1: val_acc improved from -inf to 5.00000, saving file to ./simple_example/checkpoint_epoch_1.ckpt
                 Epoch 2/5 0.10s Step 25/25: loss: 6.054254, acc: 14.000000, val_loss: 5.944495, val_acc: 19.500000
-                Epoch 2: val_acc improved from 5.00000 to 19.50000, saving file to ./simple_example/checkpoint_epoch_2.ckpt
+                Epoch 2: val_acc improved from 5.00000 to 19.50000,
+                    saving file to ./simple_example/checkpoint_epoch_2.ckpt
                 Epoch 3/5 0.09s Step 25/25: loss: 5.759377, acc: 22.875000, val_loss: 5.655412, val_acc: 21.000000
-                Epoch 3: val_acc improved from 19.50000 to 21.00000, saving file to ./simple_example/checkpoint_epoch_3.ckpt
+                Epoch 3: val_acc improved from 19.50000 to 21.00000,
+                    saving file to ./simple_example/checkpoint_epoch_3.ckpt
                 ...
 
         Training can now easily be resumed from the best checkpoint::
@@ -331,8 +336,8 @@ class ModelBundle:
         *,
         logging: bool = True,
         monitoring: bool = True,
-        monitor_metric: Union[str, None] = None,
-        monitor_mode: Union[str, None] = None,
+        monitor_metric: str | None = None,
+        monitor_mode: str | None = None,
     ):
         # pylint: disable=line-too-long
         """
@@ -400,9 +405,11 @@ class ModelBundle:
                 Epoch 1/5 0.09s Step 25/25: loss: 6.351375, acc: 1.375000, val_loss: 6.236106, val_acc: 5.000000
                 Epoch 1: val_acc improved from -inf to 5.00000, saving file to ./simple_example/checkpoint_epoch_1.ckpt
                 Epoch 2/5 0.10s Step 25/25: loss: 6.054254, acc: 14.000000, val_loss: 5.944495, val_acc: 19.500000
-                Epoch 2: val_acc improved from 5.00000 to 19.50000, saving file to ./simple_example/checkpoint_epoch_2.ckpt
+                Epoch 2: val_acc improved from 5.00000 to 19.50000,
+                    saving file to ./simple_example/checkpoint_epoch_2.ckpt
                 Epoch 3/5 0.09s Step 25/25: loss: 5.759377, acc: 22.875000, val_loss: 5.655412, val_acc: 21.000000
-                Epoch 3: val_acc improved from 19.50000 to 21.00000, saving file to ./simple_example/checkpoint_epoch_3.ckpt
+                Epoch 3: val_acc improved from 19.50000 to 21.00000,
+                    saving file to ./simple_example/checkpoint_epoch_3.ckpt
                 ...
 
         Training can now easily be resumed from the best checkpoint::
@@ -474,8 +481,8 @@ class ModelBundle:
 
     @classmethod
     def _get_loss_function(
-        cls, loss_function: Union[Callable, str], network: torch.nn.Module, task: Union[str, None]
-    ) -> Union[Callable, str]:
+        cls, loss_function: Callable | str, network: torch.nn.Module, task: str | None
+    ) -> Callable | str:
         if loss_function is None:
             if hasattr(network, 'loss_function'):
                 return network.loss_function
@@ -487,9 +494,7 @@ class ModelBundle:
         return loss_function
 
     @classmethod
-    def _get_batch_metrics(
-        cls, batch_metrics: Union[List, None], network: torch.nn.Module, task: Union[str, None]
-    ) -> Union[List, None]:
+    def _get_batch_metrics(cls, batch_metrics: list | None, network: torch.nn.Module, task: str | None) -> list | None:
         if batch_metrics is None or len(batch_metrics) == 0:
             if hasattr(network, 'batch_metrics'):
                 return network.batch_metrics
@@ -498,7 +503,7 @@ class ModelBundle:
         return batch_metrics
 
     @classmethod
-    def _get_epoch_metrics(cls, epoch_metrics: Union[List, None], network, task: Union[str, None]) -> Union[List, None]:
+    def _get_epoch_metrics(cls, epoch_metrics: list | None, network, task: str | None) -> list | None:
         if epoch_metrics is None or len(epoch_metrics) == 0:
             if hasattr(network, 'epoch_metrics'):
                 return network.epoch_metrics
@@ -510,9 +515,9 @@ class ModelBundle:
     def _get_monitoring_config(
         cls,
         monitoring: bool,
-        monitor_metric: Union[str, None],
-        monitor_mode: Union[str, None],
-        task: Union[str, None] = None,
+        monitor_metric: str | None,
+        monitor_mode: str | None,
+        task: str | None = None,
     ) -> None:
         if not monitoring:
             return False, None, None
@@ -538,7 +543,7 @@ class ModelBundle:
 
         return pd.read_csv(self.log_filename, sep='\t')
 
-    def get_best_epoch_stats(self) -> Dict:
+    def get_best_epoch_stats(self) -> dict:
         """
         Returns all computed statistics corresponding to the best epoch according to the
         ``monitor_metric`` and ``monitor_mode`` attributes.
@@ -591,23 +596,23 @@ class ModelBundle:
         return history.iloc[saved_epoch_indices]
 
     def _warn_missing_file(self, filename: str) -> None:
-        warnings.warn(f"Missing checkpoint: {filename}.")
+        warnings.warn(f"Missing checkpoint: {filename}.", stacklevel=2)
 
-    def _load_epoch_state(self, lr_schedulers: List) -> int:
+    def _load_epoch_state(self, lr_schedulers: list) -> int:
         # pylint: disable=broad-except
         initial_epoch = 1
         if os.path.isfile(self.epoch_filename):
-            with open(self.epoch_filename, 'r', encoding='utf-8') as f:
+            with open(self.epoch_filename, encoding='utf-8') as f:
                 initial_epoch = int(f.read()) + 1
 
             if os.path.isfile(self.model_checkpoint_filename):
-                print(f"Loading weights from {self.model_checkpoint_filename} and starting at epoch {initial_epoch:d}.")
+                print(f"Loading weights from {self.model_checkpoint_filename} and starting at epoch {initial_epoch:d}.")  # noqa: T201
                 self.model.load_weights(self.model_checkpoint_filename)
             else:
                 self._warn_missing_file(self.model_checkpoint_filename)
 
             if os.path.isfile(self.optimizer_checkpoint_filename):
-                print(
+                print(  # noqa: T201
                     f"Loading optimizer state from {self.optimizer_checkpoint_filename} and "
                     f"starting at epoch {initial_epoch:d}."
                 )
@@ -616,7 +621,7 @@ class ModelBundle:
                 self._warn_missing_file(self.optimizer_checkpoint_filename)
 
             if os.path.isfile(self.random_state_checkpoint_filename):
-                print(
+                print(  # noqa: T201
                     f"Loading random states from {self.random_state_checkpoint_filename} and "
                     f"starting at epoch {initial_epoch:d}."
                 )
@@ -627,7 +632,7 @@ class ModelBundle:
             for i, lr_scheduler in enumerate(lr_schedulers):
                 filename = self.lr_scheduler_filename % i
                 if os.path.isfile(filename):
-                    print(f"Loading LR scheduler state from {filename} and starting at epoch {initial_epoch:d}.")
+                    print(f"Loading LR scheduler state from {filename} and starting at epoch {initial_epoch:d}.")  # noqa: T201
                     lr_scheduler.load_state(filename)
                 else:
                     self._warn_missing_file(filename)
@@ -636,7 +641,7 @@ class ModelBundle:
 
     def _init_model_restoring_callbacks(
         self, initial_epoch: int, keep_only_last_best: bool, save_every_epoch: bool
-    ) -> List:
+    ) -> list:
         callbacks = []
         if not save_every_epoch:
             best_checkpoint = ModelCheckpoint(
@@ -669,7 +674,7 @@ class ModelBundle:
 
         return callbacks
 
-    def _init_tensorboard_callbacks(self, disable_tensorboard: bool) -> Tuple:
+    def _init_tensorboard_callbacks(self, disable_tensorboard: bool) -> tuple:
         tensorboard_writer = None
         callbacks = []
         if not disable_tensorboard:
@@ -685,7 +690,7 @@ class ModelBundle:
                 callbacks += [TensorBoardLogger(tensorboard_writer)]
         return tensorboard_writer, callbacks
 
-    def _init_lr_scheduler_callbacks(self, lr_schedulers: List) -> List:
+    def _init_lr_scheduler_callbacks(self, lr_schedulers: list) -> list:
         callbacks = []
         if self.logging:
             for i, lr_scheduler in enumerate(lr_schedulers):
@@ -707,7 +712,7 @@ class ModelBundle:
                 save_extensions=('png', 'pdf'),
             )
 
-    def train(self, train_generator, valid_generator=None, **kwargs) -> List[Dict]:
+    def train(self, train_generator, valid_generator=None, **kwargs) -> list[dict]:
         """
         Trains or finetunes the model on a dataset using a generator. If a previous training already occurred
         and lasted a total of `n_previous` epochs, then the model's weights will be set to the last checkpoint and the
@@ -728,7 +733,7 @@ class ModelBundle:
             valid_generator (optional): Generator-like object for the validation set. See
                 :func:`~Model.fit_generator()` for details on the types of generators supported.
                 (Default value = None)
-            callbacks (List[~poutyne.Callback]): List of callbacks that will be called during
+            callbacks (list[~poutyne.Callback]): List of callbacks that will be called during
                 training. These callbacks are added after those used in this method (see above). This allows to assume
                 that they are called after those.
                 (Default value = None)
@@ -751,7 +756,7 @@ class ModelBundle:
         """
         return self._train(self.model.fit_generator, train_generator, valid_generator, **kwargs)
 
-    def train_dataset(self, train_dataset, valid_dataset=None, **kwargs) -> List[Dict]:
+    def train_dataset(self, train_dataset, valid_dataset=None, **kwargs) -> list[dict]:
         """
         Trains or finetunes the model on a dataset. If a previous training already occurred
         and lasted a total of `n_previous` epochs, then the model's weights will be set to the last checkpoint and the
@@ -769,7 +774,7 @@ class ModelBundle:
         Args:
             train_dataset (~torch.utils.data.Dataset): Training dataset.
             valid_dataset (~torch.utils.data.Dataset): Validation dataset.
-            callbacks (List[~poutyne.Callback]): List of callbacks that will be called during
+            callbacks (list[~poutyne.Callback]): List of callbacks that will be called during
                 training. These callbacks are added after those used in this method (see above). This allows to assume
                 that they are called after those.
                 (Default value = None)
@@ -792,7 +797,7 @@ class ModelBundle:
         """
         return self._train(self.model.fit_dataset, train_dataset, valid_dataset, **kwargs)
 
-    def train_data(self, x, y, validation_data=None, **kwargs) -> List[Dict]:
+    def train_data(self, x, y, validation_data=None, **kwargs) -> list[dict]:
         """
         Trains or finetunes the model on data under the form of NumPy arrays or torch tensors. If a previous
         training already occurred and lasted a total of `n_previous` epochs, then the model's weights will be set to the
@@ -808,18 +813,18 @@ class ModelBundle:
         statistics.
 
         Args:
-            x (Union[~torch.Tensor, ~numpy.ndarray] or Union[tuple, list] of Union[~torch.Tensor, ~numpy.ndarray]):
-                Training dataset. Union[Tensor, ndarray] if the model has a single input.
-                Union[tuple, list] of Union[Tensor, ndarray] if the model has multiple inputs.
-            y (Union[~torch.Tensor, ~numpy.ndarray] or Union[tuple, list] of Union[~torch.Tensor, ~numpy.ndarray]):
-                Target. Union[Tensor, ndarray] if the model has a single output.
-                Union[tuple, list] of Union[Tensor, ndarray] if the model has multiple outputs.
-            validation_data (Tuple[``x_val``, ``y_val``]):
+            x (~torch.Tensor | ~numpy.ndarray or tuple | list of ~torch.Tensor | ~numpy.ndarray):
+                Training dataset. Tensor | ndarray if the model has a single input.
+                tuple | list of Tensor | ndarray if the model has multiple inputs.
+            y (~torch.Tensor | ~numpy.ndarray or tuple | list of ~torch.Tensor | ~numpy.ndarray):
+                Target. Tensor | ndarray if the model has a single output.
+                tuple | list of Tensor | ndarray if the model has multiple outputs.
+            validation_data (tuple[``x_val``, ``y_val``]):
                 Same format as ``x`` and ``y`` previously described. Validation dataset on which to
                 evaluate the loss and any model metrics at the end of each epoch. The model will not be
                 trained on this data.
                 (Default value = None)
-            callbacks (List[~poutyne.Callback]): List of callbacks that will be called during
+            callbacks (list[~poutyne.Callback]): List of callbacks that will be called during
                 training. These callbacks are added after those used in this method (see above). This allows to assume
                 that they are called after those.
                 (Default value = None)
@@ -846,14 +851,14 @@ class ModelBundle:
         self,
         training_func,
         *args,
-        callbacks: Union[List, None] = None,
-        lr_schedulers: Union[List, None] = None,
+        callbacks: list | None = None,
+        lr_schedulers: list | None = None,
         keep_only_last_best: bool = False,
         save_every_epoch: bool = False,
         disable_tensorboard: bool = False,
         seed: int = 42,
         **kwargs,
-    ) -> List[Dict]:
+    ) -> list[dict]:
         set_seeds(seed)
 
         lr_schedulers = [] if lr_schedulers is None else lr_schedulers
@@ -898,9 +903,8 @@ class ModelBundle:
 
             tensorboard_writer, cb_list = self._init_tensorboard_callbacks(disable_tensorboard)
             expt_callbacks += cb_list
-        else:
-            if self.monitoring:
-                expt_callbacks += [BestModelRestore(monitor=self.monitor_metric, mode=self.monitor_mode, verbose=True)]
+        elif self.monitoring:
+            expt_callbacks += [BestModelRestore(monitor=self.monitor_metric, mode=self.monitor_mode, verbose=True)]
 
         # This method returns callbacks that checkpoints the LR scheduler if logging is enabled.
         # Otherwise, it just returns the list of LR schedulers with a BestModelRestore callback.
@@ -918,14 +922,12 @@ class ModelBundle:
             if tensorboard_writer is not None:
                 tensorboard_writer.close()
 
-    def load_checkpoint(
-        self, checkpoint: Union[int, str], *, verbose: bool = False, strict: bool = True
-    ) -> Union[Dict, None]:
+    def load_checkpoint(self, checkpoint: int | str, *, verbose: bool = False, strict: bool = True) -> dict | None:
         """
         Loads the model's weights with the weights at a given checkpoint epoch.
 
         Args:
-            checkpoint (Union[int, str]): Which checkpoint to load the model's weights form.
+            checkpoint (int | str): Which checkpoint to load the model's weights form.
 
                 - If 'best', will load the best weights according to ``monitor_metric`` and ``monitor_mode``.
                 - If 'last', will load the last model checkpoint.
@@ -970,7 +972,7 @@ class ModelBundle:
         metrics_str = ', '.join(
             f'{metric_name}: {epoch_stats[metric_name].item():g}' for metric_name in epoch_stats.columns[2:]
         )
-        print(metrics_str)
+        print(metrics_str)  # noqa: T201
 
     def _load_epoch_checkpoint(self, epoch: int, *, verbose: bool = False, strict: bool = True) -> None:
         ckpt_filename = self.best_checkpoint_filename.format(epoch=epoch)
@@ -979,7 +981,7 @@ class ModelBundle:
         epoch_stats = history.iloc[epoch - 1 : epoch]
 
         if verbose:
-            print(f"Loading checkpoint {ckpt_filename}")
+            print(f"Loading checkpoint {ckpt_filename}")  # noqa: T201
             self._print_epoch_stats(epoch_stats)
 
         if not os.path.isfile(ckpt_filename):
@@ -987,16 +989,16 @@ class ModelBundle:
 
         return epoch_stats, self.model.load_weights(ckpt_filename, strict=strict)
 
-    def _load_best_checkpoint(self, *, verbose: bool = False, strict: bool = True) -> Dict:
+    def _load_best_checkpoint(self, *, verbose: bool = False, strict: bool = True) -> dict:
         best_epoch_stats = self.get_best_epoch_stats()
         best_epoch = best_epoch_stats['epoch'].item()
 
         ckpt_filename = self.best_checkpoint_filename.format(epoch=best_epoch)
 
         if verbose:
-            print(f"Found best checkpoint at epoch: {best_epoch}")
+            print(f"Found best checkpoint at epoch: {best_epoch}")  # noqa: T201
             self._print_epoch_stats(best_epoch_stats)
-            print(f"Loading checkpoint {ckpt_filename}")
+            print(f"Loading checkpoint {ckpt_filename}")  # noqa: T201
 
         return best_epoch_stats, self.model.load_weights(ckpt_filename, strict=strict)
 
@@ -1005,14 +1007,14 @@ class ModelBundle:
         epoch_stats = history.iloc[-1:]
 
         if verbose:
-            print(f"Loading checkpoint {self.model_checkpoint_filename}")
+            print(f"Loading checkpoint {self.model_checkpoint_filename}")  # noqa: T201
             self._print_epoch_stats(epoch_stats)
 
         return epoch_stats, self.model.load_weights(self.model_checkpoint_filename, strict=strict)
 
     def _load_path_checkpoint(self, path, verbose: bool = False, strict: bool = True) -> None:
         if verbose:
-            print(f"Loading checkpoint {path}")
+            print(f"Loading checkpoint {path}")  # noqa: T201
 
         return self.model.load_weights(path, strict=strict)
 
@@ -1028,7 +1030,7 @@ class ModelBundle:
         Args:
             test_generator: Generator-like object for the test set. See :func:`~Model.fit_generator()` for
                 details on the types of generators supported.
-            checkpoint (Union[str, int]): Which model checkpoint weights to load for the test evaluation.
+            checkpoint (str | int): Which model checkpoint weights to load for the test evaluation.
 
                 - If 'best', will load the best weights according to ``monitor_metric`` and ``monitor_mode``.
                 - If 'last', will load the last model checkpoint.
@@ -1051,7 +1053,7 @@ class ModelBundle:
         """
         return self._test(self.model.evaluate_generator, test_generator, **kwargs)
 
-    def test_dataset(self, test_dataset, **kwargs) -> Dict:
+    def test_dataset(self, test_dataset, **kwargs) -> dict:
         """
         Computes and returns the loss and the metrics of the model on a given test dataset.
 
@@ -1061,7 +1063,7 @@ class ModelBundle:
 
         Args:
             test_dataset (~torch.utils.data.Dataset): Test dataset.
-            checkpoint (Union[str, int]): Which model checkpoint weights to load for the test evaluation.
+            checkpoint (str | int): Which model checkpoint weights to load for the test evaluation.
 
                 - If 'best', will load the best weights according to ``monitor_metric`` and ``monitor_mode``.
                 - If 'last', will load the last model checkpoint.
@@ -1084,7 +1086,7 @@ class ModelBundle:
         """
         return self._test(self.model.evaluate_dataset, test_dataset, **kwargs)
 
-    def test_data(self, x, y, **kwargs) -> Dict:
+    def test_data(self, x, y, **kwargs) -> dict:
         """
         Computes and returns the loss and the metrics of the model on a given test dataset.
 
@@ -1093,14 +1095,14 @@ class ModelBundle:
         current weights of the network is used for testing and statistics are only shown in the standard output.
 
         Args:
-            x (Union[~torch.Tensor, ~numpy.ndarray] or Union[tuple, list] of Union[~torch.Tensor, ~numpy.ndarray]):
-                Input to the model. Union[Tensor, ndarray] if the model has a single input.
-                Union[tuple, list] of Union[Tensor, ndarray] if the model has multiple inputs.
-            y (Union[~torch.Tensor, ~numpy.ndarray] or Union[tuple, list] of Union[~torch.Tensor, ~numpy.ndarray]):
+            x (~torch.Tensor | ~numpy.ndarray or tuple | list of ~torch.Tensor | ~numpy.ndarray):
+                Input to the model. Tensor | ndarray if the model has a single input.
+                tuple | list of Tensor | ndarray if the model has multiple inputs.
+            y (~torch.Tensor | ~numpy.ndarray or tuple | list of ~torch.Tensor | ~numpy.ndarray):
                 Target, corresponding ground truth.
-                Union[Tensor, ndarray] if the model has a single output.
-                Union[tuple, list] of Union[Tensor, ndarray] if the model has multiple outputs.
-            checkpoint (Union[str, int]): Which model checkpoint weights to load for the test evaluation.
+                Tensor | ndarray if the model has a single output.
+                tuple | list of Tensor | ndarray if the model has multiple outputs.
+            checkpoint (str | int): Which model checkpoint weights to load for the test evaluation.
 
                 - If 'best', will load the best weights according to ``monitor_metric`` and ``monitor_mode``.
                 - If 'last', will load the last model checkpoint.
@@ -1126,12 +1128,12 @@ class ModelBundle:
         self,
         evaluate_func,
         *args,
-        checkpoint: Union[str, int] = 'best',
+        checkpoint: str | int = 'best',
         seed: int = 42,
         name='test',
         verbose=True,
         **kwargs,
-    ) -> Dict:
+    ) -> dict:
         if kwargs.get('return_dict_format') is False:
             raise ValueError("This method only returns a dict.")
         kwargs['return_dict_format'] = True
@@ -1144,7 +1146,7 @@ class ModelBundle:
             epoch_stats = self.load_checkpoint(checkpoint, verbose=verbose)
 
         if verbose:
-            print(f"Running {name}")
+            print(f"Running {name}")  # noqa: T201
         ret = evaluate_func(*args, **kwargs, verbose=verbose)
 
         if self.logging:
@@ -1167,7 +1169,7 @@ class ModelBundle:
             generator: Generator-like object for the dataset. The generator must yield a batch of
                 samples. See the :func:`fit_generator()` method for details on the types of generators
                 supported. This should only yield input data ``x`` and NOT the target ``y``.
-            checkpoint (Union[str, int]): Which model checkpoint weights to load for the prediction.
+            checkpoint (str | int): Which model checkpoint weights to load for the prediction.
 
                 - If 'best', will load the best weights according to ``monitor_metric`` and ``monitor_mode``.
                 - If 'last', will load the last model checkpoint.
@@ -1194,7 +1196,7 @@ class ModelBundle:
 
         Args:
             dataset (~torch.utils.data.Dataset): Dataset. Must not return ``y``, just ``x``.
-            checkpoint (Union[str, int]): Which model checkpoint weights to load for the prediction.
+            checkpoint (str | int): Which model checkpoint weights to load for the prediction.
 
                 - If 'best', will load the best weights according to ``monitor_metric`` and ``monitor_mode``.
                 - If 'last', will load the last model checkpoint.
@@ -1216,10 +1218,10 @@ class ModelBundle:
         converted into Numpy arrays.
 
         Args:
-            x (Union[~torch.Tensor, ~numpy.ndarray] or Union[tuple, list] of Union[~torch.Tensor, ~numpy.ndarray]):
-                Input to the model. Union[Tensor, ndarray] if the model has a single input.
-                Union[tuple, list] of Union[Tensor, ndarray] if the model has multiple inputs.
-            checkpoint (Union[str, int]): Which model checkpoint weights to load for the prediction.
+            x (~torch.Tensor | ~numpy.ndarray or tuple | list of ~torch.Tensor | ~numpy.ndarray):
+                Input to the model. Tensor | ndarray if the model has a single input.
+                tuple | list of Tensor | ndarray if the model has multiple inputs.
+            checkpoint (str | int): Which model checkpoint weights to load for the prediction.
 
                 - If 'best', will load the best weights according to ``monitor_metric`` and ``monitor_mode``.
                 - If 'last', will load the last model checkpoint.
@@ -1235,9 +1237,7 @@ class ModelBundle:
         """
         return self._predict(self.model.predict, x, **kwargs)
 
-    def _predict(
-        self, predict_func: Callable, *args, verbose=True, checkpoint: Union[str, int] = 'best', **kwargs
-    ) -> Any:
+    def _predict(self, predict_func: Callable, *args, verbose=True, checkpoint: str | int = 'best', **kwargs) -> Any:
         if self.logging:
             if not self.monitoring and checkpoint == 'best':
                 checkpoint = 'last'

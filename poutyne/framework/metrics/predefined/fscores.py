@@ -37,7 +37,6 @@ limitations under the License.
 """
 
 import warnings
-from typing import List, Optional, Tuple, Union
 
 import torch
 
@@ -83,10 +82,10 @@ class FBeta(Metric):
         respective parameters.
 
     Args:
-        metric (Optional[str]): One of {'fscore', 'precision', 'recall'}.
+        metric (str | None): One of {'fscore', 'precision', 'recall'}.
             Whether to return the F-score, the precision or the recall. When not
             provided, all three metrics are returned. (Default value = None)
-        average (Union[str, int]): One of {'micro' (default), 'macro', label_number}
+        average (str | int): One of {'micro' (default), 'macro', label_number}
             If the argument is of type integer, the score for this class (the label number) is calculated.
             Otherwise, this determines the type of averaging performed on the data:
 
@@ -114,24 +113,24 @@ class FBeta(Metric):
             this should be between 0 and 1. A suggested value would be 0.5. If a logits output is used, the threshold
             would be between -inf and inf. The suggested default value is 0 as to give a probability of 0.5 if a sigmoid
             output were used. (Default = 0)
-        names (Optional[Union[str, List[str]]]): The names associated to the metrics. It is a string when
+        names (str | list[str] | None): The names associated to the metrics. It is a string when
             a single metric is requested. It is a list of 3 strings if all metrics are requested.
             (Default value = None)
-        make_deterministic (Optional[bool]): Avoid non-deterministic operations in computations. This might make the
+        make_deterministic (bool | None): Avoid non-deterministic operations in computations. This might make the
             code slower.
     """
 
     def __init__(
         self,
         *,
-        metric: Optional[str] = None,
-        average: Union[str, int] = 'macro',
+        metric: str | None = None,
+        average: str | int = 'macro',
         beta: float = 1.0,
         pos_label: int = 1,
         ignore_index: int = -100,
         threshold: float = 0.0,
-        names: Optional[Union[str, List[str]]] = None,
-        make_deterministic: Optional[bool] = None,
+        names: str | list[str] | None = None,
+        make_deterministic: bool | None = None,
     ) -> None:
         super().__init__()
         self.metric_options = ('fscore', 'precision', 'recall')
@@ -139,7 +138,7 @@ class FBeta(Metric):
             raise ValueError(f"`metric` has to be one of {self.metric_options}.")
 
         if metric in ('precision', 'recall') and beta != 1.0:
-            warnings.warn(f"The use of the `beta` argument is useless with {repr(metric)}.")
+            warnings.warn(f"The use of the `beta` argument is useless with {metric!r}.", stacklevel=2)
 
         average_options = ('binary', 'micro', 'macro')
         if average not in average_options and not isinstance(average, int):
@@ -206,15 +205,15 @@ class FBeta(Metric):
             raise ValueError(f"`names` should contain names for the following metrics: {', '.join(default_name)}.")
 
     def forward(
-        self, y_pred: torch.Tensor, y_true: Union[torch.Tensor, Tuple[torch.Tensor, torch.Tensor]]
-    ) -> Union[float, Tuple[float]]:
+        self, y_pred: torch.Tensor, y_true: torch.Tensor | tuple[torch.Tensor, torch.Tensor]
+    ) -> float | tuple[float]:
         """
         Update the confusion matrix for calculating the F-score and compute the metrics for the current batch. See
         :meth:`FBeta.compute` for details on the return value.
 
         Args:
             y_pred (torch.Tensor): A tensor of predictions of shape (batch_size, num_classes, ...).
-            y_true (Union[torch.Tensor, Tuple[torch.Tensor, torch.Tensor]]):
+            y_true (torch.Tensor | tuple[torch.Tensor, torch.Tensor]):
                 Ground truths. A tensor of the integer class label of shape (batch_size, ...). It must
                 be the same shape as the ``y_pred`` tensor without the ``num_classes`` dimension.
                 It can also be a tuple with two tensors of the same shape, the first being the
@@ -227,13 +226,13 @@ class FBeta(Metric):
         true_positive_sum, pred_sum, true_sum = self._update(y_pred, y_true)
         return self._compute(true_positive_sum, pred_sum, true_sum)
 
-    def update(self, y_pred: torch.Tensor, y_true: Union[torch.Tensor, Tuple[torch.Tensor, torch.Tensor]]) -> None:
+    def update(self, y_pred: torch.Tensor, y_true: torch.Tensor | tuple[torch.Tensor, torch.Tensor]) -> None:
         """
         Update the confusion matrix for calculating the F-score.
 
         Args:
             y_pred (torch.Tensor): A tensor of predictions of shape (batch_size, num_classes, ...).
-            y_true (Union[torch.Tensor, Tuple[torch.Tensor, torch.Tensor]]):
+            y_true (torch.Tensor | tuple[torch.Tensor, torch.Tensor]):
                 Ground truths. A tensor of the integer class label of shape (batch_size, ...). It must
                 be the same shape as the ``y_pred`` tensor without the ``num_classes`` dimension.
                 It can also be a tuple with two tensors of the same shape, the first being the
@@ -241,8 +240,7 @@ class FBeta(Metric):
         """
         self._update(y_pred, y_true)
 
-    def _update(self, y_pred: torch.Tensor, y_true: Union[torch.Tensor, Tuple[torch.Tensor, torch.Tensor]]) -> None:
-        # pylint: disable=too-many-branches
+    def _update(self, y_pred: torch.Tensor, y_true: torch.Tensor | tuple[torch.Tensor, torch.Tensor]) -> None:  # noqa: PLR0912 (too-many-branches)
         with set_deterministic_debug_mode(self.deterministic_debug_mode):
             if isinstance(y_true, tuple):
                 y_true, mask = y_true
@@ -319,7 +317,7 @@ class FBeta(Metric):
 
             return true_positive_sum, pred_sum, true_sum
 
-    def compute(self) -> Union[float, Tuple[float]]:
+    def compute(self) -> float | tuple[float]:
         """
         Returns either a float if a single metric is set in the ``__init__`` or a tuple
         of floats (f-score, precision, recall) if all metrics are requested.

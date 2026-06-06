@@ -17,8 +17,6 @@ You should have received a copy of the GNU Lesser General Public License along w
 <https://www.gnu.org/licenses/>.
 """
 
-from typing import Dict
-
 from poutyne.framework.callbacks.callbacks import Callback
 
 
@@ -93,58 +91,58 @@ class LambdaCallback(Callback):
     def _set_lambda_for_none(self, value):
         return value if value is not None else lambda *args: None
 
-    def on_epoch_begin(self, epoch_number: int, logs: Dict):
+    def on_epoch_begin(self, epoch_number: int, logs: dict):
         self._on_epoch_begin(epoch_number, logs)
 
-    def on_epoch_end(self, epoch_number: int, logs: Dict):
+    def on_epoch_end(self, epoch_number: int, logs: dict):
         self._on_epoch_end(epoch_number, logs)
 
-    def on_train_batch_begin(self, batch_number: int, logs: Dict):
+    def on_train_batch_begin(self, batch_number: int, logs: dict):
         self._on_train_batch_begin(batch_number, logs)
 
-    def on_train_batch_end(self, batch_number: int, logs: Dict):
+    def on_train_batch_end(self, batch_number: int, logs: dict):
         self._on_train_batch_end(batch_number, logs)
 
-    def on_valid_batch_begin(self, batch_number: int, logs: Dict):
+    def on_valid_batch_begin(self, batch_number: int, logs: dict):
         self._on_valid_batch_begin(batch_number, logs)
 
-    def on_valid_batch_end(self, batch_number: int, logs: Dict):
+    def on_valid_batch_end(self, batch_number: int, logs: dict):
         self._on_valid_batch_end(batch_number, logs)
 
-    def on_test_batch_begin(self, batch_number: int, logs: Dict):
+    def on_test_batch_begin(self, batch_number: int, logs: dict):
         self._on_test_batch_begin(batch_number, logs)
 
-    def on_test_batch_end(self, batch_number: int, logs: Dict):
+    def on_test_batch_end(self, batch_number: int, logs: dict):
         self._on_test_batch_end(batch_number, logs)
 
-    def on_predict_batch_begin(self, batch_number: int, logs: Dict):
+    def on_predict_batch_begin(self, batch_number: int, logs: dict):
         self._on_predict_batch_begin(batch_number, logs)
 
-    def on_predict_batch_end(self, batch_number: int, logs: Dict):
+    def on_predict_batch_end(self, batch_number: int, logs: dict):
         self._on_predict_batch_end(batch_number, logs)
 
-    def on_train_begin(self, logs: Dict):
+    def on_train_begin(self, logs: dict):
         self._on_train_begin(logs)
 
-    def on_train_end(self, logs: Dict):
+    def on_train_end(self, logs: dict):
         self._on_train_end(logs)
 
-    def on_valid_begin(self, logs: Dict):
+    def on_valid_begin(self, logs: dict):
         self._on_valid_begin(logs)
 
-    def on_valid_end(self, logs: Dict):
+    def on_valid_end(self, logs: dict):
         self._on_valid_end(logs)
 
-    def on_test_begin(self, logs: Dict):
+    def on_test_begin(self, logs: dict):
         self._on_test_begin(logs)
 
-    def on_test_end(self, logs: Dict):
+    def on_test_end(self, logs: dict):
         self._on_test_end(logs)
 
-    def on_predict_begin(self, logs: Dict):
+    def on_predict_begin(self, logs: dict):
         self._on_predict_begin(logs)
 
-    def on_predict_end(self, logs: Dict):
+    def on_predict_end(self, logs: dict):
         self._on_predict_end(logs)
 
     def on_backward_end(self, batch_number: int):

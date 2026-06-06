@@ -18,7 +18,6 @@ You should have received a copy of the GNU Lesser General Public License along w
 """
 
 from abc import ABC, abstractmethod
-from typing import Dict, Union
 
 from poutyne.framework.callbacks.callbacks import Callback
 
@@ -30,7 +29,7 @@ class Notificator(ABC):
     """
 
     @abstractmethod
-    def send_notification(self, message: str, *, subject: Union[str, None] = None) -> None:
+    def send_notification(self, message: str, *, subject: str | None = None) -> None:
         """
         Abstract method to send a notification.
 
@@ -53,7 +52,7 @@ class NotificationCallback(Callback):
             `notif <https://notificationdoc.ca/index.html>`_ package which implements some Notificator respecting the
             interface.
         alert_frequency (int): The frequency (in epoch), during training, to send an update. By default, 1.
-        experiment_name (Union[str, None]): The name of the experiment to add to the message. By default, None.
+        experiment_name (str | None): The name of the experiment to add to the message. By default, None.
 
     Example:
 
@@ -71,15 +70,13 @@ class NotificationCallback(Callback):
             model.fit_generator(..., callbacks=[notif_callback])
     """
 
-    def __init__(
-        self, notificator: Notificator, alert_frequency: int = 1, experiment_name: Union[None, str] = None
-    ) -> None:
+    def __init__(self, notificator: Notificator, alert_frequency: int = 1, experiment_name: None | str = None) -> None:
         super().__init__()
         self.notificator = notificator
         self.alert_frequency = alert_frequency
         self.experiment_name_msg = f" for {experiment_name}" if experiment_name is not None else ""
 
-    def on_train_begin(self, logs: Dict) -> None:
+    def on_train_begin(self, logs: dict) -> None:
         """
         Send the message to the channel 'Start of the training' or
         'Start of the training for the experiment experiment_name' if an experiment name is given.
@@ -87,7 +84,7 @@ class NotificationCallback(Callback):
         empty_message = ""
         self.notificator.send_notification(empty_message, subject=f"Start of the training{self.experiment_name_msg}.")
 
-    def on_epoch_end(self, epoch_number: int, logs: Dict) -> None:
+    def on_epoch_end(self, epoch_number: int, logs: dict) -> None:
         """
         Send the message to the channel 'Epoch is done' or 'Epoch is done for the experiment experiment_name'
         if an experiment name is given and the logs metrics (one per line).
@@ -99,7 +96,7 @@ class NotificationCallback(Callback):
                 message, subject=f"Epoch {epoch_number} is done{self.experiment_name_msg}."
             )
 
-    def on_train_end(self, logs: Dict) -> None:
+    def on_train_end(self, logs: dict) -> None:
         """
         Send the message to the channel 'End of the training' or
         'End of the training for the experiment experiment_name' if an experiment name is given.
@@ -108,7 +105,7 @@ class NotificationCallback(Callback):
         empty_message = ""
         self.notificator.send_notification(empty_message, subject=f"End of the training{self.experiment_name_msg}.")
 
-    def on_test_begin(self, logs: Dict) -> None:
+    def on_test_begin(self, logs: dict) -> None:
         """
         Send the message to the channel 'Start of the testing' or
         'Start of the testing for the experiment experiment_name' if an experiment name is given.
@@ -117,7 +114,7 @@ class NotificationCallback(Callback):
         empty_message = ""
         self.notificator.send_notification(empty_message, subject=f"Start of the testing{self.experiment_name_msg}.")
 
-    def on_test_end(self, logs: Dict) -> None:
+    def on_test_end(self, logs: dict) -> None:
         """
         Send the message to the channel 'End of the testing' or
         'End of the testing for the experiment experiment_name' if an experiment name is given.
@@ -127,5 +124,5 @@ class NotificationCallback(Callback):
         self.notificator.send_notification(message, subject=f"End of the testing{self.experiment_name_msg}.")
 
     @staticmethod
-    def _format_logs(logs: Dict) -> str:
+    def _format_logs(logs: dict) -> str:
         return " ".join([f"{key}: {value}\n" for key, value in logs.items()])

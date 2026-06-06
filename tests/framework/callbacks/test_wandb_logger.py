@@ -1,6 +1,6 @@
 import os
 import warnings
-from tempfile import TemporaryDirectory, TemporaryFile
+from tempfile import NamedTemporaryFile, TemporaryDirectory
 from unittest import TestCase, main, skipIf
 from unittest.mock import MagicMock, call, patch
 
@@ -48,7 +48,8 @@ class WandBLoggerTest(TestCase):
         self.a_config_params = {"param_1": 1, "param_2": 2, "param_3": "value"}
         self.uncleaned_log = {"size": 32, "accuracy": 85}
         self.temp_dir_obj = TemporaryDirectory()
-        self.temp_file_obj = TemporaryFile()
+        with NamedTemporaryFile(delete=False) as f:
+            self.temp_file_obj = type('_TmpFile', (), {'name': f.name})()
 
     @patch.dict(os.environ, clear=True)
     def test_wandb_online_init(self):
@@ -252,31 +253,33 @@ class WandBLoggerTest(TestCase):
             logger.run.log_artifact.assert_called_once_with(self.artifact_mock)
 
     def test_save_architecture(self):
-        with patch("poutyne.framework.wandb_logger.wandb") as wandb_patch:
-            with patch("poutyne.framework.torch.onnx") as torch_onx_patch:
-                with patch("poutyne.framework.torch.randn") as torch_randn_patch:
-                    train_gen = some_data_generator(20)
-                    valid_gen = some_data_generator(20)
+        with (
+            patch("poutyne.framework.wandb_logger.wandb") as wandb_patch,
+            patch("poutyne.framework.torch.onnx") as torch_onx_patch,
+            patch("poutyne.framework.torch.randn") as torch_randn_patch,
+        ):
+            train_gen = some_data_generator(20)
+            valid_gen = some_data_generator(20)
 
-                    wandb_patch.init = self.initialize_experiment
-                    wandb_patch.run = None
-                    num_batchs = 5
-                    logger = WandBLogger(
-                        name=self.a_name,
-                        log_gradient_frequency=1,
-                        batch_granularity=True,
-                        training_batch_shape=(1, 2, 3),
-                    )
-                    logger.run.dir = "a_path"
-                    logger.run.name = self.a_name
-                    self.model.fit_generator(
-                        train_gen, valid_gen, epochs=self.num_epochs, steps_per_epoch=num_batchs, callbacks=[logger]
-                    )
+            wandb_patch.init = self.initialize_experiment
+            wandb_patch.run = None
+            num_batchs = 5
+            logger = WandBLogger(
+                name=self.a_name,
+                log_gradient_frequency=1,
+                batch_granularity=True,
+                training_batch_shape=(1, 2, 3),
+            )
+            logger.run.dir = "a_path"
+            logger.run.name = self.a_name
+            self.model.fit_generator(
+                train_gen, valid_gen, epochs=self.num_epochs, steps_per_epoch=num_batchs, callbacks=[logger]
+            )
 
-                    torch_onx_patch.export.assert_called_once_with(
-                        self.pytorch_network, torch_randn_patch().to(), f"a_path/{self.a_name}_model.onnx"
-                    )
-                    logger.run.save.assert_called_once_with(f"a_path/{self.a_name}_model.onnx")
+            torch_onx_patch.export.assert_called_once_with(
+                self.pytorch_network, torch_randn_patch().to(), f"a_path/{self.a_name}_model.onnx"
+            )
+            logger.run.save.assert_called_once_with(f"a_path/{self.a_name}_model.onnx")
 
 
 if __name__ == '__main__':

@@ -1,5 +1,4 @@
 import smtplib
-from typing import Dict
 
 import torch
 import torch.nn as nn
@@ -7,8 +6,8 @@ from notif.notificator import EmailNotificator  # pip install notif
 from torch.utils.data import random_split
 from torchvision.datasets import MNIST
 from torchvision.transforms import ToTensor
-from poutyne import Experiment, Callback
 
+from poutyne import Callback, Experiment
 
 # Instanciate the MNIST dataset
 train_valid_dataset = MNIST('./datasets', train=True, download=True, transform=ToTensor())
@@ -41,14 +40,14 @@ class TrainingAlertCallback(Callback):
 
         self.alert_frequency = alert_frequency
 
-    def on_train_begin(self, logs: Dict):
+    def on_train_begin(self, logs: dict):
         self.notif.send_notification("Start of the training.")
 
-    def on_epoch_end(self, epoch_number: int, logs: Dict):
+    def on_epoch_end(self, epoch_number: int, logs: dict):
         if epoch_number % self.alert_frequency == 0:
             self.notif.send_notification(f"Epoch {epoch_number} is done.")
 
-    def on_train_end(self, logs: Dict):
+    def on_train_end(self, logs: dict):
         self.notif.send_notification("End of the training.")
 
 

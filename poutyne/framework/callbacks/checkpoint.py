@@ -19,7 +19,7 @@ You should have received a copy of the GNU Lesser General Public License along w
 
 import pickle
 import warnings
-from typing import IO, Dict
+from typing import IO
 
 import torch
 
@@ -37,7 +37,7 @@ class ModelCheckpoint(PeriodicSaveCallback):
         :class:`~poutyne.PeriodicSaveCallback`
     """
 
-    def save_file(self, fd: IO, epoch_number: int, logs: Dict):
+    def save_file(self, fd: IO, epoch_number: int, logs: dict):
         self.model.save_weights(fd)
 
     def restore(self, fd: IO):
@@ -59,7 +59,7 @@ class OptimizerCheckpoint(PeriodicSaveCallback):
         :class:`~poutyne.PeriodicSaveCallback`
     """
 
-    def save_file(self, fd: IO, epoch_number: int, logs: Dict):
+    def save_file(self, fd: IO, epoch_number: int, logs: dict):
         self.model.save_optimizer_state(fd)
 
     def restore(self, fd: IO):
@@ -93,13 +93,13 @@ class LRSchedulerCheckpoint(PeriodicSaveCallback):
         if not isinstance(self.lr_scheduler, (_PyTorchLRSchedulerWrapper, ReduceLROnPlateau)):
             raise ValueError(f"Unknown scheduler callback '{lr_scheduler}'.")
 
-    def save_file(self, fd: IO, epoch_number: int, logs: Dict):
+    def save_file(self, fd: IO, epoch_number: int, logs: dict):
         self.lr_scheduler.save_state(fd)
 
     def restore(self, fd: IO):
         self.lr_scheduler.load_state(fd)
 
-    def set_params(self, params: Dict):
+    def set_params(self, params: dict):
         self.lr_scheduler.set_params(params)
         super().set_params(params)
 
@@ -107,19 +107,19 @@ class LRSchedulerCheckpoint(PeriodicSaveCallback):
         self.lr_scheduler.set_model(model)
         super().set_model(model)
 
-    def on_epoch_begin(self, epoch_number: int, logs: Dict):
+    def on_epoch_begin(self, epoch_number: int, logs: dict):
         self.lr_scheduler.on_epoch_begin(epoch_number, logs)
         super().on_epoch_begin(epoch_number, logs)
 
-    def on_epoch_end(self, epoch_number: int, logs: Dict):
+    def on_epoch_end(self, epoch_number: int, logs: dict):
         self.lr_scheduler.on_epoch_end(epoch_number, logs)
         super().on_epoch_end(epoch_number, logs)
 
-    def on_train_batch_begin(self, batch_number: int, logs: Dict):
+    def on_train_batch_begin(self, batch_number: int, logs: dict):
         self.lr_scheduler.on_train_batch_begin(batch_number, logs)
         super().on_train_batch_begin(batch_number, logs)
 
-    def on_train_batch_end(self, batch_number: int, logs: Dict):
+    def on_train_batch_end(self, batch_number: int, logs: dict):
         self.lr_scheduler.on_train_batch_end(batch_number, logs)
         super().on_train_batch_end(batch_number, logs)
 
@@ -127,11 +127,11 @@ class LRSchedulerCheckpoint(PeriodicSaveCallback):
         self.lr_scheduler.on_backward_end(batch_number)
         super().on_backward_end(batch_number)
 
-    def on_train_begin(self, logs: Dict):
+    def on_train_begin(self, logs: dict):
         self.lr_scheduler.on_train_begin(logs)
         super().on_train_begin(logs)
 
-    def on_train_end(self, logs: Dict):
+    def on_train_end(self, logs: dict):
         self.lr_scheduler.on_train_end(logs)
         super().on_train_end(logs)
 
@@ -141,7 +141,7 @@ class StateCheckpoint(PeriodicSaveCallback):
         super().__init__(*args, **kwargs)
         self.name_to_stateful = name_to_stateful
 
-    def save_file(self, fd: IO, epoch_number: int, logs: Dict):
+    def save_file(self, fd: IO, epoch_number: int, logs: dict):
         states = {k: v.state_dict() for k, v in self.name_to_stateful.items()}
         torch.save(states, fd, pickle_module=pickle)
 
@@ -153,9 +153,9 @@ class StateCheckpoint(PeriodicSaveCallback):
         # Fix code below and remove pylint comment.
         # pylint: disable=consider-using-f-string
         if len(unexpected_keys) > 0:
-            warnings.warn('Unexpected key(s): {}.'.format(', '.join('"{}"'.format(*unexpected_keys))))
+            warnings.warn('Unexpected key(s): {}.'.format(', '.join('"{}"'.format(*unexpected_keys))), stacklevel=2)
         if len(missing_keys) > 0:
-            warnings.warn('Missing key(s): {}.'.format(', '.join('"{}"'.format(*missing_keys))))
+            warnings.warn('Missing key(s): {}.'.format(', '.join('"{}"'.format(*missing_keys))), stacklevel=2)
 
         for name, state in states.items():
             if name in self.name_to_stateful:
@@ -173,7 +173,7 @@ class RandomStatesCheckpoint(PeriodicSaveCallback):
         :class:`~poutyne.PeriodicSaveCallback`
     """
 
-    def save_file(self, fd: IO, epoch_number: int, logs: Dict):
+    def save_file(self, fd: IO, epoch_number: int, logs: dict):
         save_random_states(fd)
 
     def restore(self, fd: IO):

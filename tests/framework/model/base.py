@@ -36,7 +36,7 @@ class ModelFittingTestCase(CaptureOutputBase):
 
     evaluate_dataset_len = 107
 
-    cuda_device = int(os.environ.get('CUDA_DEVICE', 0))
+    cuda_device = int(os.environ.get('CUDA_DEVICE', '0'))
 
     def setUp(self):
         self.mock_callback = MagicMock(spec=Callback)
@@ -168,7 +168,7 @@ class ModelFittingTestCase(CaptureOutputBase):
         for p in self.pytorch_network.parameters():
             self.assertEqual(p.device, device)
 
-        for p in self.optimizer.state.keys():
+        for p in self.optimizer.state:
             if torch.is_tensor(p):
                 self.assertEqual(p.device, device)
 
@@ -178,9 +178,9 @@ class ModelFittingTestCase(CaptureOutputBase):
                     self.assertEqual(param.device, device)
 
                 for n, v in self.optimizer.state[param].items():
-                    if 'capturable' not in param_group or param_group["capturable"] or n != 'step':
-                        if torch.is_tensor(v):
-                            self.assertEqual(v.device, device, n)
+                    capturable_ok = 'capturable' not in param_group or param_group["capturable"] or n != 'step'
+                    if capturable_ok and torch.is_tensor(v):
+                        self.assertEqual(v.device, device, n)
 
 
 class MultiIOModel(nn.Module):
@@ -188,25 +188,14 @@ class MultiIOModel(nn.Module):
 
     def __init__(self, num_input=2, num_output=2):
         super().__init__()
-        inputs = []
-        for _ in range(num_input):
-            inputs.append(nn.Linear(1, 1))
-        self.inputs = nn.ModuleList(inputs)
-
-        outputs = []
-        for _ in range(num_output):
-            outputs.append(nn.Linear(num_input, 1))
-        self.outputs = nn.ModuleList(outputs)
+        self.inputs = nn.ModuleList([nn.Linear(1, 1) for _ in range(num_input)])
+        self.outputs = nn.ModuleList([nn.Linear(num_input, 1) for _ in range(num_output)])
 
     def forward(self, *x):
-        inp_to_cat = []
-        for i, inp in enumerate(self.inputs):
-            inp_to_cat.append(inp(x[i]))
+        inp_to_cat = [inp(x[i]) for i, inp in enumerate(self.inputs)]
         inp_cat = torch.cat(inp_to_cat, dim=1)
 
-        outputs = []
-        for out in self.outputs:
-            outputs.append(out(inp_cat))
+        outputs = [out(inp_cat) for out in self.outputs]
 
         outputs = outputs if len(outputs) > 1 else outputs[0]
         return outputs

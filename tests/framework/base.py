@@ -19,7 +19,6 @@ You should have received a copy of the GNU Lesser General Public License along w
 
 import io
 import sys
-from typing import List
 from unittest import TestCase
 
 
@@ -29,6 +28,6 @@ class CaptureOutputBase(TestCase):
         self.original_output = sys.stdout
         sys.stdout = self.test_out
 
-    def assertStdoutContains(self, values: List) -> None:
+    def assertStdoutContains(self, values: list) -> None:
         for value in values:
             self.assertIn(value, self.test_out.getvalue().strip())

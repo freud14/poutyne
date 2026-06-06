@@ -22,7 +22,8 @@ import contextlib
 import pickle
 import timeit
 from collections import defaultdict
-from typing import Any, Iterable, List, Mapping, Tuple, Union
+from collections.abc import Iterable, Mapping
+from typing import Any
 
 import numpy as np
 import torch
@@ -47,12 +48,12 @@ class Model:
 
     Args:
         network (torch.nn.Module): A PyTorch network.
-        optimizer (Union[torch.optim.Optimizer, str, dict]): If torch.optim.Optimier, an initialized PyTorch.
+        optimizer (torch.optim.Optimizer | str | dict): If torch.optim.Optimier, an initialized PyTorch.
             If str, should be the name of the optimizer in Pytorch (i.e. 'Adam' for torch.optim.Adam).
             If dict, should contain a key ``'optim'`` with the value be the name of the optimizer; other
             entries are passed to the optimizer as keyword arguments.
             (Default value = None)
-        loss_function(Union[Callable, str]) It can be any PyTorch loss layer or custom loss function. It
+        loss_function(Callable | str) It can be any PyTorch loss layer or custom loss function. It
             can also be a string with the same name as a PyTorch loss function (either the functional or
             object name). The loss function must have the signature ``loss_function(input, target)`` where
             ``input`` is the prediction of the network and ``target`` is the ground truth.
@@ -80,7 +81,7 @@ class Model:
 
             Epoch metrics are computed only at the end of the epoch.
             (Default value = None)
-        device (Union[torch.torch.device, List[torch.torch.device]]): The device to which the network is
+        device (torch.device | list[torch.device]): The device to which the network is
             sent or the list of device to which the network is sent. See :func:`~Model.to()` for details.
 
     Note:
@@ -110,13 +111,14 @@ class Model:
 
             # Our training dataset with 800 samples.
             num_train_samples = 800
-            train_x = np.random.randn(num_train_samples, num_features).astype('float32')
-            train_y = np.random.randint(num_classes, size=num_train_samples).astype('int64')
+            rng = np.random.default_rng()
+            train_x = rng.standard_normal((num_train_samples, num_features)).astype('float32')
+            train_y = rng.integers(num_classes, size=num_train_samples).astype('int64')
 
             # Our validation dataset with 200 samples.
             num_valid_samples = 200
-            valid_x = np.random.randn(num_valid_samples, num_features).astype('float32')
-            valid_y = np.random.randint(num_classes, size=num_valid_samples).astype('int64')
+            valid_x = rng.standard_normal((num_valid_samples, num_features)).astype('float32')
+            valid_y = rng.integers(num_classes, size=num_valid_samples).astype('int64')
 
             pytorch_network = torch.nn.Linear(num_features, num_classes) # Our network
 
@@ -283,7 +285,7 @@ class Model:
         batches_per_step=1,
         initial_epoch=1,
         verbose=True,
-        progress_options: Union[dict, None] = None,
+        progress_options: dict | None = None,
         callbacks=None,
         dataloader_kwargs=None,
     ):
@@ -293,13 +295,13 @@ class Model:
         the :func:`~Model.fit_generator()` method.
 
         Args:
-            x (Union[~torch.Tensor, ~numpy.ndarray] or Union[tuple, list] of Union[~torch.Tensor, ~numpy.ndarray]):
-                Training dataset. Union[Tensor, ndarray] if the model has a single input.
-                Union[tuple, list] of Union[Tensor, ndarray] if the model has multiple inputs.
-            y (Union[~torch.Tensor, ~numpy.ndarray] or Union[tuple, list] of Union[~torch.Tensor, ~numpy.ndarray]):
-                Target. Union[Tensor, ndarray] if the model has a single output.
-                Union[tuple, list] of Union[Tensor, ndarray] if the model has multiple outputs.
-            validation_data (Tuple[``x_val``, ``y_val``]):
+            x (~torch.Tensor | ~numpy.ndarray or tuple | list of ~torch.Tensor | ~numpy.ndarray):
+                Training dataset. Tensor | ndarray if the model has a single input.
+                tuple | list of Tensor | ndarray if the model has multiple inputs.
+            y (~torch.Tensor | ~numpy.ndarray or tuple | list of ~torch.Tensor | ~numpy.ndarray):
+                Target. Tensor | ndarray if the model has a single output.
+                tuple | list of Tensor | ndarray if the model has multiple outputs.
+            validation_data (tuple[``x_val``, ``y_val``]):
                 Same format as ``x`` and ``y`` previously described. Validation dataset on which to
                 evaluate the loss and any model metrics at the end of each epoch. The model will not be
                 trained on this data.
@@ -327,7 +329,7 @@ class Model:
             progress_options (dict, optional): Keyword arguments to pass to the default progression callback used
                 in Poutyne (See :class:`~poutyne.ProgressionCallback` for the available arguments).
                 (Default value = None)
-            callbacks (List[~poutyne.Callback]): List of callbacks that will be called
+            callbacks (list[~poutyne.Callback]): List of callbacks that will be called
                 during training.
                 (Default value = None)
             dataloader_kwargs (dict, optional): Keyword arguments to pass to the PyTorch dataloaders created
@@ -350,9 +352,12 @@ class Model:
 
             .. code-block:: python
 
-                {'epoch': 1, 'loss': 1.7198852968215943, 'time': 0.019999928001197986, 'acc': 19.375, 'val_loss': 1.6674459838867188, 'val_acc': 22.0}
-                {'epoch': 2, 'loss': 1.7054892110824584, 'time': 0.015421080999658443, 'acc': 19.75, 'val_loss': 1.660806336402893, 'val_acc': 22.0}
-                {'epoch': 3, 'loss': 1.6923445892333984, 'time': 0.01363091799794347, 'acc': 19.625, 'val_loss': 1.6550078630447387, 'val_acc': 22.5}
+                {'epoch': 1, 'loss': 1.7198852968215943, 'time': 0.019999928001197986,
+                 'acc': 19.375, 'val_loss': 1.6674459838867188, 'val_acc': 22.0}
+                {'epoch': 2, 'loss': 1.7054892110824584, 'time': 0.015421080999658443,
+                 'acc': 19.75, 'val_loss': 1.660806336402893, 'val_acc': 22.0}
+                {'epoch': 3, 'loss': 1.6923445892333984, 'time': 0.01363091799794347,
+                 'acc': 19.625, 'val_loss': 1.6550078630447387, 'val_acc': 22.5}
                 ...
 
         """
@@ -429,7 +434,7 @@ class Model:
             progress_options (dict, optional): Keyword arguments to pass to the default progression callback used
                 in Poutyne (See :class:`~poutyne.ProgressionCallback` for the available arguments).
                 (Default value = None)
-            callbacks (List[~poutyne.Callback]): List of callbacks that will be called
+            callbacks (list[~poutyne.Callback]): List of callbacks that will be called
                 during training.
                 (Default value = None)
             dataloader_kwargs (dict, optional): Keyword arguments to pass to the PyTorch dataloaders created
@@ -459,9 +464,12 @@ class Model:
 
             .. code-block:: python
 
-                {'epoch': 1, 'loss': 1.7198852968215943, 'time': 0.019999928001197986, 'acc': 19.375, 'val_loss': 1.6674459838867188, 'val_acc': 22.0}
-                {'epoch': 2, 'loss': 1.7054892110824584, 'time': 0.015421080999658443, 'acc': 19.75, 'val_loss': 1.660806336402893, 'val_acc': 22.0}
-                {'epoch': 3, 'loss': 1.6923445892333984, 'time': 0.01363091799794347, 'acc': 19.625, 'val_loss': 1.6550078630447387, 'val_acc': 22.5}
+                {'epoch': 1, 'loss': 1.7198852968215943, 'time': 0.019999928001197986,
+                 'acc': 19.375, 'val_loss': 1.6674459838867188, 'val_acc': 22.0}
+                {'epoch': 2, 'loss': 1.7054892110824584, 'time': 0.015421080999658443,
+                 'acc': 19.75, 'val_loss': 1.660806336402893, 'val_acc': 22.0}
+                {'epoch': 3, 'loss': 1.6923445892333984, 'time': 0.01363091799794347,
+                 'acc': 19.625, 'val_loss': 1.6550078630447387, 'val_acc': 22.5}
                 ...
 
         """
@@ -503,7 +511,7 @@ class Model:
         batches_per_step=1,
         initial_epoch=1,
         verbose=True,
-        progress_options: Union[dict, None] = None,
+        progress_options: dict | None = None,
         callbacks=None,
     ):
         # pylint: disable=line-too-long
@@ -553,7 +561,7 @@ class Model:
             progress_options (dict, optional): Keyword arguments to pass to the default progression callback used
                 in Poutyne (See :class:`~poutyne.ProgressionCallback` for the available arguments).
                 (Default value = None, meaning default color setting and progress bar)
-            callbacks (List[~poutyne.Callback]): List of callbacks that will be called during
+            callbacks (list[~poutyne.Callback]): List of callbacks that will be called during
                 training. (Default value = None)
 
         Returns:
@@ -571,9 +579,12 @@ class Model:
 
             .. code-block:: python
 
-                {'epoch': 1, 'loss': 1.7198852968215943, 'time': 0.019999928001197986, 'acc': 19.375, 'val_loss': 1.6674459838867188, 'val_acc': 22.0}
-                {'epoch': 2, 'loss': 1.7054892110824584, 'time': 0.015421080999658443, 'acc': 19.75, 'val_loss': 1.660806336402893, 'val_acc': 22.0}
-                {'epoch': 3, 'loss': 1.6923445892333984, 'time': 0.01363091799794347, 'acc': 19.625, 'val_loss': 1.6550078630447387, 'val_acc': 22.5}
+                {'epoch': 1, 'loss': 1.7198852968215943, 'time': 0.019999928001197986,
+                 'acc': 19.375, 'val_loss': 1.6674459838867188, 'val_acc': 22.0}
+                {'epoch': 2, 'loss': 1.7054892110824584, 'time': 0.015421080999658443,
+                 'acc': 19.75, 'val_loss': 1.660806336402893, 'val_acc': 22.0}
+                {'epoch': 3, 'loss': 1.6923445892333984, 'time': 0.01363091799794347,
+                 'acc': 19.625, 'val_loss': 1.6550078630447387, 'val_acc': 22.5}
                 ...
 
         """
@@ -586,7 +597,7 @@ class Model:
 
         if verbose:
             progress_options = {} if progress_options is None else progress_options
-            callbacks = [ProgressionCallback(**progress_options)] + callbacks
+            callbacks = [ProgressionCallback(**progress_options), *callbacks]
         callback_list = CallbackList(callbacks)
         callback_list.set_model(self)
 
@@ -647,12 +658,14 @@ class Model:
         batches_per_step,
         examples_in_step,
         *,
-        callback=Callback(),
+        callback=None,
         step=None,
         return_pred=False,
         convert_to_numpy=True,
     ):
         # pylint: disable=too-many-locals
+        if callback is None:
+            callback = Callback()
         zero_all_gradients = (step.number - 1) % batches_per_step == 0
         do_backprop = step.number % batches_per_step == 0
 
@@ -688,7 +701,9 @@ class Model:
 
             self._run_validation(valid_step_iterator, callback_list)
 
-    def _fit_batch(self, x, y, *, callback=Callback(), step=None, return_pred=False, convert_to_numpy=True):
+    def _fit_batch(self, x, y, *, callback=None, step=None, return_pred=False, convert_to_numpy=True):
+        if callback is None:
+            callback = Callback()
         self.optimizer.zero_grad()
 
         loss_tensor, batch_metrics, pred_y = self._compute_loss_and_metrics(
@@ -785,7 +800,7 @@ class Model:
             )
 
         if return_dict_format:
-            logs = dict(loss=loss)
+            logs = {"loss": loss}
             logs.update(zip(self.batch_metrics_names, batch_metrics))
 
             return self._format_truth_pred_return((logs,), pred_y, return_pred)
@@ -817,7 +832,7 @@ class Model:
         batch_size=32,
         convert_to_numpy=True,
         verbose=True,
-        progress_options: Union[dict, None] = None,
+        progress_options: dict | None = None,
         callbacks=None,
         dataloader_kwargs=None,
     ) -> Any:
@@ -826,9 +841,9 @@ class Model:
         converted into Numpy arrays.
 
         Args:
-            x (Union[~torch.Tensor, ~numpy.ndarray] or Union[tuple, list] of Union[~torch.Tensor, ~numpy.ndarray]):
-                Input to the model. Union[Tensor, ndarray] if the model has a single input.
-                Union[tuple, list] of Union[Tensor, ndarray] if the model has multiple inputs.
+            x (~torch.Tensor | ~numpy.ndarray or tuple | list of ~torch.Tensor | ~numpy.ndarray):
+                Input to the model. Tensor | ndarray if the model has a single input.
+                tuple | list of Tensor | ndarray if the model has multiple inputs.
             batch_size (int): Number of samples given to the network at one time.
                 (Default value = 32)
             concatenate_returns (bool, optional): Whether to concatenate the predictions when returning them.
@@ -838,7 +853,7 @@ class Model:
             progress_options (dict, optional): Keyword arguments to pass to the default progression callback used
                 in Poutyne (See :class:`~poutyne.ProgressionCallback` for the available arguments).
                 (Default value = None, meaning default color setting and progress bar)
-            callbacks (List[~poutyne.Callback]): List of callbacks that will be called during
+            callbacks (list[~poutyne.Callback]): List of callbacks that will be called during
                 testing. (Default value = None)
             dataloader_kwargs (dict, optional): Keyword arguments to pass to the PyTorch dataloaders created
                 internally.
@@ -872,7 +887,7 @@ class Model:
         num_workers=0,
         collate_fn=None,
         verbose=True,
-        progress_options: Union[dict, None] = None,
+        progress_options: dict | None = None,
         callbacks=None,
         dataloader_kwargs=None,
     ) -> Any:
@@ -906,7 +921,7 @@ class Model:
             progress_options (dict, optional): Keyword arguments to pass to the default progression callback used
                 in Poutyne (See :class:`~poutyne.ProgressionCallback` for the available arguments).
                 (Default value = None, meaning default color setting and progress bar)
-            callbacks (List[~poutyne.Callback]): List of callbacks that will be called during
+            callbacks (list[~poutyne.Callback]): List of callbacks that will be called during
                 testing. (Default value = None)
             dataloader_kwargs (dict, optional): Keyword arguments to pass to the PyTorch dataloaders created
                 internally.
@@ -953,7 +968,7 @@ class Model:
         concatenate_returns=True,
         convert_to_numpy=True,
         verbose=True,
-        progress_options: Union[dict, None] = None,
+        progress_options: dict | None = None,
         callbacks=None,
     ) -> Any:
         """
@@ -980,7 +995,7 @@ class Model:
             progress_options (dict, optional): Keyword arguments to pass to the default progression callback used
                 in Poutyne (See :class:`~poutyne.ProgressionCallback` for the available arguments).
                 (Default value = None, meaning default color setting and progress bar)
-            callbacks (List[~poutyne.Callback]): List of callbacks that will be called during
+            callbacks (list[~poutyne.Callback]): List of callbacks that will be called during
                 testing. (Default value = None)
 
         Returns:
@@ -1003,7 +1018,7 @@ class Model:
 
         if verbose:
             progress_options = {} if progress_options is None else progress_options
-            callbacks = [ProgressionCallback(**progress_options)] + callbacks
+            callbacks = [ProgressionCallback(**progress_options), *callbacks]
         callback_list = CallbackList(callbacks)
         callback_list.set_model(self)
         callback_list.set_params({'steps': steps})
@@ -1072,21 +1087,21 @@ class Model:
         convert_to_numpy=True,
         callbacks=None,
         verbose=True,
-        progress_options: Union[dict, None] = None,
+        progress_options: dict | None = None,
         dataloader_kwargs=None,
-    ) -> Tuple:
+    ) -> tuple:
         """
         Computes the loss and the metrics of the network on batches of samples and optionally
         returns the predictions.
 
         Args:
-            x (Union[~torch.Tensor, ~numpy.ndarray] or Union[tuple, list] of Union[~torch.Tensor, ~numpy.ndarray]):
-                Input to the model. Union[Tensor, ndarray] if the model has a single input.
-                Union[tuple, list] of Union[Tensor, ndarray] if the model has multiple inputs.
-            y (Union[~torch.Tensor, ~numpy.ndarray] or Union[tuple, list] of Union[~torch.Tensor, ~numpy.ndarray]):
+            x (~torch.Tensor | ~numpy.ndarray or tuple | list of ~torch.Tensor | ~numpy.ndarray):
+                Input to the model. Tensor | ndarray if the model has a single input.
+                tuple | list of Tensor | ndarray if the model has multiple inputs.
+            y (~torch.Tensor | ~numpy.ndarray or tuple | list of ~torch.Tensor | ~numpy.ndarray):
                 Target, corresponding ground truth.
-                Union[Tensor, ndarray] if the model has a single output.
-                Union[tuple, list] of Union[Tensor, ndarray] if the model has multiple outputs.
+                Tensor | ndarray if the model has a single output.
+                tuple | list of Tensor | ndarray if the model has multiple outputs.
             batch_size (int): Number of samples given to the network at one time.
                 (Default value = 32)
             return_pred (bool, optional): Whether to return the predictions.
@@ -1095,7 +1110,7 @@ class Model:
                 (Default value = False)
             convert_to_numpy (bool, optional): Whether to convert the predictions into Numpy Arrays when ``return_pred``
                 is true. (Default value = True)
-            callbacks (List[~poutyne.Callback]): List of callbacks that will be called during
+            callbacks (list[~poutyne.Callback]): List of callbacks that will be called during
                 testing. (Default value = None)
             verbose (bool): Whether to display the progress of the evaluation.
                 (Default value = True)
@@ -1153,8 +1168,8 @@ class Model:
         collate_fn=None,
         dataloader_kwargs=None,
         verbose=True,
-        progress_options: Union[dict, None] = None,
-    ) -> Tuple:
+        progress_options: dict | None = None,
+    ) -> tuple:
         # pylint: disable=too-many-locals
         """
         Computes the loss and the metrics of the network on batches of samples and optionally
@@ -1176,7 +1191,7 @@ class Model:
                 or the ground truths when returning them. (Default value = True)
             convert_to_numpy (bool, optional): Whether to convert the predictions or ground truths into Numpy Arrays
                 when ``return_pred`` or ``return_ground_truth`` are true. (Default value = True)
-            callbacks (List[~poutyne.Callback]): List of callbacks that will be called during
+            callbacks (list[~poutyne.Callback]): List of callbacks that will be called during
                 testing. (Default value = None)
             num_workers (int, optional): how many subprocesses to use for data loading.
                 ``0`` means that the data will be loaded in the main process.
@@ -1245,9 +1260,9 @@ class Model:
         concatenate_returns=True,
         convert_to_numpy=True,
         verbose=True,
-        progress_options: Union[dict, None] = None,
+        progress_options: dict | None = None,
         callbacks=None,
-    ) -> Tuple:
+    ) -> tuple:
         # pylint: disable=too-many-locals
         """
         Computes the loss and the metrics of the network on batches of samples and optionally returns
@@ -1273,7 +1288,7 @@ class Model:
             progress_options (dict, optional): Keyword arguments to pass to the default progression callback used
                 in Poutyne (See :class:`~poutyne.ProgressionCallback` for the available arguments).
                 (Default value = None, meaning default color setting and progress bar)
-            callbacks (List[~poutyne.Callback]): List of callbacks that will be called during
+            callbacks (list[~poutyne.Callback]): List of callbacks that will be called during
                 testing. (Default value = None)
 
         Returns:
@@ -1361,7 +1376,7 @@ class Model:
 
         if verbose:
             progress_options = {} if progress_options is None else progress_options
-            callbacks = [ProgressionCallback(**progress_options)] + callbacks
+            callbacks = [ProgressionCallback(**progress_options), *callbacks]
 
         if steps is None and hasattr(generator, '__len__'):
             steps = len(generator)
@@ -1407,7 +1422,7 @@ class Model:
             step_iterator.loss, metrics, pred_y, return_pred, true_y, return_ground_truth
         )
 
-    def evaluate_on_batch(self, x, y, *, return_pred=False, return_dict_format=False, convert_to_numpy=True) -> Tuple:
+    def evaluate_on_batch(self, x, y, *, return_pred=False, return_dict_format=False, convert_to_numpy=True) -> tuple:
         """
         Computes the loss and the metrics of the network on a single batch of samples and optionally
         returns the predictions.
@@ -1442,7 +1457,7 @@ class Model:
             )
 
         if return_dict_format:
-            logs = dict(loss=loss)
+            logs = {"loss": loss}
             logs.update(zip(self.batch_metrics_names, batch_metrics))
 
             return self._format_truth_pred_return((logs,), pred_y, return_pred)
@@ -1474,7 +1489,7 @@ class Model:
     def _compute_loss_and_metrics(self, x, y, *, return_loss_tensor=False, return_pred=False, convert_to_numpy=True):
         x, y = self.preprocess_input(x, y)
         if self.other_device is not None:
-            pred_y = torch.nn.parallel.data_parallel(self.network, x, [self.device] + self.other_device)
+            pred_y = torch.nn.parallel.data_parallel(self.network, x, [self.device, *self.other_device])
         else:
             pred_y = self.network(*x)
         loss = self.loss_function(pred_y, y)
@@ -1485,10 +1500,7 @@ class Model:
             for epoch_metric in self.epoch_metrics:
                 epoch_metric.update(pred_y, y)
 
-        if return_pred:
-            pred_y = torch_to_numpy(pred_y) if convert_to_numpy else pred_y
-        else:
-            pred_y = None
+        pred_y = (torch_to_numpy(pred_y) if convert_to_numpy else pred_y) if return_pred else None
 
         return loss, batch_metrics, pred_y
 
@@ -1603,9 +1615,9 @@ class Model:
     def _get_named_optimizer_attrs(self):
         param_to_name = {param: name for name, param in self.network.named_parameters()}
 
-        param_name_groups = []
-        for group in self.optimizer.param_groups:
-            param_name_groups.append([param_to_name[param] for param in group['params']])
+        param_name_groups = [
+            [param_to_name[param] for param in group['params']] for group in self.optimizer.param_groups
+        ]
 
         named_state = {param_to_name[param]: state for param, state in self.optimizer.state.items()}
 
@@ -1648,7 +1660,7 @@ class Model:
         Returns a dictionary containing copies of the parameters of the network.
         """
         weights = self.get_weights()
-        for k in weights.keys():
+        for k in weights:
             weights[k] = weights[k].cpu().clone()
         return weights
 
@@ -1751,14 +1763,14 @@ class Model:
             takes care of this inconsistency by updating the parameters inside the optimizer.
 
         Args:
-            device (Union[torch.torch.device, List[torch.torch.device]]): The device to which the network is sent or
+            device (torch.device | list[torch.device]): The device to which the network is sent or
             the list of device to which the network is sent.
 
         Returns:
             `self`.
         """
         self.other_device = None
-        if isinstance(device, List) or device == "all":
+        if isinstance(device, list) or device == "all":
             if device == "all":
                 device = [f"cuda:{device}" for device in range(torch.cuda.device_count())]
             self.device = device[0]

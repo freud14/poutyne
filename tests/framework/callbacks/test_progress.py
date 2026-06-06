@@ -17,7 +17,6 @@ You should have received a copy of the GNU Lesser General Public License along w
 <https://www.gnu.org/licenses/>.
 """
 
-from typing import List, Union
 from unittest import TestCase
 from unittest.mock import MagicMock, call, patch
 
@@ -35,7 +34,7 @@ class ProgressTest(TestCase):
         self.final_log = {"time": self.total_time, "loss": 1.0}
         self.an_empty_log = {}
 
-        self.metrics_str = ''
+        self.metrics_str = 'loss: 1.000000'
 
         self.coloring = True
 
@@ -45,7 +44,9 @@ class ProgressTest(TestCase):
         with patch("poutyne.framework.progress.ColorProgress") as color_progress_patch:
             self.progression_callback = ProgressionCallback()
             self.progression_callback.set_params(params)
-            self.progression_callback.set_model(MagicMock())
+            mock_model = MagicMock()
+            mock_model.metrics_names = []
+            self.progression_callback.set_model(mock_model)
 
             self.progression_callback.on_train_begin(self.an_empty_log)
             color_progress_calls = [call(coloring=self.coloring)]
@@ -72,7 +73,9 @@ class ProgressTest(TestCase):
         with patch("poutyne.framework.progress.ColorProgress") as color_progress_patch:
             self.progression_callback = ProgressionCallback()
             self.progression_callback.set_params(params)
-            self.progression_callback.set_model(MagicMock())
+            mock_model = MagicMock()
+            mock_model.metrics_names = []
+            self.progression_callback.set_model(mock_model)
 
             self.progression_callback.on_train_begin(self.an_empty_log)
             color_progress_calls = [call(coloring=self.coloring)]
@@ -99,7 +102,9 @@ class ProgressTest(TestCase):
         with patch("poutyne.framework.progress.ColorProgress") as color_progress_patch:
             self.progression_callback = ProgressionCallback()
             self.progression_callback.set_params(params)
-            self.progression_callback.set_model(MagicMock())
+            mock_model = MagicMock()
+            mock_model.metrics_names = []
+            self.progression_callback.set_model(mock_model)
 
             self.progression_callback.on_train_begin(self.an_empty_log)
             color_progress_calls = [call(coloring=self.coloring)]
@@ -126,7 +131,9 @@ class ProgressTest(TestCase):
         with patch("poutyne.framework.progress.ColorProgress") as color_progress_patch:
             self.progression_callback = ProgressionCallback()
             self.progression_callback.set_params(params)
-            self.progression_callback.set_model(MagicMock())
+            mock_model = MagicMock()
+            mock_model.metrics_names = []
+            self.progression_callback.set_model(mock_model)
 
             self.progression_callback.on_train_begin(self.an_empty_log)
             color_progress_calls = [call(coloring=self.coloring)]
@@ -153,7 +160,9 @@ class ProgressTest(TestCase):
         with patch("poutyne.framework.progress.ColorProgress") as color_progress_patch:
             self.progression_callback = ProgressionCallback(show_every_n_train_steps=2, show_every_n_valid_steps=3)
             self.progression_callback.set_params(params)
-            self.progression_callback.set_model(MagicMock())
+            mock_model = MagicMock()
+            mock_model.metrics_names = []
+            self.progression_callback.set_model(mock_model)
 
             self.progression_callback.on_train_begin(self.an_empty_log)
             color_progress_calls = [call(coloring=self.coloring)]
@@ -187,8 +196,8 @@ class ProgressTest(TestCase):
         epoch_number,
         num_steps: int = 5,
         with_progress_bar: bool = True,
-        show_every_n_steps: Union[str, int] = 'all',
-    ) -> List:
+        show_every_n_steps: str | int = 'all',
+    ) -> list:
         color_progress_calls = []
 
         self.progression_callback.on_epoch_begin(epoch_number, self.an_empty_log)
@@ -236,8 +245,8 @@ class ProgressTest(TestCase):
         epoch_number,
         num_steps: int = 5,
         with_progress_bar: bool = True,
-        show_every_n_steps: Union[str, int] = 'all',
-    ) -> List:
+        show_every_n_steps: str | int = 'all',
+    ) -> list:
         color_progress_calls = []
 
         self.progression_callback.on_valid_begin(self.an_empty_log)

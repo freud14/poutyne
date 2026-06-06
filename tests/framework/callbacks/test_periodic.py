@@ -20,7 +20,7 @@ You should have received a copy of the GNU Lesser General Public License along w
 import os
 import unittest
 from tempfile import TemporaryDirectory
-from typing import IO, Dict
+from typing import IO
 from unittest import TestCase
 from unittest.mock import MagicMock, call
 
@@ -36,7 +36,7 @@ class PeriodicEpochSave(PeriodicSaveCallback):
         super().__init__(*args, open_mode='w', read_mode='r', **kwargs)
         self.epoch_number = None
 
-    def save_file(self, fd: IO, epoch_number: int, logs: Dict):
+    def save_file(self, fd: IO, epoch_number: int, logs: dict):
         print(epoch_number, file=fd)
         self.last_saved_epoch_number = epoch_number
 
@@ -239,7 +239,8 @@ class PeriodicSaveTest(TestCase):
             filename = self.save_filename.format(epoch=epoch)
             self.assertEqual(has_checkpoint, os.path.isfile(filename))
             if has_checkpoint:
-                self.assertEqual(f'{epoch}\n', open(filename, 'r', encoding='utf-8').read())
+                with open(filename, encoding='utf-8') as f:
+                    self.assertEqual(f'{epoch}\n', f.read())
                 best_checkpoint_filenames.append(os.path.realpath(filename))
 
         files = [os.path.realpath(os.path.join(self.temp_dir_obj.name, f)) for f in os.listdir(self.temp_dir_obj.name)]

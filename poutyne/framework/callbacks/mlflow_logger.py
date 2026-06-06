@@ -20,7 +20,8 @@ You should have received a copy of the GNU Lesser General Public License along w
 # pylint: disable=line-too-long, pointless-string-statement
 import os
 import warnings
-from typing import Any, Dict, Mapping, Optional, Sequence, Union
+from collections.abc import Mapping, Sequence
+from typing import Any
 
 from poutyne.framework.callbacks.logger import Logger
 
@@ -43,12 +44,12 @@ class MLFlowLogger(Logger):
     logger will log all run into the same experiment.
 
     Args:
-        experiment_name (Optional[str]): The name of the experiment. The name is case-sensitive. An `experiment_id` must
+        experiment_name (str | None): The name of the experiment. The name is case-sensitive. An `experiment_id` must
             not be passed if this is passed.
-        experiment_id (Optional[str]): The id of the experiment. An `experiment_name` must not be passed if this is
+        experiment_id (str | None): The id of the experiment. An `experiment_name` must not be passed if this is
             passed.
-        run_id (Optional[str]): The id of the run. An experiment name/id must not be passed if this is passed.
-        tracking_uri (Optional[str]): Either the URI tracking path (for server tracking) of the absolute path to
+        run_id (str | None): The id of the run. An experiment name/id must not be passed if this is passed.
+        tracking_uri (str | None): Either the URI tracking path (for server tracking) of the absolute path to
             the directory to save the files (for file store). For example: ``http://<ip address>:<port>``
             (remote server) or ``/home/<user>/mlflow-server`` (local server).
             If None, will use the default MLflow file tracking URI ``"./mlruns"``.
@@ -88,12 +89,12 @@ class MLFlowLogger(Logger):
 
     def __init__(
         self,
-        deprecated_experiment_name: Optional[str] = None,
+        deprecated_experiment_name: str | None = None,
         *,
-        experiment_name: Optional[str] = None,
-        experiment_id: Optional[str] = None,
-        run_id: Optional[str] = None,
-        tracking_uri: Optional[str] = None,
+        experiment_name: str | None = None,
+        experiment_id: str | None = None,
+        run_id: str | None = None,
+        tracking_uri: str | None = None,
         batch_granularity: bool = False,
         terminate_on_end=True,
     ) -> None:
@@ -110,7 +111,8 @@ class MLFlowLogger(Logger):
         if deprecated_experiment_name is not None:
             warnings.warn(
                 'Positional argument `experiment_name` is deprecated and will be removed in future versions. Please '
-                'use it as a keyword argument, i.e. experiment_name="my-experiment-name"'
+                'use it as a keyword argument, i.e. experiment_name="my-experiment-name"',
+                stacklevel=2,
             )
             experiment_name = deprecated_experiment_name
 
@@ -143,33 +145,33 @@ class MLFlowLogger(Logger):
         for param_name, element in config_params.items():
             self._log_config_write(param_name, element, **kwargs)
 
-    def log_params(self, params: Dict[str, Any], **kwargs: Any):
+    def log_params(self, params: dict[str, Any], **kwargs: Any):
         """
         Log the values of the parameters into the experiment.
 
         Args:
-            params (Dict[str, float]): Dictionary of key-value to log.
+            params (dict[str, float]): Dictionary of key-value to log.
         """
         for k, v in params.items():
             self.log_param(k, v, **kwargs)
 
-    def log_metrics(self, metrics: Dict[str, float], **kwargs: Any):
+    def log_metrics(self, metrics: dict[str, float], **kwargs: Any):
         """
         Log the values of the metrics into the experiment.
 
         Args:
-            metrics (Dict[str, float]): Dictionary of key-value to log.
+            metrics (dict[str, float]): Dictionary of key-value to log.
         """
         for k, v in metrics.items():
             self.log_metric(k, v, **kwargs)
 
-    def log_param(self, param_name: str, value: Union[str, float], **kwargs: Any) -> None:
+    def log_param(self, param_name: str, value: str | float, **kwargs: Any) -> None:
         """
         Log the value of a parameter into the experiment.
 
         Args:
             param_name (str): The name of the parameter.
-            value (Union[str, float]): The value of the parameter.
+            value (str | float): The value of the parameter.
 
         """
         self.ml_flow_client.log_param(run_id=self.run_id, key=param_name, value=value, **kwargs)
@@ -181,12 +183,12 @@ class MLFlowLogger(Logger):
         Args:
             metric_name (str): The name of the metric.
             value (float): The value of the metric.
-            step (Union[int, None]): The step when the metric was computed (Default = None).
+            step (int | None): The step when the metric was computed (Default = None).
         """
         self.ml_flow_client.log_metric(run_id=self.run_id, key=metric_name, value=value, **kwargs)
 
     def _log_config_write(
-        self, parent_name: str, element: Union[int, float, str, Mapping, Sequence], **kwargs: Any
+        self, parent_name: str, element: int | float | str | Mapping | Sequence, **kwargs: Any
     ) -> None:
         """
         Log the config parameters when it's a mapping or a sequence of elements.
@@ -202,14 +204,14 @@ class MLFlowLogger(Logger):
         else:
             self.log_param(parent_name, element, **kwargs)
 
-    def _on_train_batch_end_write(self, batch_number: int, logs: Dict) -> None:
+    def _on_train_batch_end_write(self, batch_number: int, logs: dict) -> None:
         """
         Log the batch metric.
         """
         for key, value in logs.items():
             self.log_metric(key, value, step=batch_number)
 
-    def _on_epoch_end_write(self, epoch_number: int, logs: Dict) -> None:
+    def _on_epoch_end_write(self, epoch_number: int, logs: dict) -> None:
         """
         Log the batch and epoch metric.
         """
@@ -217,7 +219,7 @@ class MLFlowLogger(Logger):
         for key, value in logs.items():
             self.log_metric(key, value, step=epoch_number)
 
-    def on_train_end(self, logs: Dict):
+    def on_train_end(self, logs: dict):
         """
         Log the last epoch batch and epoch metric and close the active run.
         """
@@ -232,11 +234,11 @@ class MLFlowLogger(Logger):
         last_epoch = self.params["epochs"]
         self.log_metric("last-epoch", last_epoch)
 
-    def on_test_begin(self, logs: Dict):
+    def on_test_begin(self, logs: dict):
         self._status = "FAILED"  # To change status from FINISHED to FAILED (base case) if trained before.
         self._status_handling()
 
-    def on_test_end(self, logs: Dict):
+    def on_test_end(self, logs: dict):
         """
         Log the test results.
         """
@@ -246,7 +248,7 @@ class MLFlowLogger(Logger):
 
         self._status_handling()
 
-    def _on_test_end_write(self, logs: Dict) -> None:
+    def _on_test_end_write(self, logs: dict) -> None:
         for key, value in logs.items():
             self.log_metric(key, value)
 
@@ -301,7 +303,8 @@ def _get_git_commit(path):
     """
     if git is None:
         warnings.warn(
-            "Failed to import Git (the Git executable is probably not on your PATH), so Git SHA is not available."
+            "Failed to import Git (the Git executable is probably not on your PATH), so Git SHA is not available.",
+            stacklevel=2,
         )
         return None
 
@@ -310,5 +313,5 @@ def _get_git_commit(path):
         commit = repo.head.commit.hexsha
         return commit
     except (git.InvalidGitRepositoryError, git.NoSuchPathError) as e:
-        warnings.warn(f"Failed to grab the git repository so Git SHA is not available. Error: {e}")
+        warnings.warn(f"Failed to grab the git repository so Git SHA is not available. Error: {e}", stacklevel=2)
         return None

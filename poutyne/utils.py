@@ -25,7 +25,7 @@ import os
 import pickle
 import random
 import warnings
-from typing import IO, Any, BinaryIO, Optional, Union
+from typing import IO, Any, BinaryIO
 
 import numpy as np
 import torch
@@ -122,7 +122,7 @@ def _concat(obj):
         return type(first_item)(_concat(ele) for ele in zip(*obj))
     if isinstance(first_item, dict):
         concat_dict = {}
-        for key in first_item.keys():
+        for key in first_item:
             concat_dict[key] = _concat([o[key] for o in obj])
         return concat_dict
     if isinstance(first_item, np.ndarray) and len(first_item.shape) != 0:
@@ -217,21 +217,21 @@ def set_seeds(seed):
         torch.manual_seed(seed)
 
 
-def save_random_states(f: Union[str, os.PathLike, BinaryIO, IO[bytes]]):
+def save_random_states(f: str | os.PathLike | BinaryIO | IO[bytes]):
     """
     Save Python, Numpy and Pytorch's (both CPU and GPU) random states.
 
     Args:
-        f (Union[str, os.PathLike, BinaryIO, IO[bytes]]): a file-like object (has to implement write and flush) or
+        f (str | os.PathLike | BinaryIO | IO[bytes]): a file-like object (has to implement write and flush) or
             a string or os.PathLike object containing a file name.
     """
     torch.save(
-        dict(
-            cpu=torch.get_rng_state(),
-            cuda=torch.cuda.get_rng_state_all(),
-            numpy=np.random.get_state(),
-            python=random.getstate(),
-        ),
+        {
+            "cpu": torch.get_rng_state(),
+            "cuda": torch.cuda.get_rng_state_all(),
+            "numpy": np.random.get_state(),
+            "python": random.getstate(),
+        },
         f,
         pickle_module=pickle,
     )
@@ -253,9 +253,8 @@ def load_random_states(f: Any):
 
 
 def is_in_jupyter_notebook():
-    # pylint: disable=import-outside-toplevel
     try:
-        from IPython import get_ipython
+        from IPython import get_ipython  # noqa: PLC0415 (import-outside-toplevel)
 
         shell = get_ipython().__class__.__name__
         jupyter = shell in ['ZMQInteractiveShell', 'Shell']
@@ -298,16 +297,14 @@ def get_batch_size(*values):
         if is_torch_or_numpy(v):
             return len(v)
     for v in values:
-        if isinstance(v, (tuple, list)):
-            if is_torch_or_numpy(v[0]):
-                return len(v[0])
+        if isinstance(v, (tuple, list)) and is_torch_or_numpy(v[0]):
+            return len(v[0])
+    for v in values:
+        if isinstance(v, dict) and 'batch_size' in v and isinstance(v['batch_size'], numbers.Integral):
+            return v['batch_size']
     for v in values:
         if isinstance(v, dict):
-            if 'batch_size' in v and isinstance(v['batch_size'], numbers.Integral):
-                return v['batch_size']
-    for v in values:
-        if isinstance(v, dict):
-            first_value = list(v.values())[0]
+            first_value = next(iter(v.values()))
             if is_torch_or_numpy(first_value):
                 return len(first_value)
 
@@ -317,28 +314,22 @@ def get_batch_size(*values):
             "set\n"
             "from poutyne import warning_settings\n"
             "warning_settings['batch_size'] = 'ignore'\n\n"
-            #
-            #
             "Here is the inferring algorithm used to compute the batch size. The values are tested in order at each "
             "step of the inferring algorithm. If one step succeed for one of the values, the algorithm stops.\n\n"
-            #
-            #
             "Step 1: if a value is a tensor or a Numpy array, then the 'len()' is returned.\n"
-            #
             "Step 2: if a value is a list or a tuple, then the 'len()' of the first element is returned if it is a "
             "tensor or a Numpy array.\n"
-            #
             "Step 3: if a value is a dict, then the value for the key 'batch_size' is returned if it is of integral "
             "type.\n"
-            #
             "Step 4: if a value is a dict, then the 'len()' of the first element of '.values()' is returned if it is a "
-            "tensor or a Numpy array.\n"
+            "tensor or a Numpy array.\n",
+            stacklevel=2,
         )
     return 1
 
 
 @contextlib.contextmanager
-def set_deterministic_debug_mode(mode: Optional[Union[str, int]]):
+def set_deterministic_debug_mode(mode: str | int | None):
     if mode is None:
         yield
         return

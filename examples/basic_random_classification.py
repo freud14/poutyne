@@ -1,6 +1,6 @@
+import numpy as np
 import torch
 import torch.nn as nn
-import numpy as np
 import torchmetrics
 
 # Import the Poutyne Model

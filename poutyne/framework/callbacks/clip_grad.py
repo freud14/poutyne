@@ -17,14 +17,14 @@ You should have received a copy of the GNU Lesser General Public License along w
 <https://www.gnu.org/licenses/>.
 """
 
-from typing import Iterable, Union
+from collections.abc import Iterable
 
 import torch
 from torch.nn.utils import clip_grad_norm_, clip_grad_value_
 
 from poutyne.framework.callbacks.callbacks import Callback
 
-_tensor_or_tensors = Union[torch.Tensor, Iterable[torch.Tensor]]
+_tensor_or_tensors = torch.Tensor | Iterable[torch.Tensor]
 
 
 class ClipNorm(Callback):

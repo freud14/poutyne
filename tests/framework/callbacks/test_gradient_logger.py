@@ -27,9 +27,8 @@ from unittest.mock import MagicMock
 import torch
 import torch.nn as nn
 
-from poutyne import AtomicCSVGradientLogger
+from poutyne import AtomicCSVGradientLogger, GradientLoggerBase, MemoryGradientLogger, Model, TensorBoardGradientLogger
 from poutyne import CSVGradientLogger as NonAtomicCSVGradientLogger
-from poutyne import GradientLoggerBase, MemoryGradientLogger, Model, TensorBoardGradientLogger
 from tests.framework.tools import some_data_generator
 
 
@@ -140,13 +139,13 @@ class BaseCSVGradientLoggerTest(BaseGradientLoggerTest):
     def _test_logging(self, history):
         for layer, stats in history.items():
             filename = self.csv_filename.format(layer)
-            with open(filename, 'r', encoding='utf-8') as csvfile:
+            with open(filename, encoding='utf-8') as csvfile:
                 reader = csv.DictReader(csvfile)
                 rows = list(reader)
             self.assertEqual(len(rows), len(stats))
             for row, stats_entry in zip(rows, stats):
                 self.assertEqual(row.keys(), stats_entry.keys())
-                for k in row.keys():
+                for k in row:
                     self.assertAlmostEqual(float(row[k]), stats_entry[k])
 
 

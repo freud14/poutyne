@@ -19,6 +19,7 @@ You should have received a copy of the GNU Lesser General Public License along w
 
 import os
 from tempfile import TemporaryDirectory
+from typing import ClassVar
 from unittest import TestCase, skipIf
 
 import numpy as np
@@ -252,7 +253,7 @@ class BaseExperimentTest:
             self.assertIn('val_loss', log)
             self.assertIn('time', log)
 
-        with open(self.epoch_file_path, 'r', encoding='utf-8') as fd:
+        with open(self.epoch_file_path, encoding='utf-8') as fd:
             epoch = int(fd.read())
         self.assertEqual(epoch, epochs)
 
@@ -346,15 +347,15 @@ class BaseExperimentTest:
 
 class MonitorMinExperimentTest(BaseExperimentTest, TestCase):
     NUM_EPOCHS = 5
-    METRIC_VALUES = [9, 3, 6, 2, 3]
-    CHECKPOINT_EPOCHS = [1, 2, 4]
-    NO_CHECKPOINT_EPOCHS = [3, 5]
+    METRIC_VALUES: ClassVar[list] = [9, 3, 6, 2, 3]
+    CHECKPOINT_EPOCHS: ClassVar[list] = [1, 2, 4]
+    NO_CHECKPOINT_EPOCHS: ClassVar[list] = [3, 5]
     MONITOR_MODE = "min"
 
 
 class MonitorMaxExperimentTest(BaseExperimentTest, TestCase):
     NUM_EPOCHS = 5
-    METRIC_VALUES = [4, 3, 6, 2, 7]
-    CHECKPOINT_EPOCHS = [1, 3, 5]
-    NO_CHECKPOINT_EPOCHS = [2, 4]
+    METRIC_VALUES: ClassVar[list] = [4, 3, 6, 2, 7]
+    CHECKPOINT_EPOCHS: ClassVar[list] = [1, 3, 5]
+    NO_CHECKPOINT_EPOCHS: ClassVar[list] = [2, 4]
     MONITOR_MODE = "max"

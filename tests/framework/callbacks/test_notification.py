@@ -17,7 +17,6 @@ You should have received a copy of the GNU Lesser General Public License along w
 <https://www.gnu.org/licenses/>.
 """
 
-from typing import List
 from unittest import TestCase
 from unittest.mock import MagicMock, call
 
@@ -146,13 +145,13 @@ class NotificationCallbackTest(TestCase):
 
         self._assert_mock_calls(call_list)
 
-    def _assert_mock_calls(self, call_list: List):
+    def _assert_mock_calls(self, call_list: list):
         method_calls = self.notificator_mock.method_calls
         self.assertEqual(len(method_calls), len(call_list))
         self.assertEqual(method_calls, call_list)
 
     @staticmethod
-    def _build_notificator_call(logs, experiment_name=None, mode: str = "training") -> List:
+    def _build_notificator_call(logs, experiment_name=None, mode: str = "training") -> list:
         experiment_name_text = f" for {experiment_name}" if experiment_name is not None else ""
         call_list = []
         call_list.append(call.send_notification('', subject=f'Start of the {mode}{experiment_name_text}.'))

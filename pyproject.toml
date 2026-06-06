@@ -66,11 +66,7 @@ dev = [
     { include-group = "examples" },
 ]
 lint = [
-    "astroid==3.2.2",
-    "black[jupyter]~=25.1",
-    "flake8==7.1.0",
-    "isort~=5.13.2",
-    "pylint==3.2.5",
+    "ruff==0.15.16",
 ]
 test = [
     "pytest",
@@ -99,15 +95,31 @@ examples = [
     "torchmetrics",
 ]
 
-[tool.black]
+[tool.ruff]
 line-length = 120
-skip-string-normalization = true
-extend-exclude = "/(slides)/"
+exclude = ["slides"]
 
-[tool.isort]
-profile = "black"
-line_length = 120
-extend_skip = ["examples", "slides"]
+[tool.ruff.lint]
+select = ["E", "W", "F", "I", "PL", "UP", "RUF", "B", "PT", "C4", "SIM", "NPY", "PERF", "T20"]
+ignore = [
+    "E731",    # lambda-assignment
+    "PLR0402", # import-alias (consider-using-from-import)
+    "PLR0913", # too-many-arguments
+    "PLR2004", # magic-value-comparison
+    "PT009",   # use plain assert instead of unittest assertEqual (intentional: tests use TestCase)
+    "PT027",   # use pytest.raises instead of assertRaises (intentional: tests use TestCase)
+    "B905",    # zip without strict= (too noisy for PyTorch tensor code)
+]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401", "F403"]
+"examples/**" = ["PLW2901", "T20", "NPY002"]  # x = x.to(device) is intentional; print and legacy numpy expected in examples
+"tutorials/**" = ["T20", "NPY002"]
+"tests/**" = ["NPY002"]  # legacy numpy random API is fine for test fixtures
+"poutyne/utils.py" = ["NPY002"]  # np.random.seed/get_state/set_state have no Generator equivalent
+
+[tool.ruff.format]
+quote-style = "preserve"
 
 [tool.pytest.ini_options]
 addopts = "--cov --cov-report html --cov-report xml"

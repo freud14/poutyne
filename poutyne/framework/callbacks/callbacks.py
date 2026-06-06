@@ -60,7 +60,7 @@ OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
-from typing import Dict, Sequence
+from collections.abc import Sequence
 
 
 class Callback:
@@ -76,13 +76,13 @@ class Callback:
         self.model = None
         self.params = None
 
-    def set_params(self, params: Dict):
+    def set_params(self, params: dict):
         self.params = params
 
     def set_model(self, model):
         self.model = model
 
-    def on_epoch_begin(self, epoch_number: int, logs: Dict):
+    def on_epoch_begin(self, epoch_number: int, logs: dict):
         """
         Is called before the beginning of each epoch.
 
@@ -92,7 +92,7 @@ class Callback:
         """
         pass
 
-    def on_epoch_end(self, epoch_number: int, logs: Dict):
+    def on_epoch_end(self, epoch_number: int, logs: dict):
         """
         Is called before the end of each epoch.
 
@@ -115,7 +115,7 @@ class Callback:
         """
         pass
 
-    def on_train_batch_begin(self, batch_number: int, logs: Dict):
+    def on_train_batch_begin(self, batch_number: int, logs: dict):
         """
         Is called before the beginning of the training batch.
 
@@ -125,7 +125,7 @@ class Callback:
         """
         pass
 
-    def on_train_batch_end(self, batch_number: int, logs: Dict):
+    def on_train_batch_end(self, batch_number: int, logs: dict):
         """
         Is called before the end of the training batch.
 
@@ -145,7 +145,7 @@ class Callback:
         """
         pass
 
-    def on_valid_batch_begin(self, batch_number: int, logs: Dict):
+    def on_valid_batch_begin(self, batch_number: int, logs: dict):
         """
         Is called before the beginning of the validation batch.
 
@@ -155,7 +155,7 @@ class Callback:
         """
         pass
 
-    def on_valid_batch_end(self, batch_number: int, logs: Dict):
+    def on_valid_batch_end(self, batch_number: int, logs: dict):
         """
         Is called before the end of the validation batch.
 
@@ -176,7 +176,7 @@ class Callback:
         """
         pass
 
-    def on_test_batch_begin(self, batch_number: int, logs: Dict):
+    def on_test_batch_begin(self, batch_number: int, logs: dict):
         """
         Is called before the beginning of the testing batch.
 
@@ -186,7 +186,7 @@ class Callback:
         """
         pass
 
-    def on_test_batch_end(self, batch_number: int, logs: Dict):
+    def on_test_batch_end(self, batch_number: int, logs: dict):
         """
         Is called before the end of the testing batch.
 
@@ -207,7 +207,7 @@ class Callback:
         """
         pass
 
-    def on_predict_batch_begin(self, batch_number: int, logs: Dict):
+    def on_predict_batch_begin(self, batch_number: int, logs: dict):
         """
         Is called before the beginning of the predict batch.
 
@@ -217,7 +217,7 @@ class Callback:
         """
         pass
 
-    def on_predict_batch_end(self, batch_number: int, logs: Dict):
+    def on_predict_batch_end(self, batch_number: int, logs: dict):
         """
         Is called before the end of the predict batch.
 
@@ -234,7 +234,7 @@ class Callback:
         """
         pass
 
-    def on_train_begin(self, logs: Dict):
+    def on_train_begin(self, logs: dict):
         """
         Is called before the beginning of the training.
 
@@ -243,7 +243,7 @@ class Callback:
         """
         pass
 
-    def on_train_end(self, logs: Dict):
+    def on_train_end(self, logs: dict):
         """
         Is called before the end of the training.
 
@@ -252,7 +252,7 @@ class Callback:
         """
         pass
 
-    def on_valid_begin(self, logs: Dict):
+    def on_valid_begin(self, logs: dict):
         """
         Is called before the beginning of the validation.
 
@@ -261,7 +261,7 @@ class Callback:
         """
         pass
 
-    def on_valid_end(self, logs: Dict):
+    def on_valid_end(self, logs: dict):
         """
         Is called before the end of the validation.
 
@@ -279,7 +279,7 @@ class Callback:
         """
         pass
 
-    def on_test_begin(self, logs: Dict):
+    def on_test_begin(self, logs: dict):
         """
         Is called before the beginning of the testing.
 
@@ -288,7 +288,7 @@ class Callback:
         """
         pass
 
-    def on_test_end(self, logs: Dict):
+    def on_test_end(self, logs: dict):
         """
         Is called before the end of the testing.
 
@@ -306,7 +306,7 @@ class Callback:
         """
         pass
 
-    def on_predict_begin(self, logs: Dict):
+    def on_predict_begin(self, logs: dict):
         """
         Is called before the beginning of the predict.
 
@@ -315,7 +315,7 @@ class Callback:
         """
         pass
 
-    def on_predict_end(self, logs: Dict):
+    def on_predict_end(self, logs: dict):
         """
         Is called before the end of the predict.
 
@@ -349,7 +349,7 @@ class CallbackList:
     def append(self, callback: Callback):
         self.callbacks.append(callback)
 
-    def set_params(self, params: Dict):
+    def set_params(self, params: dict):
         for callback in self.callbacks:
             callback.set_params(params)
 
@@ -357,92 +357,92 @@ class CallbackList:
         for callback in self.callbacks:
             callback.set_model(model)
 
-    def on_epoch_begin(self, epoch_number: int, logs: Dict):
+    def on_epoch_begin(self, epoch_number: int, logs: dict):
         logs = logs or {}
         for callback in self.callbacks:
             callback.on_epoch_begin(epoch_number, logs)
 
-    def on_epoch_end(self, epoch_number: int, logs: Dict):
+    def on_epoch_end(self, epoch_number: int, logs: dict):
         logs = logs or {}
         for callback in self.callbacks:
             callback.on_epoch_end(epoch_number, logs)
 
-    def on_train_batch_begin(self, batch_number: int, logs: Dict):
+    def on_train_batch_begin(self, batch_number: int, logs: dict):
         logs = logs or {}
         for callback in self.callbacks:
             callback.on_train_batch_begin(batch_number, logs)
 
-    def on_train_batch_end(self, batch_number: int, logs: Dict):
+    def on_train_batch_end(self, batch_number: int, logs: dict):
         logs = logs or {}
         for callback in self.callbacks:
             callback.on_train_batch_end(batch_number, logs)
 
-    def on_valid_batch_begin(self, batch_number: int, logs: Dict):
+    def on_valid_batch_begin(self, batch_number: int, logs: dict):
         logs = logs or {}
         for callback in self.callbacks:
             callback.on_valid_batch_begin(batch_number, logs)
 
-    def on_valid_batch_end(self, batch_number: int, logs: Dict):
+    def on_valid_batch_end(self, batch_number: int, logs: dict):
         logs = logs or {}
         for callback in self.callbacks:
             callback.on_valid_batch_end(batch_number, logs)
 
-    def on_test_batch_begin(self, batch_number: int, logs: Dict):
+    def on_test_batch_begin(self, batch_number: int, logs: dict):
         logs = logs or {}
         for callback in self.callbacks:
             callback.on_test_batch_begin(batch_number, logs)
 
-    def on_test_batch_end(self, batch_number: int, logs: Dict):
+    def on_test_batch_end(self, batch_number: int, logs: dict):
         logs = logs or {}
         for callback in self.callbacks:
             callback.on_test_batch_end(batch_number, logs)
 
-    def on_predict_batch_begin(self, batch_number: int, logs: Dict):
+    def on_predict_batch_begin(self, batch_number: int, logs: dict):
         logs = logs or {}
         for callback in self.callbacks:
             callback.on_predict_batch_begin(batch_number, logs)
 
-    def on_predict_batch_end(self, batch_number: int, logs: Dict):
+    def on_predict_batch_end(self, batch_number: int, logs: dict):
         logs = logs or {}
         for callback in self.callbacks:
             callback.on_predict_batch_end(batch_number, logs)
 
-    def on_train_begin(self, logs: Dict):
+    def on_train_begin(self, logs: dict):
         logs = logs or {}
         for callback in self.callbacks:
             callback.on_train_begin(logs)
 
-    def on_train_end(self, logs: Dict):
+    def on_train_end(self, logs: dict):
         logs = logs or {}
         for callback in self.callbacks:
             callback.on_train_end(logs)
 
-    def on_valid_begin(self, logs: Dict):
+    def on_valid_begin(self, logs: dict):
         logs = logs or {}
         for callback in self.callbacks:
             callback.on_valid_begin(logs)
 
-    def on_valid_end(self, logs: Dict):
+    def on_valid_end(self, logs: dict):
         logs = logs or {}
         for callback in self.callbacks:
             callback.on_valid_end(logs)
 
-    def on_test_begin(self, logs: Dict):
+    def on_test_begin(self, logs: dict):
         logs = logs or {}
         for callback in self.callbacks:
             callback.on_test_begin(logs)
 
-    def on_test_end(self, logs: Dict):
+    def on_test_end(self, logs: dict):
         logs = logs or {}
         for callback in self.callbacks:
             callback.on_test_end(logs)
 
-    def on_predict_begin(self, logs: Dict):
+    def on_predict_begin(self, logs: dict):
         logs = logs or {}
         for callback in self.callbacks:
             callback.on_predict_begin(logs)
 
-    def on_predict_end(self, logs: Dict):
+    def on_predict_end(self, logs: dict):
         logs = logs or {}
         for callback in self.callbacks:
             callback.on_predict_end(logs)

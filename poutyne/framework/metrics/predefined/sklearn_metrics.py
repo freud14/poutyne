@@ -17,7 +17,7 @@ You should have received a copy of the GNU Lesser General Public License along w
 <https://www.gnu.org/licenses/>.
 """
 
-from typing import Callable, Dict, List, Optional, Tuple, Union
+from collections.abc import Callable
 
 import numpy as np
 import torch
@@ -40,20 +40,20 @@ class SKLearnMetrics(Metric):
             my_epoch_metric = SKLearnMetrics([roc_auc_score, average_precision_score])
 
     Args:
-        funcs (Union[Callable, List[Callable]]): A metric or a list of metrics with a
+        funcs (Callable | list[Callable]): A metric or a list of metrics with a
             scikit-learn-like interface.
-        kwargs (Optional[Union[dict, List[dict]]]): Optional dictionary of list of dictionaries
+        kwargs (dict | list[dict] | None): Optional dictionary of list of dictionaries
             corresponding to keyword arguments to pass to each corresponding metric.
             (Default value = None)
-        names (Optional[Union[str, List[str]]]): Optional string or list of strings corresponding to
+        names (str | list[str] | None): Optional string or list of strings corresponding to
             the names given to the metrics. By default, the names are the names of the functions.
     """
 
     def __init__(
         self,
-        funcs: Union[Callable, List[Callable]],
-        kwargs: Optional[Union[dict, List[dict]]] = None,
-        names: Optional[Union[str, List[str]]] = None,
+        funcs: Callable | list[Callable],
+        kwargs: dict | list[dict] | None = None,
+        names: str | list[str] | None = None,
     ) -> None:
         super().__init__()
 
@@ -81,7 +81,7 @@ class SKLearnMetrics(Metric):
             names = [func.__name__ for func in self.funcs]
         return names
 
-    def forward(self, y_pred: torch.Tensor, y_true: Union[torch.Tensor, Tuple[torch.Tensor, torch.Tensor]]) -> None:
+    def forward(self, y_pred: torch.Tensor, y_true: torch.Tensor | tuple[torch.Tensor, torch.Tensor]) -> None:
         """
         Accumulate the predictions, ground truths and sample weights if any, and compute the metric for the current
         batch.
@@ -89,7 +89,7 @@ class SKLearnMetrics(Metric):
         Args:
             y_pred (torch.Tensor): A tensor of predictions of the shape expected by
                 the metric functions passed to the class.
-            y_true (Union[torch.Tensor, Tuple[torch.Tensor, torch.Tensor]]):
+            y_true (torch.Tensor | tuple[torch.Tensor, torch.Tensor]):
                 Ground truths. A tensor of ground truths of the shape expected by
                 the metric functions passed to the class.
                 It can also be a tuple with two tensors, the first being the
@@ -99,14 +99,14 @@ class SKLearnMetrics(Metric):
         y_pred, y_true, sample_weight = self._update(y_pred, y_true)
         return self._compute(y_true, y_pred, sample_weight)
 
-    def update(self, y_pred: torch.Tensor, y_true: Union[torch.Tensor, Tuple[torch.Tensor, torch.Tensor]]) -> None:
+    def update(self, y_pred: torch.Tensor, y_true: torch.Tensor | tuple[torch.Tensor, torch.Tensor]) -> None:
         """
         Accumulate the predictions, ground truths and sample weights if any.
 
         Args:
             y_pred (torch.Tensor): A tensor of predictions of the shape expected by
                 the metric functions passed to the class.
-            y_true (Union[torch.Tensor, Tuple[torch.Tensor, torch.Tensor]]):
+            y_true (torch.Tensor | tuple[torch.Tensor, torch.Tensor]):
                 Ground truths. A tensor of ground truths of the shape expected by
                 the metric functions passed to the class.
                 It can also be a tuple with two tensors, the first being the
@@ -115,7 +115,7 @@ class SKLearnMetrics(Metric):
         """
         self._update(y_pred, y_true)
 
-    def _update(self, y_pred: torch.Tensor, y_true: Union[torch.Tensor, Tuple[torch.Tensor, torch.Tensor]]) -> None:
+    def _update(self, y_pred: torch.Tensor, y_true: torch.Tensor | tuple[torch.Tensor, torch.Tensor]) -> None:
         y_pred = y_pred.cpu().numpy()
         self.y_pred_list.append(y_pred)
 
@@ -131,7 +131,7 @@ class SKLearnMetrics(Metric):
 
         return y_pred, y_true, sample_weight
 
-    def compute(self) -> Dict:
+    def compute(self) -> dict:
         """
         Returns the metrics as a dictionary with the names as keys.
         """

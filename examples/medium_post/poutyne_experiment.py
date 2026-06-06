@@ -3,6 +3,7 @@ import torch.nn as nn
 from torch.utils.data import random_split
 from torchvision.datasets import MNIST
 from torchvision.transforms import ToTensor
+
 from poutyne import Experiment
 
 # Instanciate the MNIST dataset

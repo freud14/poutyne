@@ -19,7 +19,6 @@ You should have received a copy of the GNU Lesser General Public License along w
 
 import re
 from collections import Counter
-from typing import List, Tuple
 
 # From https://stackoverflow.com/a/1176023
 pattern1 = re.compile(r'(.)([A-Z][a-z]+)')
@@ -55,14 +54,14 @@ def flatten_metric_names(metric_names):
     return [name for names in metric_names for name in to_list(names)]
 
 
-def rename_doubles(batch_metrics_names: List, epoch_metrics_names: List) -> Tuple:
+def rename_doubles(batch_metrics_names: list, epoch_metrics_names: list) -> tuple:
     metrics_names = rename_doubles_from_list(batch_metrics_names + epoch_metrics_names)
     batch_metrics_names = metrics_names[: len(batch_metrics_names)]
     epoch_metrics_names = metrics_names[len(batch_metrics_names) :]
     return batch_metrics_names, epoch_metrics_names
 
 
-def rename_doubles_from_list(metric_names: List) -> List:
+def rename_doubles_from_list(metric_names: list) -> list:
     """
     This function takes a list in the format `['a', ['b', 'a'], 'c', 'a', 'c']`
     and returns a list where each double is added a number so that there are no

@@ -21,7 +21,6 @@ import math
 import sys
 import time
 import warnings
-from typing import Dict, Union
 
 from poutyne.framework.callbacks.progress_bar import ProgressBar
 from poutyne.utils import is_in_jupyter_notebook
@@ -67,7 +66,7 @@ class ColorProgress:
     Class to managed the color templating of the training progress.
 
     Args:
-          coloring (Union[bool, Dict], optional): If bool, whether to display the progress of the training with
+          coloring (bool | dict, optional): If bool, whether to display the progress of the training with
                 default colors highlighting.
                 If Dict, the field and the color to use as colorama <https://pypi.org/project/colorama/>`_ . The fields
                 are text_color, ratio_color, metric_value_color and time_color.
@@ -82,13 +81,17 @@ class ColorProgress:
 
     """
 
-    def __init__(self, coloring: Union[bool, Dict]) -> None:
+    def __init__(self, coloring: bool | dict) -> None:
         color_settings = None
 
-        if (isinstance(coloring, Dict) or coloring) and colorama is None:
-            warnings.warn("The colorama package was not imported. Consider installing it for colorlog.", ImportWarning)
+        if (isinstance(coloring, dict) or coloring) and colorama is None:
+            warnings.warn(
+                "The colorama package was not imported. Consider installing it for colorlog.",
+                ImportWarning,
+                stacklevel=2,
+            )
 
-        if isinstance(coloring, Dict):
+        if isinstance(coloring, dict):
             color_settings = default_color_settings.copy()
 
             invalid_keys = coloring.keys() - color_settings.keys()
@@ -148,7 +151,7 @@ class ColorProgress:
         remaining_time: float,
         batch_number: int,
         metrics_str: str,
-        steps: Union[int, None] = None,
+        steps: int | None = None,
         do_print: bool = True,
     ) -> None:
         """
@@ -164,7 +167,7 @@ class ColorProgress:
         remaining_time: float,
         batch_number: int,
         metrics_str: str,
-        steps: Union[int, None] = None,
+        steps: int | None = None,
         do_print: bool = True,
     ) -> None:
         """
@@ -180,7 +183,7 @@ class ColorProgress:
         remaining_time: float,
         batch_number: int,
         metrics_str: str,
-        steps: Union[int, None] = None,
+        steps: int | None = None,
         do_print: bool = True,
     ) -> None:
         """
@@ -196,7 +199,7 @@ class ColorProgress:
         remaining_time: float,
         batch_number: int,
         metrics_str: str,
-        steps: Union[int, None] = None,
+        steps: int | None = None,
         do_print: bool = True,
     ) -> None:
         """
@@ -211,7 +214,7 @@ class ColorProgress:
         remaining_time: float,
         batch_number: int,
         metrics_str: str,
-        steps: Union[int, None] = None,
+        steps: int | None = None,
         do_print: bool = True,
     ) -> None:
         # pylint: disable=too-many-arguments
@@ -302,7 +305,7 @@ class ColorProgress:
         total_time_str = self._format_duration(total_time)
         return f"{self.time_color}{total_time_str} "
 
-    def _get_formatted_time(self, duration: float, steps: Union[int, None]) -> str:
+    def _get_formatted_time(self, duration: float, steps: int | None) -> str:
         duration_str = self._format_duration(duration)
         if steps is None:
             formatted_time = f"{self.time_color}{duration_str}/step "
@@ -311,7 +314,7 @@ class ColorProgress:
         return formatted_time
 
     def _get_formatted_step(
-        self, batch_number: int, steps: Union[int, None], prefix: str = "", suffix: str = "", ratio: bool = True
+        self, batch_number: int, steps: int | None, prefix: str = "", suffix: str = "", ratio: bool = True
     ) -> str:
         # pylint: disable=too-many-arguments
         step_text = f"{prefix}step{suffix}".capitalize()
@@ -336,7 +339,7 @@ class ColorProgress:
         return formatted_metrics
 
     def _batch_update(
-        self, remaining_time: float, batch_number: int, metrics_str: str, steps: Union[int, None] = None
+        self, remaining_time: float, batch_number: int, metrics_str: str, steps: int | None = None
     ) -> str:
         update = ""
         if self.progress_bar:
@@ -391,7 +394,7 @@ class ColorProgress:
         Print a update message but using print to create a new line after.
         """
         message = self._pad_length(message)
-        print(message)
+        print(message)  # noqa: T201
         sys.stdout.flush()
         self.prev_print_time = None
         self.prev_message_length = 0
