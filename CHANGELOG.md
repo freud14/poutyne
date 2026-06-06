@@ -1,3 +1,11 @@
+# v1.18
+
+- Migrate to [uv](https://docs.astral.sh/uv/) for dependency management and [asdf](https://asdf-vm.com/) for toolchain versioning.
+- Consolidate all packaging metadata and dependency groups into a single `pyproject.toml` (hatchling build backend).
+- Drop support for Python 3.8 and 3.9; add support for Python 3.13 and 3.14.
+- Transfer repository ownership from GRAAL-Research to freud14.
+- Fix `SKLearnMetrics` sample weight handling for scikit-learn >= 1.6.
+
 # v1.17.2
 
 - np.Inf was deprecated forever and is now gone in Numpy 2.0.
