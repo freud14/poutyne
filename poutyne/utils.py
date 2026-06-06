@@ -222,7 +222,7 @@ def save_random_states(f: str | os.PathLike | BinaryIO | IO[bytes]):
     Save Python, Numpy and Pytorch's (both CPU and GPU) random states.
 
     Args:
-        f (Union[str, os.PathLike, BinaryIO, IO[bytes]]): a file-like object (has to implement write and flush) or
+        f (str | os.PathLike | BinaryIO | IO[bytes]): a file-like object (has to implement write and flush) or
             a string or os.PathLike object containing a file name.
     """
     torch.save(

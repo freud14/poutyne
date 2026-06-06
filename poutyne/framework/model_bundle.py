@@ -131,7 +131,7 @@ class ModelBundle:
         Args:
             directory (str): Path to the model bundle's working directory. Will be used for automatic logging.
             network (torch.nn.Module): A PyTorch network.
-            device (Union[torch.torch.device, List[torch.torch.device], str, None]): The device to which the model is
+            device (torch.device | list[torch.device] | str | None): The device to which the model is
                 sent or for multi-GPUs, the list of devices to which the model is to be sent. When using a string for a
                 multiple GPUs, the option is "all", for "take them all." By default, the current device is used as the
                 main one. If None, the model will be kept on its current device.
@@ -140,10 +140,10 @@ class ModelBundle:
                 callbacks will be inserted to output training and testing stats as well as to save model checkpoints,
                 for example, automatically. See :func:`~ModelBundle.train()` and :func:`~ModelBundle.test()` for more
                 details. (Default value = True)
-            optimizer (Union[torch.optim.Optimizer, str]): If Pytorch Optimizer, must already be initialized.
+            optimizer (torch.optim.Optimizer | str): If Pytorch Optimizer, must already be initialized.
                 If str, should be the optimizer's name in Pytorch (i.e. 'Adam' for torch.optim.Adam).
                 (Default value = 'sgd')
-            loss_function(Union[Callable, str], optional) It can be any PyTorch
+            loss_function(Callable | str, optional) It can be any PyTorch
                 loss layer or custom loss function. It can also be a string with the same name as a PyTorch
                 loss function (either the functional or object name). The loss function must have the signature
                 ``loss_function(input, target)`` where ``input`` is the prediction of the network and ``target``
@@ -733,7 +733,7 @@ class ModelBundle:
             valid_generator (optional): Generator-like object for the validation set. See
                 :func:`~Model.fit_generator()` for details on the types of generators supported.
                 (Default value = None)
-            callbacks (List[~poutyne.Callback]): List of callbacks that will be called during
+            callbacks (list[~poutyne.Callback]): List of callbacks that will be called during
                 training. These callbacks are added after those used in this method (see above). This allows to assume
                 that they are called after those.
                 (Default value = None)
@@ -774,7 +774,7 @@ class ModelBundle:
         Args:
             train_dataset (~torch.utils.data.Dataset): Training dataset.
             valid_dataset (~torch.utils.data.Dataset): Validation dataset.
-            callbacks (List[~poutyne.Callback]): List of callbacks that will be called during
+            callbacks (list[~poutyne.Callback]): List of callbacks that will be called during
                 training. These callbacks are added after those used in this method (see above). This allows to assume
                 that they are called after those.
                 (Default value = None)
@@ -813,18 +813,18 @@ class ModelBundle:
         statistics.
 
         Args:
-            x (Union[~torch.Tensor, ~numpy.ndarray] or Union[tuple, list] of Union[~torch.Tensor, ~numpy.ndarray]):
-                Training dataset. Union[Tensor, ndarray] if the model has a single input.
-                Union[tuple, list] of Union[Tensor, ndarray] if the model has multiple inputs.
-            y (Union[~torch.Tensor, ~numpy.ndarray] or Union[tuple, list] of Union[~torch.Tensor, ~numpy.ndarray]):
-                Target. Union[Tensor, ndarray] if the model has a single output.
-                Union[tuple, list] of Union[Tensor, ndarray] if the model has multiple outputs.
-            validation_data (Tuple[``x_val``, ``y_val``]):
+            x (~torch.Tensor | ~numpy.ndarray or tuple | list of ~torch.Tensor | ~numpy.ndarray):
+                Training dataset. Tensor | ndarray if the model has a single input.
+                tuple | list of Tensor | ndarray if the model has multiple inputs.
+            y (~torch.Tensor | ~numpy.ndarray or tuple | list of ~torch.Tensor | ~numpy.ndarray):
+                Target. Tensor | ndarray if the model has a single output.
+                tuple | list of Tensor | ndarray if the model has multiple outputs.
+            validation_data (tuple[``x_val``, ``y_val``]):
                 Same format as ``x`` and ``y`` previously described. Validation dataset on which to
                 evaluate the loss and any model metrics at the end of each epoch. The model will not be
                 trained on this data.
                 (Default value = None)
-            callbacks (List[~poutyne.Callback]): List of callbacks that will be called during
+            callbacks (list[~poutyne.Callback]): List of callbacks that will be called during
                 training. These callbacks are added after those used in this method (see above). This allows to assume
                 that they are called after those.
                 (Default value = None)
@@ -927,7 +927,7 @@ class ModelBundle:
         Loads the model's weights with the weights at a given checkpoint epoch.
 
         Args:
-            checkpoint (Union[int, str]): Which checkpoint to load the model's weights form.
+            checkpoint (int | str): Which checkpoint to load the model's weights form.
 
                 - If 'best', will load the best weights according to ``monitor_metric`` and ``monitor_mode``.
                 - If 'last', will load the last model checkpoint.
@@ -1030,7 +1030,7 @@ class ModelBundle:
         Args:
             test_generator: Generator-like object for the test set. See :func:`~Model.fit_generator()` for
                 details on the types of generators supported.
-            checkpoint (Union[str, int]): Which model checkpoint weights to load for the test evaluation.
+            checkpoint (str | int): Which model checkpoint weights to load for the test evaluation.
 
                 - If 'best', will load the best weights according to ``monitor_metric`` and ``monitor_mode``.
                 - If 'last', will load the last model checkpoint.
@@ -1063,7 +1063,7 @@ class ModelBundle:
 
         Args:
             test_dataset (~torch.utils.data.Dataset): Test dataset.
-            checkpoint (Union[str, int]): Which model checkpoint weights to load for the test evaluation.
+            checkpoint (str | int): Which model checkpoint weights to load for the test evaluation.
 
                 - If 'best', will load the best weights according to ``monitor_metric`` and ``monitor_mode``.
                 - If 'last', will load the last model checkpoint.
@@ -1095,14 +1095,14 @@ class ModelBundle:
         current weights of the network is used for testing and statistics are only shown in the standard output.
 
         Args:
-            x (Union[~torch.Tensor, ~numpy.ndarray] or Union[tuple, list] of Union[~torch.Tensor, ~numpy.ndarray]):
-                Input to the model. Union[Tensor, ndarray] if the model has a single input.
-                Union[tuple, list] of Union[Tensor, ndarray] if the model has multiple inputs.
-            y (Union[~torch.Tensor, ~numpy.ndarray] or Union[tuple, list] of Union[~torch.Tensor, ~numpy.ndarray]):
+            x (~torch.Tensor | ~numpy.ndarray or tuple | list of ~torch.Tensor | ~numpy.ndarray):
+                Input to the model. Tensor | ndarray if the model has a single input.
+                tuple | list of Tensor | ndarray if the model has multiple inputs.
+            y (~torch.Tensor | ~numpy.ndarray or tuple | list of ~torch.Tensor | ~numpy.ndarray):
                 Target, corresponding ground truth.
-                Union[Tensor, ndarray] if the model has a single output.
-                Union[tuple, list] of Union[Tensor, ndarray] if the model has multiple outputs.
-            checkpoint (Union[str, int]): Which model checkpoint weights to load for the test evaluation.
+                Tensor | ndarray if the model has a single output.
+                tuple | list of Tensor | ndarray if the model has multiple outputs.
+            checkpoint (str | int): Which model checkpoint weights to load for the test evaluation.
 
                 - If 'best', will load the best weights according to ``monitor_metric`` and ``monitor_mode``.
                 - If 'last', will load the last model checkpoint.
@@ -1169,7 +1169,7 @@ class ModelBundle:
             generator: Generator-like object for the dataset. The generator must yield a batch of
                 samples. See the :func:`fit_generator()` method for details on the types of generators
                 supported. This should only yield input data ``x`` and NOT the target ``y``.
-            checkpoint (Union[str, int]): Which model checkpoint weights to load for the prediction.
+            checkpoint (str | int): Which model checkpoint weights to load for the prediction.
 
                 - If 'best', will load the best weights according to ``monitor_metric`` and ``monitor_mode``.
                 - If 'last', will load the last model checkpoint.
@@ -1196,7 +1196,7 @@ class ModelBundle:
 
         Args:
             dataset (~torch.utils.data.Dataset): Dataset. Must not return ``y``, just ``x``.
-            checkpoint (Union[str, int]): Which model checkpoint weights to load for the prediction.
+            checkpoint (str | int): Which model checkpoint weights to load for the prediction.
 
                 - If 'best', will load the best weights according to ``monitor_metric`` and ``monitor_mode``.
                 - If 'last', will load the last model checkpoint.
@@ -1218,10 +1218,10 @@ class ModelBundle:
         converted into Numpy arrays.
 
         Args:
-            x (Union[~torch.Tensor, ~numpy.ndarray] or Union[tuple, list] of Union[~torch.Tensor, ~numpy.ndarray]):
-                Input to the model. Union[Tensor, ndarray] if the model has a single input.
-                Union[tuple, list] of Union[Tensor, ndarray] if the model has multiple inputs.
-            checkpoint (Union[str, int]): Which model checkpoint weights to load for the prediction.
+            x (~torch.Tensor | ~numpy.ndarray or tuple | list of ~torch.Tensor | ~numpy.ndarray):
+                Input to the model. Tensor | ndarray if the model has a single input.
+                tuple | list of Tensor | ndarray if the model has multiple inputs.
+            checkpoint (str | int): Which model checkpoint weights to load for the prediction.
 
                 - If 'best', will load the best weights according to ``monitor_metric`` and ``monitor_mode``.
                 - If 'last', will load the last model checkpoint.

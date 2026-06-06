@@ -66,7 +66,7 @@ class ColorProgress:
     Class to managed the color templating of the training progress.
 
     Args:
-          coloring (Union[bool, Dict], optional): If bool, whether to display the progress of the training with
+          coloring (bool | dict, optional): If bool, whether to display the progress of the training with
                 default colors highlighting.
                 If Dict, the field and the color to use as colorama <https://pypi.org/project/colorama/>`_ . The fields
                 are text_color, ratio_color, metric_value_color and time_color.

@@ -48,12 +48,12 @@ class Model:
 
     Args:
         network (torch.nn.Module): A PyTorch network.
-        optimizer (Union[torch.optim.Optimizer, str, dict]): If torch.optim.Optimier, an initialized PyTorch.
+        optimizer (torch.optim.Optimizer | str | dict): If torch.optim.Optimier, an initialized PyTorch.
             If str, should be the name of the optimizer in Pytorch (i.e. 'Adam' for torch.optim.Adam).
             If dict, should contain a key ``'optim'`` with the value be the name of the optimizer; other
             entries are passed to the optimizer as keyword arguments.
             (Default value = None)
-        loss_function(Union[Callable, str]) It can be any PyTorch loss layer or custom loss function. It
+        loss_function(Callable | str) It can be any PyTorch loss layer or custom loss function. It
             can also be a string with the same name as a PyTorch loss function (either the functional or
             object name). The loss function must have the signature ``loss_function(input, target)`` where
             ``input`` is the prediction of the network and ``target`` is the ground truth.
@@ -81,7 +81,7 @@ class Model:
 
             Epoch metrics are computed only at the end of the epoch.
             (Default value = None)
-        device (Union[torch.torch.device, List[torch.torch.device]]): The device to which the network is
+        device (torch.device | list[torch.device]): The device to which the network is
             sent or the list of device to which the network is sent. See :func:`~Model.to()` for details.
 
     Note:
@@ -111,13 +111,14 @@ class Model:
 
             # Our training dataset with 800 samples.
             num_train_samples = 800
-            train_x = np.random.randn(num_train_samples, num_features).astype('float32')
-            train_y = np.random.randint(num_classes, size=num_train_samples).astype('int64')
+            rng = np.random.default_rng()
+            train_x = rng.standard_normal((num_train_samples, num_features)).astype('float32')
+            train_y = rng.integers(num_classes, size=num_train_samples).astype('int64')
 
             # Our validation dataset with 200 samples.
             num_valid_samples = 200
-            valid_x = np.random.randn(num_valid_samples, num_features).astype('float32')
-            valid_y = np.random.randint(num_classes, size=num_valid_samples).astype('int64')
+            valid_x = rng.standard_normal((num_valid_samples, num_features)).astype('float32')
+            valid_y = rng.integers(num_classes, size=num_valid_samples).astype('int64')
 
             pytorch_network = torch.nn.Linear(num_features, num_classes) # Our network
 
@@ -294,13 +295,13 @@ class Model:
         the :func:`~Model.fit_generator()` method.
 
         Args:
-            x (Union[~torch.Tensor, ~numpy.ndarray] or Union[tuple, list] of Union[~torch.Tensor, ~numpy.ndarray]):
-                Training dataset. Union[Tensor, ndarray] if the model has a single input.
-                Union[tuple, list] of Union[Tensor, ndarray] if the model has multiple inputs.
-            y (Union[~torch.Tensor, ~numpy.ndarray] or Union[tuple, list] of Union[~torch.Tensor, ~numpy.ndarray]):
-                Target. Union[Tensor, ndarray] if the model has a single output.
-                Union[tuple, list] of Union[Tensor, ndarray] if the model has multiple outputs.
-            validation_data (Tuple[``x_val``, ``y_val``]):
+            x (~torch.Tensor | ~numpy.ndarray or tuple | list of ~torch.Tensor | ~numpy.ndarray):
+                Training dataset. Tensor | ndarray if the model has a single input.
+                tuple | list of Tensor | ndarray if the model has multiple inputs.
+            y (~torch.Tensor | ~numpy.ndarray or tuple | list of ~torch.Tensor | ~numpy.ndarray):
+                Target. Tensor | ndarray if the model has a single output.
+                tuple | list of Tensor | ndarray if the model has multiple outputs.
+            validation_data (tuple[``x_val``, ``y_val``]):
                 Same format as ``x`` and ``y`` previously described. Validation dataset on which to
                 evaluate the loss and any model metrics at the end of each epoch. The model will not be
                 trained on this data.
@@ -328,7 +329,7 @@ class Model:
             progress_options (dict, optional): Keyword arguments to pass to the default progression callback used
                 in Poutyne (See :class:`~poutyne.ProgressionCallback` for the available arguments).
                 (Default value = None)
-            callbacks (List[~poutyne.Callback]): List of callbacks that will be called
+            callbacks (list[~poutyne.Callback]): List of callbacks that will be called
                 during training.
                 (Default value = None)
             dataloader_kwargs (dict, optional): Keyword arguments to pass to the PyTorch dataloaders created
@@ -433,7 +434,7 @@ class Model:
             progress_options (dict, optional): Keyword arguments to pass to the default progression callback used
                 in Poutyne (See :class:`~poutyne.ProgressionCallback` for the available arguments).
                 (Default value = None)
-            callbacks (List[~poutyne.Callback]): List of callbacks that will be called
+            callbacks (list[~poutyne.Callback]): List of callbacks that will be called
                 during training.
                 (Default value = None)
             dataloader_kwargs (dict, optional): Keyword arguments to pass to the PyTorch dataloaders created
@@ -560,7 +561,7 @@ class Model:
             progress_options (dict, optional): Keyword arguments to pass to the default progression callback used
                 in Poutyne (See :class:`~poutyne.ProgressionCallback` for the available arguments).
                 (Default value = None, meaning default color setting and progress bar)
-            callbacks (List[~poutyne.Callback]): List of callbacks that will be called during
+            callbacks (list[~poutyne.Callback]): List of callbacks that will be called during
                 training. (Default value = None)
 
         Returns:
@@ -840,9 +841,9 @@ class Model:
         converted into Numpy arrays.
 
         Args:
-            x (Union[~torch.Tensor, ~numpy.ndarray] or Union[tuple, list] of Union[~torch.Tensor, ~numpy.ndarray]):
-                Input to the model. Union[Tensor, ndarray] if the model has a single input.
-                Union[tuple, list] of Union[Tensor, ndarray] if the model has multiple inputs.
+            x (~torch.Tensor | ~numpy.ndarray or tuple | list of ~torch.Tensor | ~numpy.ndarray):
+                Input to the model. Tensor | ndarray if the model has a single input.
+                tuple | list of Tensor | ndarray if the model has multiple inputs.
             batch_size (int): Number of samples given to the network at one time.
                 (Default value = 32)
             concatenate_returns (bool, optional): Whether to concatenate the predictions when returning them.
@@ -852,7 +853,7 @@ class Model:
             progress_options (dict, optional): Keyword arguments to pass to the default progression callback used
                 in Poutyne (See :class:`~poutyne.ProgressionCallback` for the available arguments).
                 (Default value = None, meaning default color setting and progress bar)
-            callbacks (List[~poutyne.Callback]): List of callbacks that will be called during
+            callbacks (list[~poutyne.Callback]): List of callbacks that will be called during
                 testing. (Default value = None)
             dataloader_kwargs (dict, optional): Keyword arguments to pass to the PyTorch dataloaders created
                 internally.
@@ -920,7 +921,7 @@ class Model:
             progress_options (dict, optional): Keyword arguments to pass to the default progression callback used
                 in Poutyne (See :class:`~poutyne.ProgressionCallback` for the available arguments).
                 (Default value = None, meaning default color setting and progress bar)
-            callbacks (List[~poutyne.Callback]): List of callbacks that will be called during
+            callbacks (list[~poutyne.Callback]): List of callbacks that will be called during
                 testing. (Default value = None)
             dataloader_kwargs (dict, optional): Keyword arguments to pass to the PyTorch dataloaders created
                 internally.
@@ -994,7 +995,7 @@ class Model:
             progress_options (dict, optional): Keyword arguments to pass to the default progression callback used
                 in Poutyne (See :class:`~poutyne.ProgressionCallback` for the available arguments).
                 (Default value = None, meaning default color setting and progress bar)
-            callbacks (List[~poutyne.Callback]): List of callbacks that will be called during
+            callbacks (list[~poutyne.Callback]): List of callbacks that will be called during
                 testing. (Default value = None)
 
         Returns:
@@ -1094,13 +1095,13 @@ class Model:
         returns the predictions.
 
         Args:
-            x (Union[~torch.Tensor, ~numpy.ndarray] or Union[tuple, list] of Union[~torch.Tensor, ~numpy.ndarray]):
-                Input to the model. Union[Tensor, ndarray] if the model has a single input.
-                Union[tuple, list] of Union[Tensor, ndarray] if the model has multiple inputs.
-            y (Union[~torch.Tensor, ~numpy.ndarray] or Union[tuple, list] of Union[~torch.Tensor, ~numpy.ndarray]):
+            x (~torch.Tensor | ~numpy.ndarray or tuple | list of ~torch.Tensor | ~numpy.ndarray):
+                Input to the model. Tensor | ndarray if the model has a single input.
+                tuple | list of Tensor | ndarray if the model has multiple inputs.
+            y (~torch.Tensor | ~numpy.ndarray or tuple | list of ~torch.Tensor | ~numpy.ndarray):
                 Target, corresponding ground truth.
-                Union[Tensor, ndarray] if the model has a single output.
-                Union[tuple, list] of Union[Tensor, ndarray] if the model has multiple outputs.
+                Tensor | ndarray if the model has a single output.
+                tuple | list of Tensor | ndarray if the model has multiple outputs.
             batch_size (int): Number of samples given to the network at one time.
                 (Default value = 32)
             return_pred (bool, optional): Whether to return the predictions.
@@ -1109,7 +1110,7 @@ class Model:
                 (Default value = False)
             convert_to_numpy (bool, optional): Whether to convert the predictions into Numpy Arrays when ``return_pred``
                 is true. (Default value = True)
-            callbacks (List[~poutyne.Callback]): List of callbacks that will be called during
+            callbacks (list[~poutyne.Callback]): List of callbacks that will be called during
                 testing. (Default value = None)
             verbose (bool): Whether to display the progress of the evaluation.
                 (Default value = True)
@@ -1190,7 +1191,7 @@ class Model:
                 or the ground truths when returning them. (Default value = True)
             convert_to_numpy (bool, optional): Whether to convert the predictions or ground truths into Numpy Arrays
                 when ``return_pred`` or ``return_ground_truth`` are true. (Default value = True)
-            callbacks (List[~poutyne.Callback]): List of callbacks that will be called during
+            callbacks (list[~poutyne.Callback]): List of callbacks that will be called during
                 testing. (Default value = None)
             num_workers (int, optional): how many subprocesses to use for data loading.
                 ``0`` means that the data will be loaded in the main process.
@@ -1287,7 +1288,7 @@ class Model:
             progress_options (dict, optional): Keyword arguments to pass to the default progression callback used
                 in Poutyne (See :class:`~poutyne.ProgressionCallback` for the available arguments).
                 (Default value = None, meaning default color setting and progress bar)
-            callbacks (List[~poutyne.Callback]): List of callbacks that will be called during
+            callbacks (list[~poutyne.Callback]): List of callbacks that will be called during
                 testing. (Default value = None)
 
         Returns:
@@ -1762,7 +1763,7 @@ class Model:
             takes care of this inconsistency by updating the parameters inside the optimizer.
 
         Args:
-            device (Union[torch.torch.device, List[torch.torch.device]]): The device to which the network is sent or
+            device (torch.device | list[torch.device]): The device to which the network is sent or
             the list of device to which the network is sent.
 
         Returns:

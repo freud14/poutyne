@@ -82,10 +82,10 @@ class FBeta(Metric):
         respective parameters.
 
     Args:
-        metric (Optional[str]): One of {'fscore', 'precision', 'recall'}.
+        metric (str | None): One of {'fscore', 'precision', 'recall'}.
             Whether to return the F-score, the precision or the recall. When not
             provided, all three metrics are returned. (Default value = None)
-        average (Union[str, int]): One of {'micro' (default), 'macro', label_number}
+        average (str | int): One of {'micro' (default), 'macro', label_number}
             If the argument is of type integer, the score for this class (the label number) is calculated.
             Otherwise, this determines the type of averaging performed on the data:
 
@@ -113,10 +113,10 @@ class FBeta(Metric):
             this should be between 0 and 1. A suggested value would be 0.5. If a logits output is used, the threshold
             would be between -inf and inf. The suggested default value is 0 as to give a probability of 0.5 if a sigmoid
             output were used. (Default = 0)
-        names (Optional[Union[str, List[str]]]): The names associated to the metrics. It is a string when
+        names (str | list[str] | None): The names associated to the metrics. It is a string when
             a single metric is requested. It is a list of 3 strings if all metrics are requested.
             (Default value = None)
-        make_deterministic (Optional[bool]): Avoid non-deterministic operations in computations. This might make the
+        make_deterministic (bool | None): Avoid non-deterministic operations in computations. This might make the
             code slower.
     """
 
@@ -213,7 +213,7 @@ class FBeta(Metric):
 
         Args:
             y_pred (torch.Tensor): A tensor of predictions of shape (batch_size, num_classes, ...).
-            y_true (Union[torch.Tensor, Tuple[torch.Tensor, torch.Tensor]]):
+            y_true (torch.Tensor | tuple[torch.Tensor, torch.Tensor]):
                 Ground truths. A tensor of the integer class label of shape (batch_size, ...). It must
                 be the same shape as the ``y_pred`` tensor without the ``num_classes`` dimension.
                 It can also be a tuple with two tensors of the same shape, the first being the
@@ -232,7 +232,7 @@ class FBeta(Metric):
 
         Args:
             y_pred (torch.Tensor): A tensor of predictions of shape (batch_size, num_classes, ...).
-            y_true (Union[torch.Tensor, Tuple[torch.Tensor, torch.Tensor]]):
+            y_true (torch.Tensor | tuple[torch.Tensor, torch.Tensor]):
                 Ground truths. A tensor of the integer class label of shape (batch_size, ...). It must
                 be the same shape as the ``y_pred`` tensor without the ``num_classes`` dimension.
                 It can also be a tuple with two tensors of the same shape, the first being the

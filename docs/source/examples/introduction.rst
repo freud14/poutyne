@@ -56,7 +56,7 @@ Now, let's set our training constants. We first have the CUDA device used for tr
 .. code-block:: python
 
     cuda_device = 0
-    device = torch.device("cuda:%d" % cuda_device if torch.cuda.is_available() else "cpu")
+    device = torch.device(f"cuda:{cuda_device}" if torch.cuda.is_available() else "cpu")
 
     train_split_percent = 0.8
 

@@ -44,12 +44,12 @@ class MLFlowLogger(Logger):
     logger will log all run into the same experiment.
 
     Args:
-        experiment_name (Optional[str]): The name of the experiment. The name is case-sensitive. An `experiment_id` must
+        experiment_name (str | None): The name of the experiment. The name is case-sensitive. An `experiment_id` must
             not be passed if this is passed.
-        experiment_id (Optional[str]): The id of the experiment. An `experiment_name` must not be passed if this is
+        experiment_id (str | None): The id of the experiment. An `experiment_name` must not be passed if this is
             passed.
-        run_id (Optional[str]): The id of the run. An experiment name/id must not be passed if this is passed.
-        tracking_uri (Optional[str]): Either the URI tracking path (for server tracking) of the absolute path to
+        run_id (str | None): The id of the run. An experiment name/id must not be passed if this is passed.
+        tracking_uri (str | None): Either the URI tracking path (for server tracking) of the absolute path to
             the directory to save the files (for file store). For example: ``http://<ip address>:<port>``
             (remote server) or ``/home/<user>/mlflow-server`` (local server).
             If None, will use the default MLflow file tracking URI ``"./mlruns"``.
@@ -150,7 +150,7 @@ class MLFlowLogger(Logger):
         Log the values of the parameters into the experiment.
 
         Args:
-            params (Dict[str, float]): Dictionary of key-value to log.
+            params (dict[str, float]): Dictionary of key-value to log.
         """
         for k, v in params.items():
             self.log_param(k, v, **kwargs)
@@ -160,7 +160,7 @@ class MLFlowLogger(Logger):
         Log the values of the metrics into the experiment.
 
         Args:
-            metrics (Dict[str, float]): Dictionary of key-value to log.
+            metrics (dict[str, float]): Dictionary of key-value to log.
         """
         for k, v in metrics.items():
             self.log_metric(k, v, **kwargs)
@@ -171,7 +171,7 @@ class MLFlowLogger(Logger):
 
         Args:
             param_name (str): The name of the parameter.
-            value (Union[str, float]): The value of the parameter.
+            value (str | float): The value of the parameter.
 
         """
         self.ml_flow_client.log_param(run_id=self.run_id, key=param_name, value=value, **kwargs)
@@ -183,7 +183,7 @@ class MLFlowLogger(Logger):
         Args:
             metric_name (str): The name of the metric.
             value (float): The value of the metric.
-            step (Union[int, None]): The step when the metric was computed (Default = None).
+            step (int | None): The step when the metric was computed (Default = None).
         """
         self.ml_flow_client.log_metric(run_id=self.run_id, key=metric_name, value=value, **kwargs)
 

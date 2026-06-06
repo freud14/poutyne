@@ -33,7 +33,7 @@ class ProgressionCallback(Callback):
     :func:`~poutyne.Model.fit_generator()`.
 
     Args:
-        coloring (Union[bool, Dict], optional): If bool, whether to display the progress of the training with
+        coloring (bool | dict, optional): If bool, whether to display the progress of the training with
             default colors highlighting.
             If Dict, the field and the color to use as `colorama <https://pypi.org/project/colorama/>`_ . The fields
             are ``text_color``, ``ratio_color``, ``metric_value_color``, ``time_color`` and ``progress_bar_color``.
@@ -48,13 +48,13 @@ class ProgressionCallback(Callback):
             older step times. Set this to true to have equal weighting instead.
         show_on_valid (bool): Whether or not to display the progression during the validation phase.
             (Default value = True)
-        show_every_n_train_steps (Union[str, int]): Show a subset of the training steps. If ``'all'``, show all steps.
+        show_every_n_train_steps (str | int): Show a subset of the training steps. If ``'all'``, show all steps.
             If ``'none'``, do not show the steps (i.e. only show the stats at the end of the epoch). If an integer
             ``n``, only show every n-th steps. (Default value = 'all').
-        show_every_n_valid_steps (Union[str, int]): Show a subset of the validation steps. If ``'all'``, show all steps.
+        show_every_n_valid_steps (str | int): Show a subset of the validation steps. If ``'all'``, show all steps.
             If ``'none'``, do not show the steps (i.e. only show the stats at the end of the epoch). If an integer
             ``n``, only show every n-th steps. (Default value = 'all').
-        show_every_n_test_steps (Union[str, int]): Show a subset of the testing steps. If ``'all'``, show all steps.
+        show_every_n_test_steps (str | int): Show a subset of the testing steps. If ``'all'``, show all steps.
             If ``'none'``, do not show the steps (i.e. only show the stats at the end of the testing). If an integer
             ``n``, show only every n-th steps. (Default value = 'all').
     """

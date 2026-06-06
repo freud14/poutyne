@@ -52,7 +52,7 @@ class NotificationCallback(Callback):
             `notif <https://notificationdoc.ca/index.html>`_ package which implements some Notificator respecting the
             interface.
         alert_frequency (int): The frequency (in epoch), during training, to send an update. By default, 1.
-        experiment_name (Union[str, None]): The name of the experiment to add to the message. By default, None.
+        experiment_name (str | None): The name of the experiment to add to the message. By default, None.
 
     Example:
 

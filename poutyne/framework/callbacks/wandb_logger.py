@@ -21,8 +21,8 @@ class WandBLogger(Logger):
 
     Args:
         name(str): Display name for the run.
-        group (Optional[str]): Specify a group to organize individual runs into a larger experiment
-        config (Optional[Dict]): A dictionary summarizing the configuration
+        group (str | None): Specify a group to organize individual runs into a larger experiment
+        config (dict | None): A dictionary summarizing the configuration
             related to the current run.
         save_dir(str): Path where data is saved (wandb dir by default).
         offline(bool): Run logger offline to later stream data to a remote server.
@@ -34,9 +34,9 @@ class WandBLogger(Logger):
             parameters will be ignored.
         batch_granularity(bool): Whether to also output the result of each batch in addition to the epochs.
             (Default value = False).
-        checkpoints_path (Optional[str]): A path leading to the checkpoint saving directory.
+        checkpoints_path (str | None): A path leading to the checkpoint saving directory.
             You need to specify this argument to log the model checkpoints at the end of the training phase.
-        initial_artifacts_paths (Optional[List[str]]): a list of paths leading to artifacts
+        initial_artifacts_paths (list[str] | None): a list of paths leading to artifacts
             to be logged before the start of the training.
         log_gradient_frequency(int): log gradients and parameters every N batches (Default value = None).
         training_batch_shape(tuples): Shape of a training batch. Used for logging architecture on wandb.
@@ -229,7 +229,7 @@ class WandBLogger(Logger):
         you wish to log multiple artifacts alone (i.e. under different artifact
         groups), you should make multiple calls to this function.
         Args:
-            paths (List[str]): A list of paths leading to the directories or files
+            paths (list[str]): A list of paths leading to the directories or files
                 that are to be logged.
             name (str): The artifact group name.
             artifact_type (str): The artifact group type.

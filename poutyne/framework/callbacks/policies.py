@@ -93,8 +93,8 @@ class Phase:
     For each train step it returns a dictionary that contains the configuration for the optimizer.
 
     Args:
-        lr (List[float], optional): a configuration space for the learning rate.
-        momentum (List[float], optional): a configuration space for the momentum.
+        lr (list[float], optional): a configuration space for the learning rate.
+        momentum (list[float], optional): a configuration space for the momentum.
     """
 
     def __init__(self, *, lr: float | None = None, momentum: float | None = None):
@@ -161,8 +161,8 @@ def one_cycle_phases(
 
     Args:
         steps (int): the total number of steps to take.
-        lr (Tuple[float, float]): tuple for the triangular learning rate (start, middle).
-        momentum (Tuple[float, float]): tuple for the triangular momentum (start, middle).
+        lr (tuple[float, float]): tuple for the triangular learning rate (start, middle).
+        momentum (tuple[float, float]): tuple for the triangular momentum (start, middle).
         finetune_lr (float): target learning rate for the final fine tuning. Should be smaller than
             `min(lr)`.
         finetune_fraction (float): fraction of steps used for the fine tuning.
@@ -235,7 +235,7 @@ class OptimizerPolicy(Callback):
     row.
 
     Args:
-        phases (List[~poutyne.Phase]):
+        phases (list[~poutyne.Phase]):
             A list of :class:`~poutyne.Phase` instances.
         initial_step (int): The step to start the policy in. Used for restarting.
     """

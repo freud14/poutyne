@@ -214,7 +214,7 @@ But first, let's set the training constants, the CUDA device used for training i
 .. code-block:: python
 
     cuda_device = 0
-    device = torch.device("cuda:%d" % cuda_device if torch.cuda.is_available() else "cpu")
+    device = torch.device(f"cuda:{cuda_device}" if torch.cuda.is_available() else "cpu")
 
     batch_size = 1024
     epochs = 5

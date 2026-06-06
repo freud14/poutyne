@@ -40,12 +40,12 @@ class SKLearnMetrics(Metric):
             my_epoch_metric = SKLearnMetrics([roc_auc_score, average_precision_score])
 
     Args:
-        funcs (Union[Callable, List[Callable]]): A metric or a list of metrics with a
+        funcs (Callable | list[Callable]): A metric or a list of metrics with a
             scikit-learn-like interface.
-        kwargs (Optional[Union[dict, List[dict]]]): Optional dictionary of list of dictionaries
+        kwargs (dict | list[dict] | None): Optional dictionary of list of dictionaries
             corresponding to keyword arguments to pass to each corresponding metric.
             (Default value = None)
-        names (Optional[Union[str, List[str]]]): Optional string or list of strings corresponding to
+        names (str | list[str] | None): Optional string or list of strings corresponding to
             the names given to the metrics. By default, the names are the names of the functions.
     """
 
@@ -89,7 +89,7 @@ class SKLearnMetrics(Metric):
         Args:
             y_pred (torch.Tensor): A tensor of predictions of the shape expected by
                 the metric functions passed to the class.
-            y_true (Union[torch.Tensor, Tuple[torch.Tensor, torch.Tensor]]):
+            y_true (torch.Tensor | tuple[torch.Tensor, torch.Tensor]):
                 Ground truths. A tensor of ground truths of the shape expected by
                 the metric functions passed to the class.
                 It can also be a tuple with two tensors, the first being the
@@ -106,7 +106,7 @@ class SKLearnMetrics(Metric):
         Args:
             y_pred (torch.Tensor): A tensor of predictions of the shape expected by
                 the metric functions passed to the class.
-            y_true (Union[torch.Tensor, Tuple[torch.Tensor, torch.Tensor]]):
+            y_true (torch.Tensor | tuple[torch.Tensor, torch.Tensor]):
                 Ground truths. A tensor of ground truths of the shape expected by
                 the metric functions passed to the class.
                 It can also be a tuple with two tensors, the first being the

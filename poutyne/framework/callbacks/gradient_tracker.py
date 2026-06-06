@@ -48,7 +48,7 @@ class WeightsGradientsStatsTracker:
         max for all the layers.
 
         Args:
-             named_parameters (Iterable[Tuple[str, ~torch.nn.parameter.Parameter]): The named parameters of the model to
+             named_parameters (Iterable[tuple[str, ~torch.nn.parameter.Parameter]): The named parameters of the model to
              track.
         """
         batch_layer_abs_means = []
@@ -101,7 +101,7 @@ class WeightsGradientsStatsTracker:
         Note: This will reset the gradient tracker statistics values.
 
         Args:
-            layer_names (List[str]): The names of the layer to get statistics from.
+            layer_names (list[str]): The names of the layer to get statistics from.
 
         Returns:
             A dictionary where the keys are the layer names and the values are the statistics of the layer.
