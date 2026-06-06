@@ -898,9 +898,8 @@ class ModelBundle:
 
             tensorboard_writer, cb_list = self._init_tensorboard_callbacks(disable_tensorboard)
             expt_callbacks += cb_list
-        else:
-            if self.monitoring:
-                expt_callbacks += [BestModelRestore(monitor=self.monitor_metric, mode=self.monitor_mode, verbose=True)]
+        elif self.monitoring:
+            expt_callbacks += [BestModelRestore(monitor=self.monitor_metric, mode=self.monitor_mode, verbose=True)]
 
         # This method returns callbacks that checkpoints the LR scheduler if logging is enabled.
         # Otherwise, it just returns the list of LR schedulers with a BestModelRestore callback.

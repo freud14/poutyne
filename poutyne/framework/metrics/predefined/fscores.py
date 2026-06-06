@@ -241,8 +241,7 @@ class FBeta(Metric):
         """
         self._update(y_pred, y_true)
 
-    def _update(self, y_pred: torch.Tensor, y_true: Union[torch.Tensor, Tuple[torch.Tensor, torch.Tensor]]) -> None:
-        # pylint: disable=too-many-branches
+    def _update(self, y_pred: torch.Tensor, y_true: Union[torch.Tensor, Tuple[torch.Tensor, torch.Tensor]]) -> None:  # noqa: PLR0912 (too-many-branches)
         with set_deterministic_debug_mode(self.deterministic_debug_mode):
             if isinstance(y_true, tuple):
                 y_true, mask = y_true

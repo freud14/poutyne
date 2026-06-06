@@ -29,9 +29,7 @@ jobs:
       - name: Install dependencies
         run: uv sync --group lint
       - name: Formatting
-        run: |
-          uv run black --diff --check .
-          uv run isort --diff --check .
+        run: uv run ruff format --check --diff .
 
   linting:
     runs-on: ${{ inputs.os }}
@@ -42,11 +40,9 @@ jobs:
         with:
           python-version: ${{ inputs.python-version }}
       - name: Install dependencies
-        run: uv sync --group lint --group test
-      - name: PyLint
-        run: uv run pylint poutyne/ tests/
-      - name: Flake8
-        run: uv run flake8 poutyne/ tests/
+        run: uv sync --group lint
+      - name: Lint
+        run: uv run ruff check .
 
   docs:
     runs-on: ${{ inputs.os }}

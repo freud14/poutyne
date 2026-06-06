@@ -38,9 +38,8 @@ try:
 except ImportError:
     XSummaryWriter = None
 
-from poutyne import AtomicCSVLogger, Callback
+from poutyne import AtomicCSVLogger, Callback, Model, TensorBoardLogger
 from poutyne import CSVLogger as NonAtomicCSVLogger
-from poutyne import Model, TensorBoardLogger
 
 
 class History(Callback):
@@ -148,8 +147,8 @@ class BaseCSVLoggerTest:
 
                 rows.append(row)
         self.assertEqual(len(rows), len(history))
-        for row, hist_entry in zip(rows, history):
-            row = {k: v for k, v in row.items() if v != ''}
+        for raw_row, hist_entry in zip(rows, history):
+            row = {k: v for k, v in raw_row.items() if v != ''}
             self.assertEqual(row.keys(), hist_entry.keys())
             for k in row.keys():
                 if isinstance(hist_entry[k], float):

@@ -38,7 +38,7 @@ from tests.framework.tools import (
     some_metric_2_value,
 )
 
-TEST_MULTI_GPUS = int(os.environ.get('MULTI_GPUS', 0))
+TEST_MULTI_GPUS = int(os.environ.get('MULTI_GPUS', '0'))
 
 
 @skipIf(torch.cuda.device_count() < 2, "Need at least two gpus")

@@ -479,8 +479,7 @@ class ModelFittingTestCaseProgress(ModelFittingTestCase):
         template_format = r".*Epoch:.*{}\/1.*\[37mStep:.*{}\/5.*{:6.2f}\%.*|{}|.*ETA:"
         epoch = 1
         # the 5 train steps
-        for step, step_update in enumerate(steps_update[: ModelFittingTestCaseProgress.num_steps]):
-            step += 1
+        for step, step_update in enumerate(steps_update[: ModelFittingTestCaseProgress.num_steps], start=1):
             progress_Bar = "\u2588" * step * 2 + " " * (20 - step * 2)
             regex_filled = template_format.format(
                 epoch, step, step / ModelFittingTestCaseProgress.num_steps * 100, progress_Bar
@@ -488,8 +487,7 @@ class ModelFittingTestCaseProgress(ModelFittingTestCase):
             self.assertRegex(step_update, regex_filled)
 
         # The 5 val steps
-        for step, step_update in enumerate(steps_update[ModelFittingTestCaseProgress.num_steps : -1]):
-            step += 1
+        for step, step_update in enumerate(steps_update[ModelFittingTestCaseProgress.num_steps : -1], start=1):
             progress_Bar = "\u2588" * step * 2 + " " * (20 - step * 2)
             regex_filled = template_format.format(
                 epoch, step, step / ModelFittingTestCaseProgress.num_steps * 100, progress_Bar
@@ -518,8 +516,7 @@ class ModelFittingTestCaseProgress(ModelFittingTestCase):
         template_format = r".*Epoch:.*{}\/1.*Step:.*{}\/5.*{:6.2f}\%.*|{}|.*ETA:"
         epoch = 1
         # the 5 train steps
-        for step, step_update in enumerate(steps_update[: ModelFittingTestCaseProgress.num_steps]):
-            step += 1
+        for step, step_update in enumerate(steps_update[: ModelFittingTestCaseProgress.num_steps], start=1):
             progress_Bar = "\u2588" * step * 2 + " " * (20 - step * 2)
             regex_filled = template_format.format(
                 epoch, step, step / ModelFittingTestCaseProgress.num_steps * 100, progress_Bar
@@ -527,8 +524,7 @@ class ModelFittingTestCaseProgress(ModelFittingTestCase):
             self.assertRegex(step_update, regex_filled)
 
         # The 5 val steps
-        for step, step_update in enumerate(steps_update[ModelFittingTestCaseProgress.num_steps : -1]):
-            step += 1
+        for step, step_update in enumerate(steps_update[ModelFittingTestCaseProgress.num_steps : -1], start=1):
             progress_Bar = "\u2588" * step * 2 + " " * (20 - step * 2)
             regex_filled = template_format.format(
                 epoch, step, step / ModelFittingTestCaseProgress.num_steps * 100, progress_Bar
@@ -557,14 +553,12 @@ class ModelFittingTestCaseProgress(ModelFittingTestCase):
         template_format = r".*Epoch:.*{}\/1.*Step:.*{}\/5.*ETA:"
         epoch = 1
         # the 5 train steps
-        for step, step_update in enumerate(steps_update[: ModelFittingTestCaseProgress.num_steps]):
-            step += 1
+        for step, step_update in enumerate(steps_update[: ModelFittingTestCaseProgress.num_steps], start=1):
             regex_filled = template_format.format(epoch, step, step / ModelFittingTestCaseProgress.num_steps * 100)
             self.assertRegex(step_update, regex_filled)
 
         # The 5 val steps
-        for step, step_update in enumerate(steps_update[ModelFittingTestCaseProgress.num_steps : -1]):
-            step += 1
+        for step, step_update in enumerate(steps_update[ModelFittingTestCaseProgress.num_steps : -1], start=1):
             regex_filled = template_format.format(epoch, step, step / ModelFittingTestCaseProgress.num_steps * 100)
             self.assertRegex(step_update, regex_filled)
 
@@ -596,8 +590,7 @@ class ModelFittingTestCaseProgress(ModelFittingTestCase):
 
         # we don't validate the templating of metrics since tested before
         template_format = r".*\[37mStep:.*{}\/5.*{:6.2f}\%.*|{}|.*ETA:"
-        for step, step_update in enumerate(steps_update[:-1]):
-            step += 1
+        for step, step_update in enumerate(steps_update[:-1], start=1):
             progress_Bar = "\u2588" * step * 2 + " " * (20 - step * 2)
             regex_filled = template_format.format(
                 step, step / ModelFittingTestCaseProgress.num_steps * 100, progress_Bar
@@ -622,8 +615,7 @@ class ModelFittingTestCaseProgress(ModelFittingTestCase):
 
         # we don't validate the templating of metrics since tested before
         template_format = r".*Step:.*{}\/5.*{:6.2f}\%.*|{}|.*ETA:"
-        for step, step_update in enumerate(steps_update[:-1]):
-            step += 1
+        for step, step_update in enumerate(steps_update[:-1], start=1):
             progress_Bar = "\u2588" * step * 2 + " " * (20 - step * 2)
             regex_filled = template_format.format(
                 step, step / ModelFittingTestCaseProgress.num_steps * 100, progress_Bar
@@ -648,8 +640,7 @@ class ModelFittingTestCaseProgress(ModelFittingTestCase):
 
         # we don't validate the templating of metrics since tested before
         template_format = r".*Step:.*{}\/5.*ETA:"
-        for step, step_update in enumerate(steps_update[:-1]):
-            step += 1
+        for step, step_update in enumerate(steps_update[:-1], start=1):
             regex_filled = template_format.format(step, step / ModelFittingTestCaseProgress.num_steps * 100)
             self.assertRegex(step_update, regex_filled)
 

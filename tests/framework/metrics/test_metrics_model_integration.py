@@ -89,7 +89,7 @@ class MetricsModelIntegrationTest(unittest.TestCase):
     steps_per_epoch = 3
     batch_size = 10
 
-    cuda_device = int(os.environ.get('CUDA_DEVICE', 0))
+    cuda_device = int(os.environ.get('CUDA_DEVICE', '0'))
 
     def setUp(self):
         torch.manual_seed(42)

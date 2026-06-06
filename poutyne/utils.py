@@ -253,9 +253,8 @@ def load_random_states(f: Any):
 
 
 def is_in_jupyter_notebook():
-    # pylint: disable=import-outside-toplevel
     try:
-        from IPython import get_ipython
+        from IPython import get_ipython  # noqa: PLC0415 (import-outside-toplevel)
 
         shell = get_ipython().__class__.__name__
         jupyter = shell in ['ZMQInteractiveShell', 'Shell']
@@ -317,20 +316,13 @@ def get_batch_size(*values):
             "set\n"
             "from poutyne import warning_settings\n"
             "warning_settings['batch_size'] = 'ignore'\n\n"
-            #
-            #
             "Here is the inferring algorithm used to compute the batch size. The values are tested in order at each "
             "step of the inferring algorithm. If one step succeed for one of the values, the algorithm stops.\n\n"
-            #
-            #
             "Step 1: if a value is a tensor or a Numpy array, then the 'len()' is returned.\n"
-            #
             "Step 2: if a value is a list or a tuple, then the 'len()' of the first element is returned if it is a "
             "tensor or a Numpy array.\n"
-            #
             "Step 3: if a value is a dict, then the value for the key 'batch_size' is returned if it is of integral "
             "type.\n"
-            #
             "Step 4: if a value is a dict, then the 'len()' of the first element of '.values()' is returned if it is a "
             "tensor or a Numpy array.\n"
         )

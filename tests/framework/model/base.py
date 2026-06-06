@@ -36,7 +36,7 @@ class ModelFittingTestCase(CaptureOutputBase):
 
     evaluate_dataset_len = 107
 
-    cuda_device = int(os.environ.get('CUDA_DEVICE', 0))
+    cuda_device = int(os.environ.get('CUDA_DEVICE', '0'))
 
     def setUp(self):
         self.mock_callback = MagicMock(spec=Callback)
