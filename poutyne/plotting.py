@@ -98,12 +98,12 @@ def _close_figs(figs):
 
 
 def plot_history(
-    history: list[dict[str, float | int]] | 'pd.DataFrame',
+    history: list[dict[str, float | int]] | pd.DataFrame,
     *,
     metrics: list[str] | None = None,
     labels: list[str] | None = None,
     titles: list[str] | str | None = None,
-    axes: list['matplotlib.axes.Axes'] | None = None,
+    axes: list[matplotlib.axes.Axes] | None = None,
     show: bool = True,
     save: bool = False,
     save_filename_template: str = '{metric}',
@@ -190,12 +190,12 @@ def plot_history(
 
 
 def plot_metric(
-    history: list[dict[str, float | int]] | 'pd.DataFrame',
+    history: list[dict[str, float | int]] | pd.DataFrame,
     metric: str,
     *,
     label: str | None = None,
     title: str = '',
-    ax: 'matplotlib.axes.Axes | None' = None,
+    ax: matplotlib.axes.Axes | None = None,
 ):
     """
     Plot the training history in matplotlib for a given metric.
