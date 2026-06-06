@@ -66,7 +66,7 @@ class LambdaCallback(Callback):
         on_test_end=None,
         on_predict_begin=None,
         on_predict_end=None,
-        on_backward_end=None
+        on_backward_end=None,
     ):
         # pylint: disable=too-many-locals
         super().__init__()

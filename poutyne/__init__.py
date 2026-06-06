@@ -17,15 +17,17 @@ You should have received a copy of the GNU Lesser General Public License along w
 <https://www.gnu.org/licenses/>.
 """
 
+from importlib.metadata import PackageNotFoundError
+from importlib.metadata import version as _pkg_version
+
 # pylint: disable=wildcard-import
 from .framework import *
 from .layers import *
 from .plotting import *
 from .utils import *
-from importlib.metadata import PackageNotFoundError, version as _pkg_version
+from .warning_manager import *
 
 try:
     __version__ = _pkg_version("poutyne")
 except PackageNotFoundError:
     __version__ = "unknown"
-from .warning_manager import *

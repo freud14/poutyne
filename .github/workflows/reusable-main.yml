@@ -59,10 +59,7 @@ jobs:
       - name: Install dependencies
         run: uv sync --group docs
       - name: Building doc
-        run: |
-          cd docs
-          ./rebuild_html_doc.sh
-          cd ..
+        run: uv run make -C docs clean html
 
   tests:
     runs-on: ${{ inputs.os }}
@@ -92,7 +89,7 @@ jobs:
           python-version: ${{ inputs.python-version }}
       - name: Install dependencies
         run: |
-          uv pip install pytest pytest-cov
-          uv pip install -e .
+          uv venv
+          uv pip install pytest pytest-cov -e .
       - name: Test with pytest
         run: uv run pytest

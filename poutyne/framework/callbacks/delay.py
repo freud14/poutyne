@@ -41,7 +41,7 @@ class DelayCallback(Callback):
         callbacks: Union[Callback, Sequence],
         *,
         epoch_delay: Optional[int] = None,
-        batch_delay: Optional[int] = None
+        batch_delay: Optional[int] = None,
     ):
         super().__init__()
         if isinstance(callbacks, Sequence):
