@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "poutyne"
-version = "1.18.0"
+version = "1.19.0"
 description = "A simplified framework and utilities for PyTorch."
 readme = "README.md"
 license = { text = "LGPL-3.0-or-later" }

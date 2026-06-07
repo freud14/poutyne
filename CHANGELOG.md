@@ -1,3 +1,12 @@
+# v1.19
+
+- Migrate linting and formatting to [ruff](https://docs.astral.sh/ruff/).
+- Migrate test suite to idiomatic pytest (plain asserts, `pytest.raises`, `capsys`).
+
+Breaking change:
+
+- Remove the deprecated positional `experiment_name` argument from [MLFlowLogger](https://poutyne.org/callbacks.html#poutyne.MLFlowLogger). It must now be passed as a keyword argument.
+
 # v1.18
 
 - Migrate to [uv](https://docs.astral.sh/uv/) for dependency management and [asdf](https://asdf-vm.com/) for toolchain versioning.
