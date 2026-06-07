@@ -165,7 +165,7 @@ class ModelCheckpointTest:
 
         self.optimizer.step()
 
-        return float(loss)
+        return float(loss.detach())
 
     def _test_restore_best(self, val_losses):
         final_weights = torch_to_numpy(self.model.get_weight_copies())

@@ -304,7 +304,7 @@ That is, doing your own training loop.
                 # Since the loss and accuracy are averages for the batch, we multiply
                 # them by the the number of examples so that we can do the right
                 # averages at the end of the epoch.
-                loss_sum += float(loss) * len(x)
+                loss_sum += float(loss.detach()) * len(x)
                 acc_sum += float(pytorch_accuracy(y_pred, y)) * len(x)
                 example_count += len(x)
 
@@ -341,7 +341,7 @@ That is, doing your own training loop.
                 # Since the loss and accuracy are averages for the batch, we multiply
                 # them by the the number of examples so that we can do the right
                 # averages at the end of the test.
-                loss_sum += float(loss) * len(x)
+                loss_sum += float(loss.detach()) * len(x)
                 acc_sum += float(pytorch_accuracy(y_pred, y)) * len(x)
                 example_count += len(x)
 

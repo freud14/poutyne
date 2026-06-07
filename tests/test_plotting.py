@@ -62,7 +62,7 @@ class PlotHistoryTest:
     NUM_METRIC_PLOTS = len(METRICS)
 
     def test_basic(self):
-        figs, axes = plot_history(PlotHistoryTest.HISTORY)
+        figs, axes = plot_history(PlotHistoryTest.HISTORY, show=False)
         assert len(figs) == PlotHistoryTest.NUM_METRIC_PLOTS
         assert len(axes) == PlotHistoryTest.NUM_METRIC_PLOTS
         for fig, ax in zip(figs, axes):

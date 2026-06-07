@@ -260,7 +260,7 @@ class PeriodicSaveTest:
 
         self.optimizer.step()
 
-        return float(loss)
+        return float(loss.detach())
 
 
 class PeriodicSaveLambdaTest:
