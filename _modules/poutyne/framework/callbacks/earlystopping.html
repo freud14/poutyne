@@ -5,14 +5,14 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>poutyne.framework.callbacks.earlystopping &mdash; Poutyne 1.18.0 documentation</title>
+  <title>poutyne.framework.callbacks.earlystopping &mdash; Poutyne 1.19.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=9edc463e" />
 
   
       <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../../_static/documentation_options.js?v=256cef93"></script>
+      <script src="../../../../_static/documentation_options.js?v=54b9a5ca"></script>
       <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../_static/js/theme.js"></script>
@@ -148,8 +148,6 @@
 <span class="sd">CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span>
-
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">poutyne.framework.callbacks.callbacks</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callback</span>
@@ -208,13 +206,13 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">min_delta</span> <span class="o">*=</span> <span class="mi">1</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">monitor_op</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">greater</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">on_train_begin</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_train_begin</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
         <span class="c1"># Allow instances to be re-used</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">wait</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">stopped_epoch</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">best</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;min&#39;</span> <span class="k">else</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">on_epoch_end</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epoch_number</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">logs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_epoch_end</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epoch_number</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">logs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
         <span class="n">current</span> <span class="o">=</span> <span class="n">logs</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">monitor</span><span class="p">]</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">monitor_op</span><span class="p">(</span><span class="n">current</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_delta</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">best</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">best</span> <span class="o">=</span> <span class="n">current</span>
@@ -225,7 +223,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">stopped_epoch</span> <span class="o">=</span> <span class="n">epoch_number</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">stop_training</span> <span class="o">=</span> <span class="kc">True</span>
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
-                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Epoch </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">stopped_epoch</span><span class="si">}</span><span class="s1">: early stopping&#39;</span><span class="p">)</span></div>
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Epoch </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">stopped_epoch</span><span class="si">}</span><span class="s1">: early stopping&#39;</span><span class="p">)</span>  <span class="c1"># noqa: T201</span></div>
 
 </pre></div>
 

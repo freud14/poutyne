@@ -5,14 +5,14 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>poutyne.framework.metrics.predefined.fscores &mdash; Poutyne 1.18.0 documentation</title>
+  <title>poutyne.framework.metrics.predefined.fscores &mdash; Poutyne 1.19.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme.css?v=9edc463e" />
 
   
       <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../../../_static/documentation_options.js?v=256cef93"></script>
+      <script src="../../../../../_static/documentation_options.js?v=54b9a5ca"></script>
       <script src="../../../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../../_static/js/theme.js"></script>
@@ -125,7 +125,6 @@
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
 
@@ -173,10 +172,10 @@
 <span class="sd">        respective parameters.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        metric (Optional[str]): One of {&#39;fscore&#39;, &#39;precision&#39;, &#39;recall&#39;}.</span>
+<span class="sd">        metric (str | None): One of {&#39;fscore&#39;, &#39;precision&#39;, &#39;recall&#39;}.</span>
 <span class="sd">            Whether to return the F-score, the precision or the recall. When not</span>
 <span class="sd">            provided, all three metrics are returned. (Default value = None)</span>
-<span class="sd">        average (Union[str, int]): One of {&#39;micro&#39; (default), &#39;macro&#39;, label_number}</span>
+<span class="sd">        average (str | int): One of {&#39;micro&#39; (default), &#39;macro&#39;, label_number}</span>
 <span class="sd">            If the argument is of type integer, the score for this class (the label number) is calculated.</span>
 <span class="sd">            Otherwise, this determines the type of averaging performed on the data:</span>
 
@@ -204,24 +203,24 @@
 <span class="sd">            this should be between 0 and 1. A suggested value would be 0.5. If a logits output is used, the threshold</span>
 <span class="sd">            would be between -inf and inf. The suggested default value is 0 as to give a probability of 0.5 if a sigmoid</span>
 <span class="sd">            output were used. (Default = 0)</span>
-<span class="sd">        names (Optional[Union[str, List[str]]]): The names associated to the metrics. It is a string when</span>
+<span class="sd">        names (str | list[str] | None): The names associated to the metrics. It is a string when</span>
 <span class="sd">            a single metric is requested. It is a list of 3 strings if all metrics are requested.</span>
 <span class="sd">            (Default value = None)</span>
-<span class="sd">        make_deterministic (Optional[bool]): Avoid non-deterministic operations in computations. This might make the</span>
+<span class="sd">        make_deterministic (bool | None): Avoid non-deterministic operations in computations. This might make the</span>
 <span class="sd">            code slower.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
-        <span class="n">metric</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">average</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;macro&#39;</span><span class="p">,</span>
+        <span class="n">metric</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">average</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">=</span> <span class="s1">&#39;macro&#39;</span><span class="p">,</span>
         <span class="n">beta</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
         <span class="n">pos_label</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
         <span class="n">ignore_index</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">100</span><span class="p">,</span>
         <span class="n">threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
-        <span class="n">names</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">make_deterministic</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">names</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">make_deterministic</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">metric_options</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;fscore&#39;</span><span class="p">,</span> <span class="s1">&#39;precision&#39;</span><span class="p">,</span> <span class="s1">&#39;recall&#39;</span><span class="p">)</span>
@@ -229,7 +228,7 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;`metric` has to be one of </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">metric_options</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">metric</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;precision&#39;</span><span class="p">,</span> <span class="s1">&#39;recall&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">beta</span> <span class="o">!=</span> <span class="mf">1.0</span><span class="p">:</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The use of the `beta` argument is useless with </span><span class="si">{</span><span class="nb">repr</span><span class="p">(</span><span class="n">metric</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The use of the `beta` argument is useless with </span><span class="si">{</span><span class="n">metric</span><span class="si">!r}</span><span class="s2">.&quot;</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 
         <span class="n">average_options</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;binary&#39;</span><span class="p">,</span> <span class="s1">&#39;micro&#39;</span><span class="p">,</span> <span class="s1">&#39;macro&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">average</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">average_options</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">average</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
@@ -298,15 +297,15 @@
 <div class="viewcode-block" id="FBeta.forward">
 <a class="viewcode-back" href="../../../../../metrics.html#poutyne.FBeta.forward">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">y_true</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]]</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">]]:</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">y_true</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Update the confusion matrix for calculating the F-score and compute the metrics for the current batch. See</span>
 <span class="sd">        :meth:`FBeta.compute` for details on the return value.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            y_pred (torch.Tensor): A tensor of predictions of shape (batch_size, num_classes, ...).</span>
-<span class="sd">            y_true (Union[torch.Tensor, Tuple[torch.Tensor, torch.Tensor]]):</span>
+<span class="sd">            y_true (torch.Tensor | tuple[torch.Tensor, torch.Tensor]):</span>
 <span class="sd">                Ground truths. A tensor of the integer class label of shape (batch_size, ...). It must</span>
 <span class="sd">                be the same shape as the ``y_pred`` tensor without the ``num_classes`` dimension.</span>
 <span class="sd">                It can also be a tuple with two tensors of the same shape, the first being the</span>
@@ -322,13 +321,13 @@
 
 <div class="viewcode-block" id="FBeta.update">
 <a class="viewcode-back" href="../../../../../metrics.html#poutyne.FBeta.update">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">y_true</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">y_true</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Update the confusion matrix for calculating the F-score.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            y_pred (torch.Tensor): A tensor of predictions of shape (batch_size, num_classes, ...).</span>
-<span class="sd">            y_true (Union[torch.Tensor, Tuple[torch.Tensor, torch.Tensor]]):</span>
+<span class="sd">            y_true (torch.Tensor | tuple[torch.Tensor, torch.Tensor]):</span>
 <span class="sd">                Ground truths. A tensor of the integer class label of shape (batch_size, ...). It must</span>
 <span class="sd">                be the same shape as the ``y_pred`` tensor without the ``num_classes`` dimension.</span>
 <span class="sd">                It can also be a tuple with two tensors of the same shape, the first being the</span>
@@ -337,8 +336,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_update</span><span class="p">(</span><span class="n">y_pred</span><span class="p">,</span> <span class="n">y_true</span><span class="p">)</span></div>
 
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">y_true</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="c1"># pylint: disable=too-many-branches</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">y_true</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># noqa: PLR0912 (too-many-branches)</span>
         <span class="k">with</span> <span class="n">set_deterministic_debug_mode</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">deterministic_debug_mode</span><span class="p">):</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
                 <span class="n">y_true</span><span class="p">,</span> <span class="n">mask</span> <span class="o">=</span> <span class="n">y_true</span>
@@ -417,7 +415,7 @@
 
 <div class="viewcode-block" id="FBeta.compute">
 <a class="viewcode-back" href="../../../../../metrics.html#poutyne.FBeta.compute">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">compute</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">]]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns either a float if a single metric is set in the ``__init__`` or a tuple</span>
 <span class="sd">        of floats (f-score, precision, recall) if all metrics are requested.</span>

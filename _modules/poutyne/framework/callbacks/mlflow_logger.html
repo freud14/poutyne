@@ -5,14 +5,14 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>poutyne.framework.callbacks.mlflow_logger &mdash; Poutyne 1.18.0 documentation</title>
+  <title>poutyne.framework.callbacks.mlflow_logger &mdash; Poutyne 1.19.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=9edc463e" />
 
   
       <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../../_static/documentation_options.js?v=256cef93"></script>
+      <script src="../../../../_static/documentation_options.js?v=54b9a5ca"></script>
       <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../_static/js/theme.js"></script>
@@ -108,7 +108,8 @@
 <span class="c1"># pylint: disable=line-too-long, pointless-string-statement</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Sequence</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">poutyne.framework.callbacks.logger</span><span class="w"> </span><span class="kn">import</span> <span class="n">Logger</span>
 
@@ -133,12 +134,12 @@
 <span class="sd">    logger will log all run into the same experiment.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        experiment_name (Optional[str]): The name of the experiment. The name is case-sensitive. An `experiment_id` must</span>
+<span class="sd">        experiment_name (str | None): The name of the experiment. The name is case-sensitive. An `experiment_id` must</span>
 <span class="sd">            not be passed if this is passed.</span>
-<span class="sd">        experiment_id (Optional[str]): The id of the experiment. An `experiment_name` must not be passed if this is</span>
+<span class="sd">        experiment_id (str | None): The id of the experiment. An `experiment_name` must not be passed if this is</span>
 <span class="sd">            passed.</span>
-<span class="sd">        run_id (Optional[str]): The id of the run. An experiment name/id must not be passed if this is passed.</span>
-<span class="sd">        tracking_uri (Optional[str]): Either the URI tracking path (for server tracking) of the absolute path to</span>
+<span class="sd">        run_id (str | None): The id of the run. An experiment name/id must not be passed if this is passed.</span>
+<span class="sd">        tracking_uri (str | None): Either the URI tracking path (for server tracking) of the absolute path to</span>
 <span class="sd">            the directory to save the files (for file store). For example: ``http://&lt;ip address&gt;:&lt;port&gt;``</span>
 <span class="sd">            (remote server) or ``/home/&lt;user&gt;/mlflow-server`` (local server).</span>
 <span class="sd">            If None, will use the default MLflow file tracking URI ``&quot;./mlruns&quot;``.</span>
@@ -178,31 +179,17 @@
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">deprecated_experiment_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
-        <span class="n">experiment_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">experiment_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">run_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">tracking_uri</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">experiment_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">experiment_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">run_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">tracking_uri</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">batch_granularity</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">terminate_on_end</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">batch_granularity</span><span class="o">=</span><span class="n">batch_granularity</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">mlflow</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="s2">&quot;Mlflow needs to be installed to use this callback.&quot;</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">deprecated_experiment_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">experiment_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;`experiment_name` was passed as positional and keyword arguments. Make sure to only pass it once as a &quot;</span>
-                <span class="s2">&quot;keyword argument.&quot;</span>
-            <span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">deprecated_experiment_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-                <span class="s1">&#39;Positional argument `experiment_name` is deprecated and will be removed in future versions. Please &#39;</span>
-                <span class="s1">&#39;use it as a keyword argument, i.e. experiment_name=&quot;my-experiment-name&quot;&#39;</span>
-            <span class="p">)</span>
-            <span class="n">experiment_name</span> <span class="o">=</span> <span class="n">deprecated_experiment_name</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">tracking</span> <span class="o">=</span> <span class="n">tracking_uri</span>
 
@@ -236,35 +223,35 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_log_config_write</span><span class="p">(</span><span class="n">param_name</span><span class="p">,</span> <span class="n">element</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">log_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">log_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Log the values of the parameters into the experiment.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            params (Dict[str, float]): Dictionary of key-value to log.</span>
+<span class="sd">            params (dict[str, float]): Dictionary of key-value to log.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">params</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">log_param</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">log_metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metrics</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">log_metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metrics</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Log the values of the metrics into the experiment.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            metrics (Dict[str, float]): Dictionary of key-value to log.</span>
+<span class="sd">            metrics (dict[str, float]): Dictionary of key-value to log.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">metrics</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">log_metric</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
 <div class="viewcode-block" id="MLFlowLogger.log_param">
 <a class="viewcode-back" href="../../../../callbacks.html#poutyne.MLFlowLogger.log_param">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">log_param</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">log_param</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">float</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Log the value of a parameter into the experiment.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            param_name (str): The name of the parameter.</span>
-<span class="sd">            value (Union[str, float]): The value of the parameter.</span>
+<span class="sd">            value (str | float): The value of the parameter.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ml_flow_client</span><span class="o">.</span><span class="n">log_param</span><span class="p">(</span><span class="n">run_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">run_id</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">param_name</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
@@ -279,13 +266,13 @@
 <span class="sd">        Args:</span>
 <span class="sd">            metric_name (str): The name of the metric.</span>
 <span class="sd">            value (float): The value of the metric.</span>
-<span class="sd">            step (Union[int, None]): The step when the metric was computed (Default = None).</span>
+<span class="sd">            step (int | None): The step when the metric was computed (Default = None).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ml_flow_client</span><span class="o">.</span><span class="n">log_metric</span><span class="p">(</span><span class="n">run_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">run_id</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">metric_name</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_log_config_write</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">parent_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">element</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">parent_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">element</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">float</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Mapping</span> <span class="o">|</span> <span class="n">Sequence</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Log the config parameters when it&#39;s a mapping or a sequence of elements.</span>
@@ -301,14 +288,14 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">log_param</span><span class="p">(</span><span class="n">parent_name</span><span class="p">,</span> <span class="n">element</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_on_train_batch_end_write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch_number</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">logs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_on_train_batch_end_write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch_number</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">logs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Log the batch metric.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">logs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">log_metric</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="n">batch_number</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_on_epoch_end_write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epoch_number</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">logs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_on_epoch_end_write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epoch_number</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">logs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Log the batch and epoch metric.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -316,7 +303,7 @@
         <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">logs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">log_metric</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="n">epoch_number</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">on_train_end</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_train_end</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Log the last epoch batch and epoch metric and close the active run.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -331,11 +318,11 @@
         <span class="n">last_epoch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;epochs&quot;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">log_metric</span><span class="p">(</span><span class="s2">&quot;last-epoch&quot;</span><span class="p">,</span> <span class="n">last_epoch</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">on_test_begin</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_test_begin</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_status</span> <span class="o">=</span> <span class="s2">&quot;FAILED&quot;</span>  <span class="c1"># To change status from FINISHED to FAILED (base case) if trained before.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_status_handling</span><span class="p">()</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">on_test_end</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_test_end</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Log the test results.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -345,7 +332,7 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_status_handling</span><span class="p">()</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_on_test_end_write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_on_test_end_write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">logs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">log_metric</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
 
@@ -401,7 +388,8 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">git</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-            <span class="s2">&quot;Failed to import Git (the Git executable is probably not on your PATH), so Git SHA is not available.&quot;</span>
+            <span class="s2">&quot;Failed to import Git (the Git executable is probably not on your PATH), so Git SHA is not available.&quot;</span><span class="p">,</span>
+            <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="kc">None</span>
 
@@ -410,7 +398,7 @@
         <span class="n">commit</span> <span class="o">=</span> <span class="n">repo</span><span class="o">.</span><span class="n">head</span><span class="o">.</span><span class="n">commit</span><span class="o">.</span><span class="n">hexsha</span>
         <span class="k">return</span> <span class="n">commit</span>
     <span class="k">except</span> <span class="p">(</span><span class="n">git</span><span class="o">.</span><span class="n">InvalidGitRepositoryError</span><span class="p">,</span> <span class="n">git</span><span class="o">.</span><span class="n">NoSuchPathError</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to grab the git repository so Git SHA is not available. Error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to grab the git repository so Git SHA is not available. Error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
         <span class="k">return</span> <span class="kc">None</span>
 </pre></div>
 

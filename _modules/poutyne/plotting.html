@@ -5,14 +5,14 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>poutyne.plotting &mdash; Poutyne 1.18.0 documentation</title>
+  <title>poutyne.plotting &mdash; Poutyne 1.19.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
 
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=256cef93"></script>
+      <script src="../../_static/documentation_options.js?v=54b9a5ca"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -105,9 +105,11 @@
 <span class="sd">&lt;https://www.gnu.org/licenses/&gt;.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
 <span class="kn">import</span><span class="w"> </span><span class="nn">itertools</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
 
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
@@ -186,51 +188,51 @@
 <div class="viewcode-block" id="plot_history">
 <a class="viewcode-back" href="../../utils.html#poutyne.plot_history">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">plot_history</span><span class="p">(</span>
-    <span class="n">history</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]],</span> <span class="s1">&#39;pd.DataFrame&#39;</span><span class="p">],</span>
+    <span class="n">history</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span> <span class="o">|</span> <span class="nb">int</span><span class="p">]]</span> <span class="o">|</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
-    <span class="n">metrics</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">labels</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">titles</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">axes</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="s1">&#39;matplotlib.axes.Axes&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">metrics</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">labels</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">titles</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">axes</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">matplotlib</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">Axes</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">show</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">save</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">save_filename_template</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{metric}</span><span class="s1">&#39;</span><span class="p">,</span>
-    <span class="n">save_directory</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">save_extensions</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;png&#39;</span><span class="p">,),</span>
-    <span class="n">close</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">fig_kwargs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">save_directory</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">save_extensions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;png&#39;</span><span class="p">,),</span>
+    <span class="n">close</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">fig_kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Plot the training history in matplotlib. By default, all metrics are plotted.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        history (Union[List[Dict[str, Union[float, int]]], pandas.DataFrame]): The training history to plot. Can be</span>
+<span class="sd">        history (list[dict[str, float | int]] | pandas.DataFrame): The training history to plot. Can be</span>
 <span class="sd">            either a list of dictionary as returned by :func:`~poutyne.Model.fit()` or a Pandas DataFrame as read from a</span>
 <span class="sd">            CSV output by the :class:`~poutyne.CSVLogger` callback.</span>
-<span class="sd">        metrics (Optional[List[str]], optional): The list of metrics for which to output the plot. By default, every</span>
+<span class="sd">        metrics (list[str] | None, optional): The list of metrics for which to output the plot. By default, every</span>
 <span class="sd">            metric in the history is used.</span>
-<span class="sd">        labels (Optional[List[str]], optional): A list of labels to use for each metric. Must be of the same length as</span>
+<span class="sd">        labels (list[str] | None, optional): A list of labels to use for each metric. Must be of the same length as</span>
 <span class="sd">            ``metrics``. By default, the names in the history are used.</span>
-<span class="sd">        titles (Optional[Union[List[str], str]], optional): A title or a list of titles to use for each metric. If a</span>
+<span class="sd">        titles (list[str] | str | None, optional): A title or a list of titles to use for each metric. If a</span>
 <span class="sd">            list, must be of the same length as ``metrics``. If a string, the same title will be used for all plots. By</span>
 <span class="sd">            default, there is no title.</span>
-<span class="sd">        axes (Optional[List[matplotlib.axes.Axes]], optional): A list of matplotlib :class:`~matplotlib.axes.Axes` to</span>
+<span class="sd">        axes (list[matplotlib.axes.Axes] | None, optional): A list of matplotlib :class:`~matplotlib.axes.Axes` to</span>
 <span class="sd">            use for each metric. Must be of the same length as ``metrics``. By default, a new figure and an new axe is</span>
 <span class="sd">            created for each plot.</span>
 <span class="sd">        show (bool, optional): Whether to show the plots. Defaults to True.</span>
 <span class="sd">        save (bool, optional): Whether to save the plots. Defaults to False.</span>
 <span class="sd">        save_filename_template (str, optional): The filename without extension for saving the plot. Should contain</span>
 <span class="sd">            ``{metric}`` somewhere in it or all the plots will overwrite each other. Defaults to ``&#39;{metric}&#39;``.</span>
-<span class="sd">        save_directory (Optional[str], optional): The directory to save the plots. Default to the current directory.</span>
-<span class="sd">        save_extensions (Union[List[str], Tuple[str]], optional): A list of extensions under which to save the plots.</span>
+<span class="sd">        save_directory (str | None, optional): The directory to save the plots. Default to the current directory.</span>
+<span class="sd">        save_extensions (list[str] | tuple[str], optional): A list of extensions under which to save the plots.</span>
 <span class="sd">            Defaults to `(&#39;png&#39;, )`.</span>
-<span class="sd">        close (Optional[bool], optional): Whether to close the matplotlib figures. By default, the figures are closed</span>
+<span class="sd">        close (bool | None, optional): Whether to close the matplotlib figures. By default, the figures are closed</span>
 <span class="sd">            except when in Jupyter notebooks.</span>
-<span class="sd">        fig_kwargs (Optional[Dict[str, Any]], optional): Any keyword arguments to pass to</span>
+<span class="sd">        fig_kwargs (dict[str, Any] | None, optional): Any keyword arguments to pass to</span>
 <span class="sd">            :func:`~matplotlib.pyplot.subplots`.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        Tuple[List[matplotlib.figure.Figure], List[matplotlib.axes.Axes]]: A tuple ``(figs, axes)``  where ``figs`` is</span>
+<span class="sd">        tuple[list[matplotlib.figure.Figure], list[matplotlib.axes.Axes]]: A tuple ``(figs, axes)``  where ``figs`` is</span>
 <span class="sd">        the list of instanciated matplotlib :class:`~matplotlib.figure.Figure` and ``axes`` is a list of instanciated</span>
 <span class="sd">        matplotlib :class:`~matplotlib.figure.Axes`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -281,24 +283,24 @@
 <div class="viewcode-block" id="plot_metric">
 <a class="viewcode-back" href="../../utils.html#poutyne.plot_metric">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">plot_metric</span><span class="p">(</span>
-    <span class="n">history</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]],</span> <span class="s1">&#39;pd.DataFrame&#39;</span><span class="p">],</span>
+    <span class="n">history</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span> <span class="o">|</span> <span class="nb">int</span><span class="p">]]</span> <span class="o">|</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
     <span class="n">metric</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
-    <span class="n">label</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
-    <span class="n">ax</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;matplotlib.axes.Axes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">ax</span><span class="p">:</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">Axes</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Plot the training history in matplotlib for a given metric.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        history (Union[List[Dict[str, Union[float, int]]], pd.DataFrame]): The training history to plot. Can be</span>
+<span class="sd">        history (list[dict[str, float | int]] | pd.DataFrame): The training history to plot. Can be</span>
 <span class="sd">            either a list of dictionary as returned by :func:`~poutyne.Model.fit()` or a Pandas DataFrame as read from a</span>
 <span class="sd">            CSV output by the :class:`~poutyne.CSVLogger` callback.</span>
 <span class="sd">        metric (str): The metric for which to output the plot.</span>
-<span class="sd">        label (str, Optional[str]): A label for the metric. By default, the label is the same as the name of the metric.</span>
+<span class="sd">        label (str | None): A label for the metric. By default, the label is the same as the name of the metric.</span>
 <span class="sd">        title (str, optional): A title for the plot. By default, no title.</span>
-<span class="sd">        ax (Optional[matplotlib.axes.Axes], optional): A matplotlib :class:`~matplotlib.axes.Axes` to use. By default,</span>
+<span class="sd">        ax (matplotlib.axes.Axes | None, optional): A matplotlib :class:`~matplotlib.axes.Axes` to use. By default,</span>
 <span class="sd">            the current axe is used.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">_raise_error_if_matplotlib_not_there</span><span class="p">()</span>

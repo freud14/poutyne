@@ -5,14 +5,14 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>poutyne.framework.metrics.predefined.sklearn_metrics &mdash; Poutyne 1.18.0 documentation</title>
+  <title>poutyne.framework.metrics.predefined.sklearn_metrics &mdash; Poutyne 1.19.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme.css?v=9edc463e" />
 
   
       <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../../../_static/documentation_options.js?v=256cef93"></script>
+      <script src="../../../../../_static/documentation_options.js?v=54b9a5ca"></script>
       <script src="../../../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../../_static/js/theme.js"></script>
@@ -105,7 +105,7 @@
 <span class="sd">&lt;https://www.gnu.org/licenses/&gt;.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
@@ -130,20 +130,20 @@
 <span class="sd">            my_epoch_metric = SKLearnMetrics([roc_auc_score, average_precision_score])</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        funcs (Union[Callable, List[Callable]]): A metric or a list of metrics with a</span>
+<span class="sd">        funcs (Callable | list[Callable]): A metric or a list of metrics with a</span>
 <span class="sd">            scikit-learn-like interface.</span>
-<span class="sd">        kwargs (Optional[Union[dict, List[dict]]]): Optional dictionary of list of dictionaries</span>
+<span class="sd">        kwargs (dict | list[dict] | None): Optional dictionary of list of dictionaries</span>
 <span class="sd">            corresponding to keyword arguments to pass to each corresponding metric.</span>
 <span class="sd">            (Default value = None)</span>
-<span class="sd">        names (Optional[Union[str, List[str]]]): Optional string or list of strings corresponding to</span>
+<span class="sd">        names (str | list[str] | None): Optional string or list of strings corresponding to</span>
 <span class="sd">            the names given to the metrics. By default, the names are the names of the functions.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">funcs</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Callable</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Callable</span><span class="p">]],</span>
-        <span class="n">kwargs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">dict</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">names</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">funcs</span><span class="p">:</span> <span class="n">Callable</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="n">Callable</span><span class="p">],</span>
+        <span class="n">kwargs</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">names</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
 
@@ -173,7 +173,7 @@
 
 <div class="viewcode-block" id="SKLearnMetrics.forward">
 <a class="viewcode-back" href="../../../../../metrics.html#poutyne.SKLearnMetrics.forward">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">y_true</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">y_true</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Accumulate the predictions, ground truths and sample weights if any, and compute the metric for the current</span>
 <span class="sd">        batch.</span>
@@ -181,7 +181,7 @@
 <span class="sd">        Args:</span>
 <span class="sd">            y_pred (torch.Tensor): A tensor of predictions of the shape expected by</span>
 <span class="sd">                the metric functions passed to the class.</span>
-<span class="sd">            y_true (Union[torch.Tensor, Tuple[torch.Tensor, torch.Tensor]]):</span>
+<span class="sd">            y_true (torch.Tensor | tuple[torch.Tensor, torch.Tensor]):</span>
 <span class="sd">                Ground truths. A tensor of ground truths of the shape expected by</span>
 <span class="sd">                the metric functions passed to the class.</span>
 <span class="sd">                It can also be a tuple with two tensors, the first being the</span>
@@ -194,14 +194,14 @@
 
 <div class="viewcode-block" id="SKLearnMetrics.update">
 <a class="viewcode-back" href="../../../../../metrics.html#poutyne.SKLearnMetrics.update">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">y_true</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">y_true</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Accumulate the predictions, ground truths and sample weights if any.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            y_pred (torch.Tensor): A tensor of predictions of the shape expected by</span>
 <span class="sd">                the metric functions passed to the class.</span>
-<span class="sd">            y_true (Union[torch.Tensor, Tuple[torch.Tensor, torch.Tensor]]):</span>
+<span class="sd">            y_true (torch.Tensor | tuple[torch.Tensor, torch.Tensor]):</span>
 <span class="sd">                Ground truths. A tensor of ground truths of the shape expected by</span>
 <span class="sd">                the metric functions passed to the class.</span>
 <span class="sd">                It can also be a tuple with two tensors, the first being the</span>
@@ -211,7 +211,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_update</span><span class="p">(</span><span class="n">y_pred</span><span class="p">,</span> <span class="n">y_true</span><span class="p">)</span></div>
 
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">y_true</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">y_true</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">y_pred</span> <span class="o">=</span> <span class="n">y_pred</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">y_pred_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y_pred</span><span class="p">)</span>
 
@@ -229,7 +229,7 @@
 
 <div class="viewcode-block" id="SKLearnMetrics.compute">
 <a class="viewcode-back" href="../../../../../metrics.html#poutyne.SKLearnMetrics.compute">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">compute</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the metrics as a dictionary with the names as keys.</span>
 <span class="sd">        &quot;&quot;&quot;</span>

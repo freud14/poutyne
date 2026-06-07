@@ -10,14 +10,14 @@
 <meta content="https://poutyne.org/_static/logos/poutyne-notext.png" property="og:image" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Here is Poutyne &mdash; Poutyne 1.18.0 documentation</title>
+  <title>Here is Poutyne &mdash; Poutyne 1.19.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
 
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=256cef93"></script>
+      <script src="_static/documentation_options.js?v=54b9a5ca"></script>
       <script src="_static/doctools.js?v=fd6eb6e6"></script>
       <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/js/theme.js"></script>
@@ -129,22 +129,24 @@
 <span class="n">num_classes</span> <span class="o">=</span> <span class="mi">5</span>
 <span class="n">hidden_state_size</span> <span class="o">=</span> <span class="mi">100</span>
 
+<span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">()</span>
+
 <span class="n">num_train_samples</span> <span class="o">=</span> <span class="mi">800</span>
-<span class="n">train_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">num_train_samples</span><span class="p">,</span> <span class="n">num_features</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;float32&#39;</span><span class="p">)</span>
-<span class="n">train_y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="n">num_classes</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">num_train_samples</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;int64&#39;</span><span class="p">)</span>
+<span class="n">train_x</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">standard_normal</span><span class="p">((</span><span class="n">num_train_samples</span><span class="p">,</span> <span class="n">num_features</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;float32&#39;</span><span class="p">)</span>
+<span class="n">train_y</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">integers</span><span class="p">(</span><span class="n">num_classes</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">num_train_samples</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;int64&#39;</span><span class="p">)</span>
 
 <span class="n">num_valid_samples</span> <span class="o">=</span> <span class="mi">200</span>
-<span class="n">valid_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">num_valid_samples</span><span class="p">,</span> <span class="n">num_features</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;float32&#39;</span><span class="p">)</span>
-<span class="n">valid_y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="n">num_classes</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">num_valid_samples</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;int64&#39;</span><span class="p">)</span>
+<span class="n">valid_x</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">standard_normal</span><span class="p">((</span><span class="n">num_valid_samples</span><span class="p">,</span> <span class="n">num_features</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;float32&#39;</span><span class="p">)</span>
+<span class="n">valid_y</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">integers</span><span class="p">(</span><span class="n">num_classes</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">num_valid_samples</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;int64&#39;</span><span class="p">)</span>
 
 <span class="n">num_test_samples</span> <span class="o">=</span> <span class="mi">200</span>
-<span class="n">test_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">num_test_samples</span><span class="p">,</span> <span class="n">num_features</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;float32&#39;</span><span class="p">)</span>
-<span class="n">test_y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="n">num_classes</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">num_test_samples</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;int64&#39;</span><span class="p">)</span>
+<span class="n">test_x</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">standard_normal</span><span class="p">((</span><span class="n">num_test_samples</span><span class="p">,</span> <span class="n">num_features</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;float32&#39;</span><span class="p">)</span>
+<span class="n">test_y</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">integers</span><span class="p">(</span><span class="n">num_classes</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">num_test_samples</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;int64&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Select a PyTorch device so that it runs on GPU if you have one:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cuda_device</span> <span class="o">=</span> <span class="mi">0</span>
-<span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cuda:</span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">cuda_device</span> <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
+<span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;cuda:</span><span class="si">{</span><span class="n">cuda_device</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Create yourself a <a class="reference external" href="https://pytorch.org/docs/master/nn.html">PyTorch</a> network:</p>

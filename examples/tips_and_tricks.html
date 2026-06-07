@@ -6,14 +6,14 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tips and Tricks &mdash; Poutyne 1.18.0 documentation</title>
+  <title>Tips and Tricks &mdash; Poutyne 1.19.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
 
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=256cef93"></script>
+      <script src="../_static/documentation_options.js?v=54b9a5ca"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
@@ -165,7 +165,7 @@
 </div>
 <p>In Poutyne, as we will see in the following sections, you can define your own loss functions and optimizers. However, we can also pass magic strings to use PyTorch’s standard optimizers and loss functions. Furthermore, for the optimizer, we can also use a dictionary to set other parameters as the learning rate, for instance, if we don’t want the default learning rate.</p>
 <p>Here, we initialize the dictionary for our optimizer as well as the string for our loss function. We thus use SGD with the specified learning rate and the cross-entropy loss.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">optimizer</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">optim</span><span class="o">=</span><span class="s1">&#39;sgd&#39;</span><span class="p">,</span> <span class="n">lr</span><span class="o">=</span><span class="n">learning_rate</span><span class="p">)</span>  <span class="c1"># Could be &#39;sgd&#39; if we didn&#39;t need to change the learning rate.</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">optimizer</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;optim&#39;</span><span class="p">:</span> <span class="s1">&#39;sgd&#39;</span><span class="p">,</span> <span class="s1">&#39;lr&#39;</span><span class="p">:</span> <span class="n">learning_rate</span><span class="p">}</span>  <span class="c1"># Could be &#39;sgd&#39; if we didn&#39;t need to change the learning rate.</span>
 <span class="n">loss_function</span> <span class="o">=</span> <span class="s1">&#39;cross_entropy&#39;</span>
 </pre></div>
 </div>
@@ -398,7 +398,7 @@
 
 
 <span class="c1"># kwargs are keyword arguments we wish to pass to roc_auc.</span>
-<span class="n">roc_epoch_metric</span> <span class="o">=</span> <span class="n">SKLearnMetrics</span><span class="p">(</span><span class="n">roc_auc</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">multi_class</span><span class="o">=</span><span class="s1">&#39;ovr&#39;</span><span class="p">,</span> <span class="n">average</span><span class="o">=</span><span class="s1">&#39;macro&#39;</span><span class="p">))</span>
+<span class="n">roc_epoch_metric</span> <span class="o">=</span> <span class="n">SKLearnMetrics</span><span class="p">(</span><span class="n">roc_auc</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;multi_class&#39;</span><span class="p">:</span> <span class="s1">&#39;ovr&#39;</span><span class="p">,</span> <span class="s1">&#39;average&#39;</span><span class="p">:</span> <span class="s1">&#39;macro&#39;</span><span class="p">})</span>
 </pre></div>
 </div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Instantiating our network</span>
@@ -617,12 +617,12 @@
 <section id="coloring">
 <h2>Coloring<a class="headerlink" href="#coloring" title="Link to this heading"></a></h2>
 <p>Also, Poutyne use by default a coloring template of the training step when the package <cite>colorama</cite> is installed.
-One could either remove the coloring (<code class="docutils literal notranslate"><span class="pre">progress_options=dict(coloring=False)</span></code>) or set a different coloring template using the fields:
+One could either remove the coloring (<code class="docutils literal notranslate"><span class="pre">progress_options={'coloring':</span> <span class="pre">False}</span></code>) or set a different coloring template using the fields:
 <code class="docutils literal notranslate"><span class="pre">text_color</span></code>, <code class="docutils literal notranslate"><span class="pre">ratio_color</span></code>, <code class="docutils literal notranslate"><span class="pre">metric_value_color</span></code>, <code class="docutils literal notranslate"><span class="pre">time_color</span></code> and <code class="docutils literal notranslate"><span class="pre">progress_bar_color</span></code>.
 If a field is not specified, the default color will be used.
 <a class="reference external" href="https://github.com/tartley/colorama/blob/9946cfb/colorama/ansi.py#L49">See available colors in colorama’s source code</a>.</p>
 <p>Here an example where we set the <code class="docutils literal notranslate"><span class="pre">text_color</span></code> to RED and the <code class="docutils literal notranslate"><span class="pre">progress_bar_color</span></code> to LIGHTGREEN_EX.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">progress_options</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">coloring</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">text_color</span><span class="o">=</span><span class="s2">&quot;RED&quot;</span><span class="p">,</span> <span class="n">progress_bar_color</span><span class="o">=</span><span class="s2">&quot;LIGHTGREEN_EX&quot;</span><span class="p">))</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">progress_options</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;coloring&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;text_color&#39;</span><span class="p">:</span> <span class="s2">&quot;RED&quot;</span><span class="p">,</span> <span class="s1">&#39;progress_bar_color&#39;</span><span class="p">:</span> <span class="s2">&quot;LIGHTGREEN_EX&quot;</span><span class="p">}}</span>
 
 <span class="c1"># Instantiating our network</span>
 <span class="n">network</span> <span class="o">=</span> <span class="n">create_network</span><span class="p">()</span>

@@ -5,14 +5,14 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>poutyne.framework.callbacks.wandb_logger &mdash; Poutyne 1.18.0 documentation</title>
+  <title>poutyne.framework.callbacks.wandb_logger &mdash; Poutyne 1.19.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=9edc463e" />
 
   
       <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../../_static/documentation_options.js?v=256cef93"></script>
+      <script src="../../../../_static/documentation_options.js?v=54b9a5ca"></script>
       <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../_static/js/theme.js"></script>
@@ -88,7 +88,6 @@
   <h1>Source code for poutyne.framework.callbacks.wandb_logger</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
 
@@ -112,8 +111,8 @@
 
 <span class="sd">    Args:</span>
 <span class="sd">        name(str): Display name for the run.</span>
-<span class="sd">        group (Optional[str]): Specify a group to organize individual runs into a larger experiment</span>
-<span class="sd">        config (Optional[Dict]): A dictionary summarizing the configuration</span>
+<span class="sd">        group (str | None): Specify a group to organize individual runs into a larger experiment</span>
+<span class="sd">        config (dict | None): A dictionary summarizing the configuration</span>
 <span class="sd">            related to the current run.</span>
 <span class="sd">        save_dir(str): Path where data is saved (wandb dir by default).</span>
 <span class="sd">        offline(bool): Run logger offline to later stream data to a remote server.</span>
@@ -125,9 +124,9 @@
 <span class="sd">            parameters will be ignored.</span>
 <span class="sd">        batch_granularity(bool): Whether to also output the result of each batch in addition to the epochs.</span>
 <span class="sd">            (Default value = False).</span>
-<span class="sd">        checkpoints_path (Optional[str]): A path leading to the checkpoint saving directory.</span>
+<span class="sd">        checkpoints_path (str | None): A path leading to the checkpoint saving directory.</span>
 <span class="sd">            You need to specify this argument to log the model checkpoints at the end of the training phase.</span>
-<span class="sd">        initial_artifacts_paths (Optional[List[str]]): a list of paths leading to artifacts</span>
+<span class="sd">        initial_artifacts_paths (list[str] | None): a list of paths leading to artifacts</span>
 <span class="sd">            to be logged before the start of the training.</span>
 <span class="sd">        log_gradient_frequency(int): log gradients and parameters every N batches (Default value = None).</span>
 <span class="sd">        training_batch_shape(tuples): Shape of a training batch. Used for logging architecture on wandb.</span>
@@ -161,21 +160,21 @@
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
-        <span class="n">name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">group</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">save_dir</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">offline</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-        <span class="n">run_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">anonymous</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">version</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">project</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">group</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">config</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">save_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">offline</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">run_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">anonymous</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">project</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">experiment</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">batch_granularity</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-        <span class="n">checkpoints_path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">initial_artifacts_paths</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">log_gradient_frequency</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">training_batch_shape</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">tuple</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">batch_granularity</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">checkpoints_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">initial_artifacts_paths</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">log_gradient_frequency</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">training_batch_shape</span><span class="p">:</span> <span class="nb">tuple</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="c1"># pylint: disable-msg=too-many-locals</span>
 
@@ -185,16 +184,16 @@
             <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="s2">&quot;WandB needs to be installed to use this callback.&quot;</span><span class="p">)</span>
 
         <span class="n">anonymous_lut</span> <span class="o">=</span> <span class="p">{</span><span class="kc">True</span><span class="p">:</span> <span class="s2">&quot;allow&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">:</span> <span class="kc">None</span><span class="p">}</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_wandb_init</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
-            <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
-            <span class="n">group</span><span class="o">=</span><span class="n">group</span><span class="p">,</span>
-            <span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">,</span>
-            <span class="n">project</span><span class="o">=</span><span class="n">project</span><span class="p">,</span>
-            <span class="nb">id</span><span class="o">=</span><span class="n">version</span> <span class="ow">or</span> <span class="n">run_id</span><span class="p">,</span>
-            <span class="nb">dir</span><span class="o">=</span><span class="n">save_dir</span><span class="p">,</span>
-            <span class="n">resume</span><span class="o">=</span><span class="s2">&quot;allow&quot;</span><span class="p">,</span>
-            <span class="n">anonymous</span><span class="o">=</span><span class="n">anonymous_lut</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">anonymous</span><span class="p">),</span>
-        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_wandb_init</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span>
+            <span class="s2">&quot;group&quot;</span><span class="p">:</span> <span class="n">group</span><span class="p">,</span>
+            <span class="s2">&quot;config&quot;</span><span class="p">:</span> <span class="n">config</span><span class="p">,</span>
+            <span class="s2">&quot;project&quot;</span><span class="p">:</span> <span class="n">project</span><span class="p">,</span>
+            <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="n">version</span> <span class="ow">or</span> <span class="n">run_id</span><span class="p">,</span>
+            <span class="s2">&quot;dir&quot;</span><span class="p">:</span> <span class="n">save_dir</span><span class="p">,</span>
+            <span class="s2">&quot;resume&quot;</span><span class="p">:</span> <span class="s2">&quot;allow&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;anonymous&quot;</span><span class="p">:</span> <span class="n">anonymous_lut</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">anonymous</span><span class="p">),</span>
+        <span class="p">}</span>
 
         <span class="k">if</span> <span class="n">experiment</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">offline</span><span class="p">:</span>
@@ -205,7 +204,8 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
                     <span class="s2">&quot;There is already a wandb running experiment. This callback will reuse this run. If you want&quot;</span>
-                    <span class="s2">&quot;to start a new one, stop this process and call `wandb.finish()` before starting again.&quot;</span>
+                    <span class="s2">&quot;to start a new one, stop this process and call `wandb.finish()` before starting again.&quot;</span><span class="p">,</span>
+                    <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
                 <span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">run</span> <span class="o">=</span> <span class="n">wandb</span><span class="o">.</span><span class="n">run</span>
         <span class="k">else</span><span class="p">:</span>
@@ -234,7 +234,7 @@
         <span class="n">torch</span><span class="o">.</span><span class="n">onnx</span><span class="o">.</span><span class="n">export</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">network</span><span class="p">,</span> <span class="n">dummies_batch</span><span class="p">,</span> <span class="n">save_path</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">run</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">save_path</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">on_train_begin</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_train_begin</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">on_train_begin</span><span class="p">(</span><span class="n">logs</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">log_gradient_frequency</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_watch_gradient</span><span class="p">()</span>
@@ -244,7 +244,7 @@
 
 <div class="viewcode-block" id="WandBLogger.log_config_params">
 <a class="viewcode-back" href="../../../../callbacks.html#poutyne.WandBLogger.log_config_params">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">log_config_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config_params</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">log_config_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config_params</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Args:</span>
 <span class="sd">            config_params Dict:</span>
@@ -254,7 +254,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">run</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">config_params</span><span class="p">)</span></div>
 
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_on_train_batch_end_write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch_number</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">logs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_on_train_batch_end_write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch_number</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">logs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Log the batch metric.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -263,7 +263,7 @@
             <span class="n">step</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_log_metrics</span><span class="p">(</span><span class="n">train_metrics</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="n">step</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_on_epoch_end_write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epoch_number</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">logs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_on_epoch_end_write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epoch_number</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">logs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Log the epoch metric.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -284,11 +284,11 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_log_metrics</span><span class="p">(</span><span class="n">val_metrics</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="n">step</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_log_params</span><span class="p">(</span><span class="n">learning_rate</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="n">step</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_on_train_end_write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_on_train_end_write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">checkpoints_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_log_artifacts</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">checkpoints_path</span><span class="p">],</span> <span class="s2">&quot;Checkpoints&quot;</span><span class="p">,</span> <span class="n">artifact_type</span><span class="o">=</span><span class="s2">&quot;Model-weights&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_log_metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metrics</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">step</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_log_metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metrics</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">step</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Log metrics for a specific step.</span>
 <span class="sd">        Args:</span>
@@ -300,7 +300,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">run</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">metrics</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="n">step</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_log_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">step</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_log_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">step</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Log parameters for a specific step.</span>
 <span class="sd">        This functions logs parameters as metrics since wandb doesn&#39;t support</span>
@@ -315,14 +315,14 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">run</span><span class="o">.</span><span class="n">log</span><span class="p">({</span><span class="s2">&quot;params&quot;</span><span class="p">:</span> <span class="n">params</span><span class="p">},</span> <span class="n">step</span><span class="o">=</span><span class="n">step</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_log_artifacts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">paths</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">artifact_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_log_artifacts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">paths</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">artifact_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Log artifacts for a specific step.</span>
 <span class="sd">        This function logs multiple artifacts under the same artifact group. if</span>
 <span class="sd">        you wish to log multiple artifacts alone (i.e. under different artifact</span>
 <span class="sd">        groups), you should make multiple calls to this function.</span>
 <span class="sd">        Args:</span>
-<span class="sd">            paths (List[str]): A list of paths leading to the directories or files</span>
+<span class="sd">            paths (list[str]): A list of paths leading to the directories or files</span>
 <span class="sd">                that are to be logged.</span>
 <span class="sd">            name (str): The artifact group name.</span>
 <span class="sd">            artifact_type (str): The artifact group type.</span>
@@ -340,13 +340,13 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">run</span><span class="o">.</span><span class="n">log_artifact</span><span class="p">(</span><span class="n">artifact</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_on_test_end_write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_on_test_end_write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
         <span class="c1"># The test metrics are logged a step further than the training&#39;s</span>
         <span class="c1"># last step</span>
         <span class="n">logs</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;testing&quot;</span><span class="p">:</span> <span class="p">{</span><span class="n">key</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;test_&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">):</span> <span class="n">value</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">logs</span><span class="o">.</span><span class="n">items</span><span class="p">()}}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_log_metrics</span><span class="p">(</span><span class="n">logs</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">run</span><span class="o">.</span><span class="n">step</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">on_test_end</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_test_end</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_on_test_end_write</span><span class="p">(</span><span class="n">logs</span><span class="p">)</span></div>
 
 </pre></div>

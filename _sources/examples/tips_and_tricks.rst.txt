@@ -72,7 +72,7 @@ Here, we initialize the dictionary for our optimizer as well as the string for o
 
 .. code-block:: python
 
-    optimizer = dict(optim='sgd', lr=learning_rate)  # Could be 'sgd' if we didn't need to change the learning rate.
+    optimizer = {'optim': 'sgd', 'lr': learning_rate}  # Could be 'sgd' if we didn't need to change the learning rate.
     loss_function = 'cross_entropy'
 
 Loading the Dataset
@@ -326,7 +326,7 @@ Furthermore, you could also use the :class:`~poutyne.SKLearnMetrics` wrapper to 
 
 
     # kwargs are keyword arguments we wish to pass to roc_auc.
-    roc_epoch_metric = SKLearnMetrics(roc_auc, kwargs=dict(multi_class='ovr', average='macro'))
+    roc_epoch_metric = SKLearnMetrics(roc_auc, kwargs={'multi_class': 'ovr', 'average': 'macro'})
 
 .. code-block:: python
 
@@ -568,7 +568,7 @@ Coloring
 ========
 
 Also, Poutyne use by default a coloring template of the training step when the package `colorama` is installed.
-One could either remove the coloring (``progress_options=dict(coloring=False)``) or set a different coloring template using the fields:
+One could either remove the coloring (``progress_options={'coloring': False}``) or set a different coloring template using the fields:
 ``text_color``, ``ratio_color``, ``metric_value_color``, ``time_color`` and ``progress_bar_color``.
 If a field is not specified, the default color will be used.
 `See available colors in colorama's source code <https://github.com/tartley/colorama/blob/9946cfb/colorama/ansi.py#L49>`__.
@@ -577,7 +577,7 @@ Here an example where we set the ``text_color`` to RED and the ``progress_bar_co
 
 .. code-block:: python
 
-    progress_options = dict(coloring=dict(text_color="RED", progress_bar_color="LIGHTGREEN_EX"))
+    progress_options = {'coloring': {'text_color': "RED", 'progress_bar_color': "LIGHTGREEN_EX"}}
 
     # Instantiating our network
     network = create_network()

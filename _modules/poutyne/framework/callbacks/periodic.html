@@ -5,14 +5,14 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>poutyne.framework.callbacks.periodic &mdash; Poutyne 1.18.0 documentation</title>
+  <title>poutyne.framework.callbacks.periodic &mdash; Poutyne 1.19.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=9edc463e" />
 
   
       <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../../_static/documentation_options.js?v=256cef93"></script>
+      <script src="../../../../_static/documentation_options.js?v=54b9a5ca"></script>
       <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../_static/js/theme.js"></script>
@@ -151,7 +151,8 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">IO</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">IO</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">poutyne.framework.callbacks._utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">atomic_lambda_save</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">poutyne.framework.callbacks.callbacks</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callback</span>
@@ -214,7 +215,7 @@
         <span class="n">restore_best</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">period</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
         <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-        <span class="n">temporary_filename</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">temporary_filename</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">atomic_write</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="n">open_mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;wb&#39;</span><span class="p">,</span>
         <span class="n">read_mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;rb&#39;</span><span class="p">,</span>
@@ -252,7 +253,7 @@
 <div class="viewcode-block" id="PeriodicSaveCallback.save_file">
 <a class="viewcode-back" href="../../../../callbacks.html#poutyne.PeriodicSaveCallback.save_file">[docs]</a>
     <span class="nd">@abstractmethod</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">save_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fd</span><span class="p">:</span> <span class="n">IO</span><span class="p">,</span> <span class="n">epoch_number</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">logs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">save_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fd</span><span class="p">:</span> <span class="n">IO</span><span class="p">,</span> <span class="n">epoch_number</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">logs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Abstract method that is called every time a save needs to be done.</span>
 
@@ -264,7 +265,7 @@
         <span class="k">pass</span></div>
 
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_save_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">epoch_number</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">logs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_save_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">epoch_number</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">logs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">atomic_lambda_save</span><span class="p">(</span>
             <span class="n">filename</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">save_file</span><span class="p">,</span>
@@ -274,7 +275,7 @@
             <span class="n">atomic</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">atomic_write</span><span class="p">,</span>
         <span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">on_epoch_end</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epoch_number</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">logs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_epoch_end</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epoch_number</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">logs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="o">.</span><span class="n">format_map</span><span class="p">(</span><span class="n">logs</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">save_best_only</span><span class="p">:</span>
@@ -286,7 +287,7 @@
                     <span class="bp">self</span><span class="o">.</span><span class="n">best_filename</span> <span class="o">=</span> <span class="n">filename</span>
 
                     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
-                        <span class="nb">print</span><span class="p">(</span>
+                        <span class="nb">print</span><span class="p">(</span>  <span class="c1"># noqa: T201</span>
                             <span class="sa">f</span><span class="s1">&#39;Epoch </span><span class="si">{</span><span class="n">epoch_number</span><span class="si">:</span><span class="s1">d</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">monitor</span><span class="si">}</span><span class="s1"> improved from </span><span class="si">{</span><span class="n">old_best</span><span class="si">:</span><span class="s1">0.5f</span><span class="si">}</span><span class="s1"> &#39;</span>
                             <span class="sa">f</span><span class="s1">&#39;to </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">current_best</span><span class="si">:</span><span class="s1">0.5f</span><span class="si">}</span><span class="s1">, saving file to </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">best_filename</span><span class="si">}</span><span class="s1">&#39;</span>
                         <span class="p">)</span>
@@ -301,7 +302,7 @@
                 <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The monitored metric name </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">monitor</span><span class="si">}</span><span class="s2"> is not found in computed metrics.&quot;</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">epoch_number</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">period</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
-                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Epoch </span><span class="si">{</span><span class="n">epoch_number</span><span class="si">:</span><span class="s1">d</span><span class="si">}</span><span class="s1">: saving file to </span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Epoch </span><span class="si">{</span><span class="n">epoch_number</span><span class="si">:</span><span class="s1">d</span><span class="si">}</span><span class="s1">: saving file to </span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>  <span class="c1"># noqa: T201</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_save_file</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">epoch_number</span><span class="p">,</span> <span class="n">logs</span><span class="p">)</span>
 
 <div class="viewcode-block" id="PeriodicSaveCallback.restore">
@@ -318,17 +319,17 @@
         <span class="k">pass</span></div>
 
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">on_train_end</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_train_end</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">restore_best</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">best_filename</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
-                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Restoring data from </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">best_filename</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Restoring data from </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">best_filename</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>  <span class="c1"># noqa: T201</span>
                 <span class="c1"># pylint: disable=unspecified-encoding</span>
-                <span class="n">open_kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="s1">&#39;b&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_mode</span> <span class="k">else</span> <span class="p">{}</span>
+                <span class="n">open_kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;encoding&#39;</span><span class="p">:</span> <span class="s1">&#39;utf-8&#39;</span><span class="p">}</span> <span class="k">if</span> <span class="s1">&#39;b&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_mode</span> <span class="k">else</span> <span class="p">{}</span>
                 <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">best_filename</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_mode</span><span class="p">,</span> <span class="o">**</span><span class="n">open_kwargs</span><span class="p">)</span> <span class="k">as</span> <span class="n">fd</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">restore</span><span class="p">(</span><span class="n">fd</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;No data to restore!&#39;</span><span class="p">)</span></div>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;No data to restore!&#39;</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span></div>
 
 
 
@@ -349,12 +350,12 @@
 <span class="sd">        :class:`~poutyne.PeriodicSaveCallback`</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">restore</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">restore</span><span class="p">:</span> <span class="n">Callable</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">func</span> <span class="o">=</span> <span class="n">func</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_restore</span> <span class="o">=</span> <span class="n">restore</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">save_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fd</span><span class="p">:</span> <span class="n">IO</span><span class="p">,</span> <span class="n">epoch_number</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">logs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">save_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fd</span><span class="p">:</span> <span class="n">IO</span><span class="p">,</span> <span class="n">epoch_number</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">logs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="p">(</span><span class="n">fd</span><span class="p">,</span> <span class="n">epoch_number</span><span class="p">,</span> <span class="n">logs</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">restore</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fd</span><span class="p">:</span> <span class="n">IO</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>

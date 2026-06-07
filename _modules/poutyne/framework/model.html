@@ -5,14 +5,14 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>poutyne.framework.model &mdash; Poutyne 1.18.0 documentation</title>
+  <title>poutyne.framework.model &mdash; Poutyne 1.19.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
 
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=256cef93"></script>
+      <script src="../../../_static/documentation_options.js?v=54b9a5ca"></script>
       <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -110,7 +110,8 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">pickle</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">timeit</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">defaultdict</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Mapping</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
@@ -137,12 +138,12 @@
 
 <span class="sd">    Args:</span>
 <span class="sd">        network (torch.nn.Module): A PyTorch network.</span>
-<span class="sd">        optimizer (Union[torch.optim.Optimizer, str, dict]): If torch.optim.Optimier, an initialized PyTorch.</span>
+<span class="sd">        optimizer (torch.optim.Optimizer | str | dict): If torch.optim.Optimier, an initialized PyTorch.</span>
 <span class="sd">            If str, should be the name of the optimizer in Pytorch (i.e. &#39;Adam&#39; for torch.optim.Adam).</span>
 <span class="sd">            If dict, should contain a key ``&#39;optim&#39;`` with the value be the name of the optimizer; other</span>
 <span class="sd">            entries are passed to the optimizer as keyword arguments.</span>
 <span class="sd">            (Default value = None)</span>
-<span class="sd">        loss_function(Union[Callable, str]) It can be any PyTorch loss layer or custom loss function. It</span>
+<span class="sd">        loss_function(Callable | str) It can be any PyTorch loss layer or custom loss function. It</span>
 <span class="sd">            can also be a string with the same name as a PyTorch loss function (either the functional or</span>
 <span class="sd">            object name). The loss function must have the signature ``loss_function(input, target)`` where</span>
 <span class="sd">            ``input`` is the prediction of the network and ``target`` is the ground truth.</span>
@@ -170,7 +171,7 @@
 
 <span class="sd">            Epoch metrics are computed only at the end of the epoch.</span>
 <span class="sd">            (Default value = None)</span>
-<span class="sd">        device (Union[torch.torch.device, List[torch.torch.device]]): The device to which the network is</span>
+<span class="sd">        device (torch.device | list[torch.device]): The device to which the network is</span>
 <span class="sd">            sent or the list of device to which the network is sent. See :func:`~Model.to()` for details.</span>
 
 <span class="sd">    Note:</span>
@@ -200,13 +201,14 @@
 
 <span class="sd">            # Our training dataset with 800 samples.</span>
 <span class="sd">            num_train_samples = 800</span>
-<span class="sd">            train_x = np.random.randn(num_train_samples, num_features).astype(&#39;float32&#39;)</span>
-<span class="sd">            train_y = np.random.randint(num_classes, size=num_train_samples).astype(&#39;int64&#39;)</span>
+<span class="sd">            rng = np.random.default_rng()</span>
+<span class="sd">            train_x = rng.standard_normal((num_train_samples, num_features)).astype(&#39;float32&#39;)</span>
+<span class="sd">            train_y = rng.integers(num_classes, size=num_train_samples).astype(&#39;int64&#39;)</span>
 
 <span class="sd">            # Our validation dataset with 200 samples.</span>
 <span class="sd">            num_valid_samples = 200</span>
-<span class="sd">            valid_x = np.random.randn(num_valid_samples, num_features).astype(&#39;float32&#39;)</span>
-<span class="sd">            valid_y = np.random.randint(num_classes, size=num_valid_samples).astype(&#39;int64&#39;)</span>
+<span class="sd">            valid_x = rng.standard_normal((num_valid_samples, num_features)).astype(&#39;float32&#39;)</span>
+<span class="sd">            valid_y = rng.integers(num_classes, size=num_valid_samples).astype(&#39;int64&#39;)</span>
 
 <span class="sd">            pytorch_network = torch.nn.Linear(num_features, num_classes) # Our network</span>
 
@@ -375,7 +377,7 @@
         <span class="n">batches_per_step</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
         <span class="n">initial_epoch</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
         <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="n">progress_options</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">progress_options</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">callbacks</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">dataloader_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
@@ -385,13 +387,13 @@
 <span class="sd">        the :func:`~Model.fit_generator()` method.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            x (Union[~torch.Tensor, ~numpy.ndarray] or Union[tuple, list] of Union[~torch.Tensor, ~numpy.ndarray]):</span>
-<span class="sd">                Training dataset. Union[Tensor, ndarray] if the model has a single input.</span>
-<span class="sd">                Union[tuple, list] of Union[Tensor, ndarray] if the model has multiple inputs.</span>
-<span class="sd">            y (Union[~torch.Tensor, ~numpy.ndarray] or Union[tuple, list] of Union[~torch.Tensor, ~numpy.ndarray]):</span>
-<span class="sd">                Target. Union[Tensor, ndarray] if the model has a single output.</span>
-<span class="sd">                Union[tuple, list] of Union[Tensor, ndarray] if the model has multiple outputs.</span>
-<span class="sd">            validation_data (Tuple[``x_val``, ``y_val``]):</span>
+<span class="sd">            x (~torch.Tensor | ~numpy.ndarray or tuple | list of ~torch.Tensor | ~numpy.ndarray):</span>
+<span class="sd">                Training dataset. Tensor | ndarray if the model has a single input.</span>
+<span class="sd">                tuple | list of Tensor | ndarray if the model has multiple inputs.</span>
+<span class="sd">            y (~torch.Tensor | ~numpy.ndarray or tuple | list of ~torch.Tensor | ~numpy.ndarray):</span>
+<span class="sd">                Target. Tensor | ndarray if the model has a single output.</span>
+<span class="sd">                tuple | list of Tensor | ndarray if the model has multiple outputs.</span>
+<span class="sd">            validation_data (tuple[``x_val``, ``y_val``]):</span>
 <span class="sd">                Same format as ``x`` and ``y`` previously described. Validation dataset on which to</span>
 <span class="sd">                evaluate the loss and any model metrics at the end of each epoch. The model will not be</span>
 <span class="sd">                trained on this data.</span>
@@ -419,7 +421,7 @@
 <span class="sd">            progress_options (dict, optional): Keyword arguments to pass to the default progression callback used</span>
 <span class="sd">                in Poutyne (See :class:`~poutyne.ProgressionCallback` for the available arguments).</span>
 <span class="sd">                (Default value = None)</span>
-<span class="sd">            callbacks (List[~poutyne.Callback]): List of callbacks that will be called</span>
+<span class="sd">            callbacks (list[~poutyne.Callback]): List of callbacks that will be called</span>
 <span class="sd">                during training.</span>
 <span class="sd">                (Default value = None)</span>
 <span class="sd">            dataloader_kwargs (dict, optional): Keyword arguments to pass to the PyTorch dataloaders created</span>
@@ -442,9 +444,12 @@
 
 <span class="sd">            .. code-block:: python</span>
 
-<span class="sd">                {&#39;epoch&#39;: 1, &#39;loss&#39;: 1.7198852968215943, &#39;time&#39;: 0.019999928001197986, &#39;acc&#39;: 19.375, &#39;val_loss&#39;: 1.6674459838867188, &#39;val_acc&#39;: 22.0}</span>
-<span class="sd">                {&#39;epoch&#39;: 2, &#39;loss&#39;: 1.7054892110824584, &#39;time&#39;: 0.015421080999658443, &#39;acc&#39;: 19.75, &#39;val_loss&#39;: 1.660806336402893, &#39;val_acc&#39;: 22.0}</span>
-<span class="sd">                {&#39;epoch&#39;: 3, &#39;loss&#39;: 1.6923445892333984, &#39;time&#39;: 0.01363091799794347, &#39;acc&#39;: 19.625, &#39;val_loss&#39;: 1.6550078630447387, &#39;val_acc&#39;: 22.5}</span>
+<span class="sd">                {&#39;epoch&#39;: 1, &#39;loss&#39;: 1.7198852968215943, &#39;time&#39;: 0.019999928001197986,</span>
+<span class="sd">                 &#39;acc&#39;: 19.375, &#39;val_loss&#39;: 1.6674459838867188, &#39;val_acc&#39;: 22.0}</span>
+<span class="sd">                {&#39;epoch&#39;: 2, &#39;loss&#39;: 1.7054892110824584, &#39;time&#39;: 0.015421080999658443,</span>
+<span class="sd">                 &#39;acc&#39;: 19.75, &#39;val_loss&#39;: 1.660806336402893, &#39;val_acc&#39;: 22.0}</span>
+<span class="sd">                {&#39;epoch&#39;: 3, &#39;loss&#39;: 1.6923445892333984, &#39;time&#39;: 0.01363091799794347,</span>
+<span class="sd">                 &#39;acc&#39;: 19.625, &#39;val_loss&#39;: 1.6550078630447387, &#39;val_acc&#39;: 22.5}</span>
 <span class="sd">                ...</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -524,7 +529,7 @@
 <span class="sd">            progress_options (dict, optional): Keyword arguments to pass to the default progression callback used</span>
 <span class="sd">                in Poutyne (See :class:`~poutyne.ProgressionCallback` for the available arguments).</span>
 <span class="sd">                (Default value = None)</span>
-<span class="sd">            callbacks (List[~poutyne.Callback]): List of callbacks that will be called</span>
+<span class="sd">            callbacks (list[~poutyne.Callback]): List of callbacks that will be called</span>
 <span class="sd">                during training.</span>
 <span class="sd">                (Default value = None)</span>
 <span class="sd">            dataloader_kwargs (dict, optional): Keyword arguments to pass to the PyTorch dataloaders created</span>
@@ -554,9 +559,12 @@
 
 <span class="sd">            .. code-block:: python</span>
 
-<span class="sd">                {&#39;epoch&#39;: 1, &#39;loss&#39;: 1.7198852968215943, &#39;time&#39;: 0.019999928001197986, &#39;acc&#39;: 19.375, &#39;val_loss&#39;: 1.6674459838867188, &#39;val_acc&#39;: 22.0}</span>
-<span class="sd">                {&#39;epoch&#39;: 2, &#39;loss&#39;: 1.7054892110824584, &#39;time&#39;: 0.015421080999658443, &#39;acc&#39;: 19.75, &#39;val_loss&#39;: 1.660806336402893, &#39;val_acc&#39;: 22.0}</span>
-<span class="sd">                {&#39;epoch&#39;: 3, &#39;loss&#39;: 1.6923445892333984, &#39;time&#39;: 0.01363091799794347, &#39;acc&#39;: 19.625, &#39;val_loss&#39;: 1.6550078630447387, &#39;val_acc&#39;: 22.5}</span>
+<span class="sd">                {&#39;epoch&#39;: 1, &#39;loss&#39;: 1.7198852968215943, &#39;time&#39;: 0.019999928001197986,</span>
+<span class="sd">                 &#39;acc&#39;: 19.375, &#39;val_loss&#39;: 1.6674459838867188, &#39;val_acc&#39;: 22.0}</span>
+<span class="sd">                {&#39;epoch&#39;: 2, &#39;loss&#39;: 1.7054892110824584, &#39;time&#39;: 0.015421080999658443,</span>
+<span class="sd">                 &#39;acc&#39;: 19.75, &#39;val_loss&#39;: 1.660806336402893, &#39;val_acc&#39;: 22.0}</span>
+<span class="sd">                {&#39;epoch&#39;: 3, &#39;loss&#39;: 1.6923445892333984, &#39;time&#39;: 0.01363091799794347,</span>
+<span class="sd">                 &#39;acc&#39;: 19.625, &#39;val_loss&#39;: 1.6550078630447387, &#39;val_acc&#39;: 22.5}</span>
 <span class="sd">                ...</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -601,7 +609,7 @@
         <span class="n">batches_per_step</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
         <span class="n">initial_epoch</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
         <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="n">progress_options</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">progress_options</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">callbacks</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="c1"># pylint: disable=line-too-long</span>
@@ -651,7 +659,7 @@
 <span class="sd">            progress_options (dict, optional): Keyword arguments to pass to the default progression callback used</span>
 <span class="sd">                in Poutyne (See :class:`~poutyne.ProgressionCallback` for the available arguments).</span>
 <span class="sd">                (Default value = None, meaning default color setting and progress bar)</span>
-<span class="sd">            callbacks (List[~poutyne.Callback]): List of callbacks that will be called during</span>
+<span class="sd">            callbacks (list[~poutyne.Callback]): List of callbacks that will be called during</span>
 <span class="sd">                training. (Default value = None)</span>
 
 <span class="sd">        Returns:</span>
@@ -669,9 +677,12 @@
 
 <span class="sd">            .. code-block:: python</span>
 
-<span class="sd">                {&#39;epoch&#39;: 1, &#39;loss&#39;: 1.7198852968215943, &#39;time&#39;: 0.019999928001197986, &#39;acc&#39;: 19.375, &#39;val_loss&#39;: 1.6674459838867188, &#39;val_acc&#39;: 22.0}</span>
-<span class="sd">                {&#39;epoch&#39;: 2, &#39;loss&#39;: 1.7054892110824584, &#39;time&#39;: 0.015421080999658443, &#39;acc&#39;: 19.75, &#39;val_loss&#39;: 1.660806336402893, &#39;val_acc&#39;: 22.0}</span>
-<span class="sd">                {&#39;epoch&#39;: 3, &#39;loss&#39;: 1.6923445892333984, &#39;time&#39;: 0.01363091799794347, &#39;acc&#39;: 19.625, &#39;val_loss&#39;: 1.6550078630447387, &#39;val_acc&#39;: 22.5}</span>
+<span class="sd">                {&#39;epoch&#39;: 1, &#39;loss&#39;: 1.7198852968215943, &#39;time&#39;: 0.019999928001197986,</span>
+<span class="sd">                 &#39;acc&#39;: 19.375, &#39;val_loss&#39;: 1.6674459838867188, &#39;val_acc&#39;: 22.0}</span>
+<span class="sd">                {&#39;epoch&#39;: 2, &#39;loss&#39;: 1.7054892110824584, &#39;time&#39;: 0.015421080999658443,</span>
+<span class="sd">                 &#39;acc&#39;: 19.75, &#39;val_loss&#39;: 1.660806336402893, &#39;val_acc&#39;: 22.0}</span>
+<span class="sd">                {&#39;epoch&#39;: 3, &#39;loss&#39;: 1.6923445892333984, &#39;time&#39;: 0.01363091799794347,</span>
+<span class="sd">                 &#39;acc&#39;: 19.625, &#39;val_loss&#39;: 1.6550078630447387, &#39;val_acc&#39;: 22.5}</span>
 <span class="sd">                ...</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -684,7 +695,7 @@
 
         <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
             <span class="n">progress_options</span> <span class="o">=</span> <span class="p">{}</span> <span class="k">if</span> <span class="n">progress_options</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">progress_options</span>
-            <span class="n">callbacks</span> <span class="o">=</span> <span class="p">[</span><span class="n">ProgressionCallback</span><span class="p">(</span><span class="o">**</span><span class="n">progress_options</span><span class="p">)]</span> <span class="o">+</span> <span class="n">callbacks</span>
+            <span class="n">callbacks</span> <span class="o">=</span> <span class="p">[</span><span class="n">ProgressionCallback</span><span class="p">(</span><span class="o">**</span><span class="n">progress_options</span><span class="p">),</span> <span class="o">*</span><span class="n">callbacks</span><span class="p">]</span>
         <span class="n">callback_list</span> <span class="o">=</span> <span class="n">CallbackList</span><span class="p">(</span><span class="n">callbacks</span><span class="p">)</span>
         <span class="n">callback_list</span><span class="o">.</span><span class="n">set_model</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
@@ -746,12 +757,14 @@
         <span class="n">batches_per_step</span><span class="p">,</span>
         <span class="n">examples_in_step</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
-        <span class="n">callback</span><span class="o">=</span><span class="n">Callback</span><span class="p">(),</span>
+        <span class="n">callback</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">step</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">return_pred</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">convert_to_numpy</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="c1"># pylint: disable=too-many-locals</span>
+        <span class="k">if</span> <span class="n">callback</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">callback</span> <span class="o">=</span> <span class="n">Callback</span><span class="p">()</span>
         <span class="n">zero_all_gradients</span> <span class="o">=</span> <span class="p">(</span><span class="n">step</span><span class="o">.</span><span class="n">number</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="n">batches_per_step</span> <span class="o">==</span> <span class="mi">0</span>
         <span class="n">do_backprop</span> <span class="o">=</span> <span class="n">step</span><span class="o">.</span><span class="n">number</span> <span class="o">%</span> <span class="n">batches_per_step</span> <span class="o">==</span> <span class="mi">0</span>
 
@@ -771,7 +784,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_adjust_step_size</span><span class="p">(</span><span class="n">examples_in_step</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
 
-        <span class="n">loss</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">loss_tensor</span><span class="p">)</span>
+        <span class="n">loss</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">loss_tensor</span><span class="o">.</span><span class="n">detach</span><span class="p">())</span>
         <span class="k">return</span> <span class="n">loss</span><span class="p">,</span> <span class="n">batch_metrics</span><span class="p">,</span> <span class="n">do_backprop</span><span class="p">,</span> <span class="n">pred_y</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_fit_generator_one_batch_per_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epoch_iterator</span><span class="p">,</span> <span class="n">callback_list</span><span class="p">):</span>
@@ -787,7 +800,9 @@
 
             <span class="bp">self</span><span class="o">.</span><span class="n">_run_validation</span><span class="p">(</span><span class="n">valid_step_iterator</span><span class="p">,</span> <span class="n">callback_list</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_fit_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">callback</span><span class="o">=</span><span class="n">Callback</span><span class="p">(),</span> <span class="n">step</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">return_pred</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">convert_to_numpy</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_fit_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">callback</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">return_pred</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">convert_to_numpy</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">callback</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">callback</span> <span class="o">=</span> <span class="n">Callback</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
 
         <span class="n">loss_tensor</span><span class="p">,</span> <span class="n">batch_metrics</span><span class="p">,</span> <span class="n">pred_y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compute_loss_and_metrics</span><span class="p">(</span>
@@ -798,7 +813,7 @@
         <span class="n">callback</span><span class="o">.</span><span class="n">on_backward_end</span><span class="p">(</span><span class="n">step</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
 
-        <span class="n">loss</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">loss_tensor</span><span class="p">)</span>
+        <span class="n">loss</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">loss_tensor</span><span class="o">.</span><span class="n">detach</span><span class="p">())</span>
         <span class="k">return</span> <span class="n">loss</span><span class="p">,</span> <span class="n">batch_metrics</span><span class="p">,</span> <span class="n">pred_y</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_run_validation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">valid_step_iterator</span><span class="p">,</span> <span class="n">callback_list</span><span class="p">):</span>
@@ -886,7 +901,7 @@
             <span class="p">)</span>
 
         <span class="k">if</span> <span class="n">return_dict_format</span><span class="p">:</span>
-            <span class="n">logs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">loss</span><span class="o">=</span><span class="n">loss</span><span class="p">)</span>
+            <span class="n">logs</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;loss&quot;</span><span class="p">:</span> <span class="n">loss</span><span class="p">}</span>
             <span class="n">logs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">batch_metrics_names</span><span class="p">,</span> <span class="n">batch_metrics</span><span class="p">))</span>
 
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_format_truth_pred_return</span><span class="p">((</span><span class="n">logs</span><span class="p">,),</span> <span class="n">pred_y</span><span class="p">,</span> <span class="n">return_pred</span><span class="p">)</span>
@@ -921,7 +936,7 @@
         <span class="n">batch_size</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span>
         <span class="n">convert_to_numpy</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="n">progress_options</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">progress_options</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">callbacks</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">dataloader_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
@@ -930,9 +945,9 @@
 <span class="sd">        converted into Numpy arrays.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            x (Union[~torch.Tensor, ~numpy.ndarray] or Union[tuple, list] of Union[~torch.Tensor, ~numpy.ndarray]):</span>
-<span class="sd">                Input to the model. Union[Tensor, ndarray] if the model has a single input.</span>
-<span class="sd">                Union[tuple, list] of Union[Tensor, ndarray] if the model has multiple inputs.</span>
+<span class="sd">            x (~torch.Tensor | ~numpy.ndarray or tuple | list of ~torch.Tensor | ~numpy.ndarray):</span>
+<span class="sd">                Input to the model. Tensor | ndarray if the model has a single input.</span>
+<span class="sd">                tuple | list of Tensor | ndarray if the model has multiple inputs.</span>
 <span class="sd">            batch_size (int): Number of samples given to the network at one time.</span>
 <span class="sd">                (Default value = 32)</span>
 <span class="sd">            concatenate_returns (bool, optional): Whether to concatenate the predictions when returning them.</span>
@@ -942,7 +957,7 @@
 <span class="sd">            progress_options (dict, optional): Keyword arguments to pass to the default progression callback used</span>
 <span class="sd">                in Poutyne (See :class:`~poutyne.ProgressionCallback` for the available arguments).</span>
 <span class="sd">                (Default value = None, meaning default color setting and progress bar)</span>
-<span class="sd">            callbacks (List[~poutyne.Callback]): List of callbacks that will be called during</span>
+<span class="sd">            callbacks (list[~poutyne.Callback]): List of callbacks that will be called during</span>
 <span class="sd">                testing. (Default value = None)</span>
 <span class="sd">            dataloader_kwargs (dict, optional): Keyword arguments to pass to the PyTorch dataloaders created</span>
 <span class="sd">                internally.</span>
@@ -979,7 +994,7 @@
         <span class="n">num_workers</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
         <span class="n">collate_fn</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="n">progress_options</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">progress_options</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">callbacks</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">dataloader_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
@@ -1013,7 +1028,7 @@
 <span class="sd">            progress_options (dict, optional): Keyword arguments to pass to the default progression callback used</span>
 <span class="sd">                in Poutyne (See :class:`~poutyne.ProgressionCallback` for the available arguments).</span>
 <span class="sd">                (Default value = None, meaning default color setting and progress bar)</span>
-<span class="sd">            callbacks (List[~poutyne.Callback]): List of callbacks that will be called during</span>
+<span class="sd">            callbacks (list[~poutyne.Callback]): List of callbacks that will be called during</span>
 <span class="sd">                testing. (Default value = None)</span>
 <span class="sd">            dataloader_kwargs (dict, optional): Keyword arguments to pass to the PyTorch dataloaders created</span>
 <span class="sd">                internally.</span>
@@ -1063,7 +1078,7 @@
         <span class="n">concatenate_returns</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="n">convert_to_numpy</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="n">progress_options</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">progress_options</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">callbacks</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -1090,7 +1105,7 @@
 <span class="sd">            progress_options (dict, optional): Keyword arguments to pass to the default progression callback used</span>
 <span class="sd">                in Poutyne (See :class:`~poutyne.ProgressionCallback` for the available arguments).</span>
 <span class="sd">                (Default value = None, meaning default color setting and progress bar)</span>
-<span class="sd">            callbacks (List[~poutyne.Callback]): List of callbacks that will be called during</span>
+<span class="sd">            callbacks (list[~poutyne.Callback]): List of callbacks that will be called during</span>
 <span class="sd">                testing. (Default value = None)</span>
 
 <span class="sd">        Returns:</span>
@@ -1113,7 +1128,7 @@
 
         <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
             <span class="n">progress_options</span> <span class="o">=</span> <span class="p">{}</span> <span class="k">if</span> <span class="n">progress_options</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">progress_options</span>
-            <span class="n">callbacks</span> <span class="o">=</span> <span class="p">[</span><span class="n">ProgressionCallback</span><span class="p">(</span><span class="o">**</span><span class="n">progress_options</span><span class="p">)]</span> <span class="o">+</span> <span class="n">callbacks</span>
+            <span class="n">callbacks</span> <span class="o">=</span> <span class="p">[</span><span class="n">ProgressionCallback</span><span class="p">(</span><span class="o">**</span><span class="n">progress_options</span><span class="p">),</span> <span class="o">*</span><span class="n">callbacks</span><span class="p">]</span>
         <span class="n">callback_list</span> <span class="o">=</span> <span class="n">CallbackList</span><span class="p">(</span><span class="n">callbacks</span><span class="p">)</span>
         <span class="n">callback_list</span><span class="o">.</span><span class="n">set_model</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="n">callback_list</span><span class="o">.</span><span class="n">set_params</span><span class="p">({</span><span class="s1">&#39;steps&#39;</span><span class="p">:</span> <span class="n">steps</span><span class="p">})</span>
@@ -1188,21 +1203,21 @@
         <span class="n">convert_to_numpy</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="n">callbacks</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="n">progress_options</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">progress_options</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">dataloader_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">:</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Computes the loss and the metrics of the network on batches of samples and optionally</span>
 <span class="sd">        returns the predictions.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            x (Union[~torch.Tensor, ~numpy.ndarray] or Union[tuple, list] of Union[~torch.Tensor, ~numpy.ndarray]):</span>
-<span class="sd">                Input to the model. Union[Tensor, ndarray] if the model has a single input.</span>
-<span class="sd">                Union[tuple, list] of Union[Tensor, ndarray] if the model has multiple inputs.</span>
-<span class="sd">            y (Union[~torch.Tensor, ~numpy.ndarray] or Union[tuple, list] of Union[~torch.Tensor, ~numpy.ndarray]):</span>
+<span class="sd">            x (~torch.Tensor | ~numpy.ndarray or tuple | list of ~torch.Tensor | ~numpy.ndarray):</span>
+<span class="sd">                Input to the model. Tensor | ndarray if the model has a single input.</span>
+<span class="sd">                tuple | list of Tensor | ndarray if the model has multiple inputs.</span>
+<span class="sd">            y (~torch.Tensor | ~numpy.ndarray or tuple | list of ~torch.Tensor | ~numpy.ndarray):</span>
 <span class="sd">                Target, corresponding ground truth.</span>
-<span class="sd">                Union[Tensor, ndarray] if the model has a single output.</span>
-<span class="sd">                Union[tuple, list] of Union[Tensor, ndarray] if the model has multiple outputs.</span>
+<span class="sd">                Tensor | ndarray if the model has a single output.</span>
+<span class="sd">                tuple | list of Tensor | ndarray if the model has multiple outputs.</span>
 <span class="sd">            batch_size (int): Number of samples given to the network at one time.</span>
 <span class="sd">                (Default value = 32)</span>
 <span class="sd">            return_pred (bool, optional): Whether to return the predictions.</span>
@@ -1211,7 +1226,7 @@
 <span class="sd">                (Default value = False)</span>
 <span class="sd">            convert_to_numpy (bool, optional): Whether to convert the predictions into Numpy Arrays when ``return_pred``</span>
 <span class="sd">                is true. (Default value = True)</span>
-<span class="sd">            callbacks (List[~poutyne.Callback]): List of callbacks that will be called during</span>
+<span class="sd">            callbacks (list[~poutyne.Callback]): List of callbacks that will be called during</span>
 <span class="sd">                testing. (Default value = None)</span>
 <span class="sd">            verbose (bool): Whether to display the progress of the evaluation.</span>
 <span class="sd">                (Default value = True)</span>
@@ -1272,8 +1287,8 @@
         <span class="n">collate_fn</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">dataloader_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="n">progress_options</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">:</span>
+        <span class="n">progress_options</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
         <span class="c1"># pylint: disable=too-many-locals</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Computes the loss and the metrics of the network on batches of samples and optionally</span>
@@ -1295,7 +1310,7 @@
 <span class="sd">                or the ground truths when returning them. (Default value = True)</span>
 <span class="sd">            convert_to_numpy (bool, optional): Whether to convert the predictions or ground truths into Numpy Arrays</span>
 <span class="sd">                when ``return_pred`` or ``return_ground_truth`` are true. (Default value = True)</span>
-<span class="sd">            callbacks (List[~poutyne.Callback]): List of callbacks that will be called during</span>
+<span class="sd">            callbacks (list[~poutyne.Callback]): List of callbacks that will be called during</span>
 <span class="sd">                testing. (Default value = None)</span>
 <span class="sd">            num_workers (int, optional): how many subprocesses to use for data loading.</span>
 <span class="sd">                ``0`` means that the data will be loaded in the main process.</span>
@@ -1367,9 +1382,9 @@
         <span class="n">concatenate_returns</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="n">convert_to_numpy</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="n">progress_options</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">progress_options</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">callbacks</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">:</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
         <span class="c1"># pylint: disable=too-many-locals</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Computes the loss and the metrics of the network on batches of samples and optionally returns</span>
@@ -1395,7 +1410,7 @@
 <span class="sd">            progress_options (dict, optional): Keyword arguments to pass to the default progression callback used</span>
 <span class="sd">                in Poutyne (See :class:`~poutyne.ProgressionCallback` for the available arguments).</span>
 <span class="sd">                (Default value = None, meaning default color setting and progress bar)</span>
-<span class="sd">            callbacks (List[~poutyne.Callback]): List of callbacks that will be called during</span>
+<span class="sd">            callbacks (list[~poutyne.Callback]): List of callbacks that will be called during</span>
 <span class="sd">                testing. (Default value = None)</span>
 
 <span class="sd">        Returns:</span>
@@ -1483,7 +1498,7 @@
 
         <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
             <span class="n">progress_options</span> <span class="o">=</span> <span class="p">{}</span> <span class="k">if</span> <span class="n">progress_options</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">progress_options</span>
-            <span class="n">callbacks</span> <span class="o">=</span> <span class="p">[</span><span class="n">ProgressionCallback</span><span class="p">(</span><span class="o">**</span><span class="n">progress_options</span><span class="p">)]</span> <span class="o">+</span> <span class="n">callbacks</span>
+            <span class="n">callbacks</span> <span class="o">=</span> <span class="p">[</span><span class="n">ProgressionCallback</span><span class="p">(</span><span class="o">**</span><span class="n">progress_options</span><span class="p">),</span> <span class="o">*</span><span class="n">callbacks</span><span class="p">]</span>
 
         <span class="k">if</span> <span class="n">steps</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">generator</span><span class="p">,</span> <span class="s1">&#39;__len__&#39;</span><span class="p">):</span>
             <span class="n">steps</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">generator</span><span class="p">)</span>
@@ -1532,7 +1547,7 @@
 
 <div class="viewcode-block" id="Model.evaluate_on_batch">
 <a class="viewcode-back" href="../../../model.html#poutyne.Model.evaluate_on_batch">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">evaluate_on_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">return_pred</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">return_dict_format</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">convert_to_numpy</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">evaluate_on_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">return_pred</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">return_dict_format</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">convert_to_numpy</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Computes the loss and the metrics of the network on a single batch of samples and optionally</span>
 <span class="sd">        returns the predictions.</span>
@@ -1567,7 +1582,7 @@
             <span class="p">)</span>
 
         <span class="k">if</span> <span class="n">return_dict_format</span><span class="p">:</span>
-            <span class="n">logs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">loss</span><span class="o">=</span><span class="n">loss</span><span class="p">)</span>
+            <span class="n">logs</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;loss&quot;</span><span class="p">:</span> <span class="n">loss</span><span class="p">}</span>
             <span class="n">logs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">batch_metrics_names</span><span class="p">,</span> <span class="n">batch_metrics</span><span class="p">))</span>
 
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_format_truth_pred_return</span><span class="p">((</span><span class="n">logs</span><span class="p">,),</span> <span class="n">pred_y</span><span class="p">,</span> <span class="n">return_pred</span><span class="p">)</span>
@@ -1600,21 +1615,18 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">_compute_loss_and_metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">return_loss_tensor</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">return_pred</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">convert_to_numpy</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">preprocess_input</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">other_device</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">pred_y</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">parallel</span><span class="o">.</span><span class="n">data_parallel</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">network</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">other_device</span><span class="p">)</span>
+            <span class="n">pred_y</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">parallel</span><span class="o">.</span><span class="n">data_parallel</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">network</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">,</span> <span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">other_device</span><span class="p">])</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">pred_y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">network</span><span class="p">(</span><span class="o">*</span><span class="n">x</span><span class="p">)</span>
         <span class="n">loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss_function</span><span class="p">(</span><span class="n">pred_y</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">return_loss_tensor</span><span class="p">:</span>
-            <span class="n">loss</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">loss</span><span class="p">)</span>
+            <span class="n">loss</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">loss</span><span class="o">.</span><span class="n">detach</span><span class="p">())</span>
         <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
             <span class="n">batch_metrics</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compute_batch_metrics</span><span class="p">(</span><span class="n">pred_y</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">epoch_metric</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">epoch_metrics</span><span class="p">:</span>
                 <span class="n">epoch_metric</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">pred_y</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">return_pred</span><span class="p">:</span>
-            <span class="n">pred_y</span> <span class="o">=</span> <span class="n">torch_to_numpy</span><span class="p">(</span><span class="n">pred_y</span><span class="p">)</span> <span class="k">if</span> <span class="n">convert_to_numpy</span> <span class="k">else</span> <span class="n">pred_y</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">pred_y</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">pred_y</span> <span class="o">=</span> <span class="p">(</span><span class="n">torch_to_numpy</span><span class="p">(</span><span class="n">pred_y</span><span class="p">)</span> <span class="k">if</span> <span class="n">convert_to_numpy</span> <span class="k">else</span> <span class="n">pred_y</span><span class="p">)</span> <span class="k">if</span> <span class="n">return_pred</span> <span class="k">else</span> <span class="kc">None</span>
 
         <span class="k">return</span> <span class="n">loss</span><span class="p">,</span> <span class="n">batch_metrics</span><span class="p">,</span> <span class="n">pred_y</span>
 
@@ -1741,9 +1753,9 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">_get_named_optimizer_attrs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">param_to_name</span> <span class="o">=</span> <span class="p">{</span><span class="n">param</span><span class="p">:</span> <span class="n">name</span> <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">param</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">network</span><span class="o">.</span><span class="n">named_parameters</span><span class="p">()}</span>
 
-        <span class="n">param_name_groups</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">group</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="o">.</span><span class="n">param_groups</span><span class="p">:</span>
-            <span class="n">param_name_groups</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">param_to_name</span><span class="p">[</span><span class="n">param</span><span class="p">]</span> <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">group</span><span class="p">[</span><span class="s1">&#39;params&#39;</span><span class="p">]])</span>
+        <span class="n">param_name_groups</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">[</span><span class="n">param_to_name</span><span class="p">[</span><span class="n">param</span><span class="p">]</span> <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">group</span><span class="p">[</span><span class="s1">&#39;params&#39;</span><span class="p">]]</span> <span class="k">for</span> <span class="n">group</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="o">.</span><span class="n">param_groups</span>
+        <span class="p">]</span>
 
         <span class="n">named_state</span> <span class="o">=</span> <span class="p">{</span><span class="n">param_to_name</span><span class="p">[</span><span class="n">param</span><span class="p">]:</span> <span class="n">state</span> <span class="k">for</span> <span class="n">param</span><span class="p">,</span> <span class="n">state</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
 
@@ -1791,7 +1803,7 @@
 <span class="sd">        Returns a dictionary containing copies of the parameters of the network.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">weights</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_weights</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">weights</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">weights</span><span class="p">:</span>
             <span class="n">weights</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">weights</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">weights</span></div>
 
@@ -1906,14 +1918,14 @@
 <span class="sd">            takes care of this inconsistency by updating the parameters inside the optimizer.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            device (Union[torch.torch.device, List[torch.torch.device]]): The device to which the network is sent or</span>
+<span class="sd">            device (torch.device | list[torch.device]): The device to which the network is sent or</span>
 <span class="sd">            the list of device to which the network is sent.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            `self`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">other_device</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">device</span><span class="p">,</span> <span class="n">List</span><span class="p">)</span> <span class="ow">or</span> <span class="n">device</span> <span class="o">==</span> <span class="s2">&quot;all&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">device</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">or</span> <span class="n">device</span> <span class="o">==</span> <span class="s2">&quot;all&quot;</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">device</span> <span class="o">==</span> <span class="s2">&quot;all&quot;</span><span class="p">:</span>
                 <span class="n">device</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;cuda:</span><span class="si">{</span><span class="n">device</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">device</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">device_count</span><span class="p">())]</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span class="n">device</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>

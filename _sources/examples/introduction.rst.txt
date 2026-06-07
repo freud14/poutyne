@@ -56,7 +56,7 @@ Now, let's set our training constants. We first have the CUDA device used for tr
 .. code-block:: python
 
     cuda_device = 0
-    device = torch.device("cuda:%d" % cuda_device if torch.cuda.is_available() else "cpu")
+    device = torch.device(f"cuda:{cuda_device}" if torch.cuda.is_available() else "cpu")
 
     train_split_percent = 0.8
 
@@ -304,7 +304,7 @@ That is, doing your own training loop.
                 # Since the loss and accuracy are averages for the batch, we multiply
                 # them by the the number of examples so that we can do the right
                 # averages at the end of the epoch.
-                loss_sum += float(loss) * len(x)
+                loss_sum += float(loss.detach()) * len(x)
                 acc_sum += float(pytorch_accuracy(y_pred, y)) * len(x)
                 example_count += len(x)
 
@@ -341,7 +341,7 @@ That is, doing your own training loop.
                 # Since the loss and accuracy are averages for the batch, we multiply
                 # them by the the number of examples so that we can do the right
                 # averages at the end of the test.
-                loss_sum += float(loss) * len(x)
+                loss_sum += float(loss.detach()) * len(x)
                 acc_sum += float(pytorch_accuracy(y_pred, y)) * len(x)
                 example_count += len(x)
 

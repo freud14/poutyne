@@ -5,14 +5,14 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>poutyne.utils &mdash; Poutyne 1.18.0 documentation</title>
+  <title>poutyne.utils &mdash; Poutyne 1.19.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
 
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=256cef93"></script>
+      <script src="../../_static/documentation_options.js?v=54b9a5ca"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -113,7 +113,7 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">pickle</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">random</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">IO</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">BinaryIO</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">IO</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">BinaryIO</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
@@ -216,7 +216,7 @@
         <span class="k">return</span> <span class="nb">type</span><span class="p">(</span><span class="n">first_item</span><span class="p">)(</span><span class="n">_concat</span><span class="p">(</span><span class="n">ele</span><span class="p">)</span> <span class="k">for</span> <span class="n">ele</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">obj</span><span class="p">))</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">first_item</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
         <span class="n">concat_dict</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">first_item</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">first_item</span><span class="p">:</span>
             <span class="n">concat_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">_concat</span><span class="p">([</span><span class="n">o</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">obj</span><span class="p">])</span>
         <span class="k">return</span> <span class="n">concat_dict</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">first_item</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">first_item</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
@@ -319,21 +319,21 @@
 
 <div class="viewcode-block" id="save_random_states">
 <a class="viewcode-back" href="../../utils.html#poutyne.save_random_states">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">save_random_states</span><span class="p">(</span><span class="n">f</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">PathLike</span><span class="p">,</span> <span class="n">BinaryIO</span><span class="p">,</span> <span class="n">IO</span><span class="p">[</span><span class="nb">bytes</span><span class="p">]]):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">save_random_states</span><span class="p">(</span><span class="n">f</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">os</span><span class="o">.</span><span class="n">PathLike</span> <span class="o">|</span> <span class="n">BinaryIO</span> <span class="o">|</span> <span class="n">IO</span><span class="p">[</span><span class="nb">bytes</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Save Python, Numpy and Pytorch&#39;s (both CPU and GPU) random states.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        f (Union[str, os.PathLike, BinaryIO, IO[bytes]]): a file-like object (has to implement write and flush) or</span>
+<span class="sd">        f (str | os.PathLike | BinaryIO | IO[bytes]): a file-like object (has to implement write and flush) or</span>
 <span class="sd">            a string or os.PathLike object containing a file name.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">(</span>
-        <span class="nb">dict</span><span class="p">(</span>
-            <span class="n">cpu</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">get_rng_state</span><span class="p">(),</span>
-            <span class="n">cuda</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">get_rng_state_all</span><span class="p">(),</span>
-            <span class="n">numpy</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">get_state</span><span class="p">(),</span>
-            <span class="n">python</span><span class="o">=</span><span class="n">random</span><span class="o">.</span><span class="n">getstate</span><span class="p">(),</span>
-        <span class="p">),</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;cpu&quot;</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">get_rng_state</span><span class="p">(),</span>
+            <span class="s2">&quot;cuda&quot;</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">get_rng_state_all</span><span class="p">(),</span>
+            <span class="s2">&quot;numpy&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">get_state</span><span class="p">(),</span>
+            <span class="s2">&quot;python&quot;</span><span class="p">:</span> <span class="n">random</span><span class="o">.</span><span class="n">getstate</span><span class="p">(),</span>
+        <span class="p">},</span>
         <span class="n">f</span><span class="p">,</span>
         <span class="n">pickle_module</span><span class="o">=</span><span class="n">pickle</span><span class="p">,</span>
     <span class="p">)</span></div>
@@ -359,9 +359,8 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">is_in_jupyter_notebook</span><span class="p">():</span>
-    <span class="c1"># pylint: disable=import-outside-toplevel</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="kn">from</span><span class="w"> </span><span class="nn">IPython</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_ipython</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">IPython</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_ipython</span>  <span class="c1"># noqa: PLC0415 (import-outside-toplevel)</span>
 
         <span class="n">shell</span> <span class="o">=</span> <span class="n">get_ipython</span><span class="p">()</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
         <span class="n">jupyter</span> <span class="o">=</span> <span class="n">shell</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;ZMQInteractiveShell&#39;</span><span class="p">,</span> <span class="s1">&#39;Shell&#39;</span><span class="p">]</span>
@@ -406,16 +405,14 @@
         <span class="k">if</span> <span class="n">is_torch_or_numpy</span><span class="p">(</span><span class="n">v</span><span class="p">):</span>
             <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">values</span><span class="p">:</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="p">(</span><span class="nb">tuple</span><span class="p">,</span> <span class="nb">list</span><span class="p">)):</span>
-            <span class="k">if</span> <span class="n">is_torch_or_numpy</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
-                <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="p">(</span><span class="nb">tuple</span><span class="p">,</span> <span class="nb">list</span><span class="p">))</span> <span class="ow">and</span> <span class="n">is_torch_or_numpy</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+            <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">values</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="s1">&#39;batch_size&#39;</span> <span class="ow">in</span> <span class="n">v</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="s1">&#39;batch_size&#39;</span><span class="p">],</span> <span class="n">numbers</span><span class="o">.</span><span class="n">Integral</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">v</span><span class="p">[</span><span class="s1">&#39;batch_size&#39;</span><span class="p">]</span>
     <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">values</span><span class="p">:</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-            <span class="k">if</span> <span class="s1">&#39;batch_size&#39;</span> <span class="ow">in</span> <span class="n">v</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="s1">&#39;batch_size&#39;</span><span class="p">],</span> <span class="n">numbers</span><span class="o">.</span><span class="n">Integral</span><span class="p">):</span>
-                <span class="k">return</span> <span class="n">v</span><span class="p">[</span><span class="s1">&#39;batch_size&#39;</span><span class="p">]</span>
-    <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">values</span><span class="p">:</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-            <span class="n">first_value</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">values</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">first_value</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span>
             <span class="k">if</span> <span class="n">is_torch_or_numpy</span><span class="p">(</span><span class="n">first_value</span><span class="p">):</span>
                 <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">first_value</span><span class="p">)</span>
 
@@ -425,29 +422,23 @@
             <span class="s2">&quot;set</span><span class="se">\n</span><span class="s2">&quot;</span>
             <span class="s2">&quot;from poutyne import warning_settings</span><span class="se">\n</span><span class="s2">&quot;</span>
             <span class="s2">&quot;warning_settings[&#39;batch_size&#39;] = &#39;ignore&#39;</span><span class="se">\n\n</span><span class="s2">&quot;</span>
-            <span class="c1">#</span>
-            <span class="c1">#</span>
             <span class="s2">&quot;Here is the inferring algorithm used to compute the batch size. The values are tested in order at each &quot;</span>
             <span class="s2">&quot;step of the inferring algorithm. If one step succeed for one of the values, the algorithm stops.</span><span class="se">\n\n</span><span class="s2">&quot;</span>
-            <span class="c1">#</span>
-            <span class="c1">#</span>
             <span class="s2">&quot;Step 1: if a value is a tensor or a Numpy array, then the &#39;len()&#39; is returned.</span><span class="se">\n</span><span class="s2">&quot;</span>
-            <span class="c1">#</span>
             <span class="s2">&quot;Step 2: if a value is a list or a tuple, then the &#39;len()&#39; of the first element is returned if it is a &quot;</span>
             <span class="s2">&quot;tensor or a Numpy array.</span><span class="se">\n</span><span class="s2">&quot;</span>
-            <span class="c1">#</span>
             <span class="s2">&quot;Step 3: if a value is a dict, then the value for the key &#39;batch_size&#39; is returned if it is of integral &quot;</span>
             <span class="s2">&quot;type.</span><span class="se">\n</span><span class="s2">&quot;</span>
-            <span class="c1">#</span>
             <span class="s2">&quot;Step 4: if a value is a dict, then the &#39;len()&#39; of the first element of &#39;.values()&#39; is returned if it is a &quot;</span>
-            <span class="s2">&quot;tensor or a Numpy array.</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;tensor or a Numpy array.</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
         <span class="p">)</span>
     <span class="k">return</span> <span class="mi">1</span></div>
 
 
 
 <span class="nd">@contextlib</span><span class="o">.</span><span class="n">contextmanager</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">set_deterministic_debug_mode</span><span class="p">(</span><span class="n">mode</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">set_deterministic_debug_mode</span><span class="p">(</span><span class="n">mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">mode</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">yield</span>
         <span class="k">return</span>

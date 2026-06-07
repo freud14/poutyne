@@ -5,14 +5,14 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>poutyne.framework.callbacks.checkpoint &mdash; Poutyne 1.18.0 documentation</title>
+  <title>poutyne.framework.callbacks.checkpoint &mdash; Poutyne 1.19.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=9edc463e" />
 
   
       <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../../_static/documentation_options.js?v=256cef93"></script>
+      <script src="../../../../_static/documentation_options.js?v=54b9a5ca"></script>
       <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../_static/js/theme.js"></script>
@@ -107,7 +107,7 @@
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">pickle</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">IO</span><span class="p">,</span> <span class="n">Dict</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">IO</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
 
@@ -127,7 +127,7 @@
 <span class="sd">        :class:`~poutyne.PeriodicSaveCallback`</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">save_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fd</span><span class="p">:</span> <span class="n">IO</span><span class="p">,</span> <span class="n">epoch_number</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">logs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">save_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fd</span><span class="p">:</span> <span class="n">IO</span><span class="p">,</span> <span class="n">epoch_number</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">logs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">save_weights</span><span class="p">(</span><span class="n">fd</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">restore</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fd</span><span class="p">:</span> <span class="n">IO</span><span class="p">):</span>
@@ -152,7 +152,7 @@
 <span class="sd">        :class:`~poutyne.PeriodicSaveCallback`</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">save_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fd</span><span class="p">:</span> <span class="n">IO</span><span class="p">,</span> <span class="n">epoch_number</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">logs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">save_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fd</span><span class="p">:</span> <span class="n">IO</span><span class="p">,</span> <span class="n">epoch_number</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">logs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">save_optimizer_state</span><span class="p">(</span><span class="n">fd</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">restore</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fd</span><span class="p">:</span> <span class="n">IO</span><span class="p">):</span>
@@ -189,13 +189,13 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lr_scheduler</span><span class="p">,</span> <span class="p">(</span><span class="n">_PyTorchLRSchedulerWrapper</span><span class="p">,</span> <span class="n">ReduceLROnPlateau</span><span class="p">)):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown scheduler callback &#39;</span><span class="si">{</span><span class="n">lr_scheduler</span><span class="si">}</span><span class="s2">&#39;.&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">save_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fd</span><span class="p">:</span> <span class="n">IO</span><span class="p">,</span> <span class="n">epoch_number</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">logs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">save_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fd</span><span class="p">:</span> <span class="n">IO</span><span class="p">,</span> <span class="n">epoch_number</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">logs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">lr_scheduler</span><span class="o">.</span><span class="n">save_state</span><span class="p">(</span><span class="n">fd</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">restore</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fd</span><span class="p">:</span> <span class="n">IO</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">lr_scheduler</span><span class="o">.</span><span class="n">load_state</span><span class="p">(</span><span class="n">fd</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">set_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="n">Dict</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">lr_scheduler</span><span class="o">.</span><span class="n">set_params</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">set_params</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
 
@@ -203,19 +203,19 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">lr_scheduler</span><span class="o">.</span><span class="n">set_model</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">set_model</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">on_epoch_begin</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epoch_number</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">logs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_epoch_begin</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epoch_number</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">logs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">lr_scheduler</span><span class="o">.</span><span class="n">on_epoch_begin</span><span class="p">(</span><span class="n">epoch_number</span><span class="p">,</span> <span class="n">logs</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">on_epoch_begin</span><span class="p">(</span><span class="n">epoch_number</span><span class="p">,</span> <span class="n">logs</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">on_epoch_end</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epoch_number</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">logs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_epoch_end</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epoch_number</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">logs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">lr_scheduler</span><span class="o">.</span><span class="n">on_epoch_end</span><span class="p">(</span><span class="n">epoch_number</span><span class="p">,</span> <span class="n">logs</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">on_epoch_end</span><span class="p">(</span><span class="n">epoch_number</span><span class="p">,</span> <span class="n">logs</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">on_train_batch_begin</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch_number</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">logs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_train_batch_begin</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch_number</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">logs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">lr_scheduler</span><span class="o">.</span><span class="n">on_train_batch_begin</span><span class="p">(</span><span class="n">batch_number</span><span class="p">,</span> <span class="n">logs</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">on_train_batch_begin</span><span class="p">(</span><span class="n">batch_number</span><span class="p">,</span> <span class="n">logs</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">on_train_batch_end</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch_number</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">logs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_train_batch_end</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch_number</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">logs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">lr_scheduler</span><span class="o">.</span><span class="n">on_train_batch_end</span><span class="p">(</span><span class="n">batch_number</span><span class="p">,</span> <span class="n">logs</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">on_train_batch_end</span><span class="p">(</span><span class="n">batch_number</span><span class="p">,</span> <span class="n">logs</span><span class="p">)</span>
 
@@ -223,11 +223,11 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">lr_scheduler</span><span class="o">.</span><span class="n">on_backward_end</span><span class="p">(</span><span class="n">batch_number</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">on_backward_end</span><span class="p">(</span><span class="n">batch_number</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">on_train_begin</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_train_begin</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">lr_scheduler</span><span class="o">.</span><span class="n">on_train_begin</span><span class="p">(</span><span class="n">logs</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">on_train_begin</span><span class="p">(</span><span class="n">logs</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">on_train_end</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_train_end</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">lr_scheduler</span><span class="o">.</span><span class="n">on_train_end</span><span class="p">(</span><span class="n">logs</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">on_train_end</span><span class="p">(</span><span class="n">logs</span><span class="p">)</span></div>
 
@@ -238,7 +238,7 @@
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">name_to_stateful</span> <span class="o">=</span> <span class="n">name_to_stateful</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">save_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fd</span><span class="p">:</span> <span class="n">IO</span><span class="p">,</span> <span class="n">epoch_number</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">logs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">save_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fd</span><span class="p">:</span> <span class="n">IO</span><span class="p">,</span> <span class="n">epoch_number</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">logs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
         <span class="n">states</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">state_dict</span><span class="p">()</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">name_to_stateful</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
         <span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">states</span><span class="p">,</span> <span class="n">fd</span><span class="p">,</span> <span class="n">pickle_module</span><span class="o">=</span><span class="n">pickle</span><span class="p">)</span>
 
@@ -250,9 +250,9 @@
         <span class="c1"># Fix code below and remove pylint comment.</span>
         <span class="c1"># pylint: disable=consider-using-f-string</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">unexpected_keys</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Unexpected key(s): </span><span class="si">{}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;&quot;</span><span class="si">{}</span><span class="s1">&quot;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">*</span><span class="n">unexpected_keys</span><span class="p">))))</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Unexpected key(s): </span><span class="si">{}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;&quot;</span><span class="si">{}</span><span class="s1">&quot;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">*</span><span class="n">unexpected_keys</span><span class="p">))),</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">missing_keys</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Missing key(s): </span><span class="si">{}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;&quot;</span><span class="si">{}</span><span class="s1">&quot;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">*</span><span class="n">missing_keys</span><span class="p">))))</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Missing key(s): </span><span class="si">{}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;&quot;</span><span class="si">{}</span><span class="s1">&quot;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">*</span><span class="n">missing_keys</span><span class="p">))),</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">state</span> <span class="ow">in</span> <span class="n">states</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">name_to_stateful</span><span class="p">:</span>
@@ -272,7 +272,7 @@
 <span class="sd">        :class:`~poutyne.PeriodicSaveCallback`</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">save_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fd</span><span class="p">:</span> <span class="n">IO</span><span class="p">,</span> <span class="n">epoch_number</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">logs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">save_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fd</span><span class="p">:</span> <span class="n">IO</span><span class="p">,</span> <span class="n">epoch_number</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">logs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
         <span class="n">save_random_states</span><span class="p">(</span><span class="n">fd</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">restore</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fd</span><span class="p">:</span> <span class="n">IO</span><span class="p">):</span>
