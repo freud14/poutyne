@@ -103,7 +103,7 @@ class OptimizerCheckpointTest:
 
         self.optimizer.step()
 
-        return float(loss)
+        return float(loss.detach())
 
     def _test_checkpoint(self, scheduler_states, lr_scheduler):
         for epoch, epoch_scheduler_state in scheduler_states.items():

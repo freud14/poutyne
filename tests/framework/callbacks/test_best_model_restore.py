@@ -96,4 +96,4 @@ class BestModelRestoreTest:
 
         self.optimizer.step()
 
-        return float(loss)
+        return float(loss.detach())

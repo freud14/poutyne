@@ -17,7 +17,6 @@ You should have received a copy of the GNU Lesser General Public License along w
 <https://www.gnu.org/licenses/>.
 """
 
-import numpy as np
 import pytest
 import torch
 
@@ -45,35 +44,35 @@ class AccuracyTest:
         accuracy = Accuracy()
         actual = accuracy(self.predictions, self.targets)
         assert actual.shape == ()
-        np.testing.assert_almost_equal(self.accuracy, actual)
+        assert float(actual) == pytest.approx(float(self.accuracy))
 
     def test_functional(self):
         actual = acc(self.predictions, self.targets)
         assert actual.shape == ()
-        np.testing.assert_almost_equal(self.accuracy, actual)
+        assert float(actual) == pytest.approx(float(self.accuracy))
 
     def test_hundred(self):
         accuracy = Accuracy()
         actual = accuracy(self.predictions, self.label_predictions)
         assert actual.shape == ()
-        np.testing.assert_almost_equal(100.0, actual)
+        assert float(actual) == pytest.approx(100.0)
 
     def test_sum(self):
         accuracy = Accuracy(reduction='sum')
         actual = accuracy(self.predictions, self.targets)
         assert actual.shape == ()
-        np.testing.assert_almost_equal(self.accuracy * len(self.predictions), actual)
+        assert float(actual) == pytest.approx(float(self.accuracy * len(self.predictions)))
 
     def test_functional_sum(self):
         actual = acc(self.predictions, self.targets, reduction='sum')
         assert actual.shape == ()
-        np.testing.assert_almost_equal(self.accuracy * len(self.predictions), actual)
+        assert float(actual) == pytest.approx(float(self.accuracy * len(self.predictions)))
 
     def test_sum_hundred(self):
         accuracy = Accuracy(reduction='sum')
         actual = accuracy(self.predictions, self.label_predictions)
         assert actual.shape == ()
-        np.testing.assert_almost_equal(100.0 * len(self.predictions), actual)
+        assert float(actual) == pytest.approx(100.0 * len(self.predictions))
 
     def test_none(self):
         accuracy = Accuracy(reduction='none')
@@ -98,13 +97,13 @@ class AccuracyTest:
         accuracy.cuda()
         actual = accuracy(self.predictions.cuda(), self.targets.cuda())
         assert actual.shape == ()
-        np.testing.assert_almost_equal(self.accuracy, actual.cpu())
+        assert float(actual.cpu()) == pytest.approx(float(self.accuracy))
 
     @pytest.mark.skipif(not torch.cuda.is_available(), reason="no gpu available")
     def test_functional_on_gpu(self):
         actual = acc(self.predictions.cuda(), self.targets.cuda())
         assert actual.shape == ()
-        np.testing.assert_almost_equal(self.accuracy, actual.cpu())
+        assert float(actual.cpu()) == pytest.approx(float(self.accuracy))
 
 
 class IgnoreIndexAccuracyTest:
@@ -127,12 +126,12 @@ class IgnoreIndexAccuracyTest:
         accuracy = Accuracy()
         actual = accuracy(self.predictions, self.targets)
         assert actual.shape == ()
-        np.testing.assert_almost_equal(self.accuracy, actual)
+        assert float(actual) == pytest.approx(float(self.accuracy))
 
     def test_functional_standard(self):
         actual = acc(self.predictions, self.targets)
         assert actual.shape == ()
-        np.testing.assert_almost_equal(self.accuracy, actual)
+        assert float(actual) == pytest.approx(float(self.accuracy))
 
     def test_ignore_index_with_different_value(self):
         accuracy = Accuracy(ignore_index=-1)
@@ -149,12 +148,12 @@ class IgnoreIndexAccuracyTest:
         accuracy = Accuracy(ignore_index=1)
         actual = accuracy(self.predictions, self.targets)
         assert actual.shape == ()
-        np.testing.assert_almost_equal(20.0, actual)
+        assert float(actual) == pytest.approx(20.0)
 
     def test_functional_ignore_index_with_valid_index(self):
         actual = acc(self.predictions, self.targets, ignore_index=1)
         assert actual.shape == ()
-        np.testing.assert_almost_equal(20.0, actual)
+        assert float(actual) == pytest.approx(20.0)
 
 
 class BinaryAccuracyTest:
@@ -169,35 +168,35 @@ class BinaryAccuracyTest:
         binary_accuracy = BinaryAccuracy()
         actual = binary_accuracy(self.predictions, self.targets)
         assert actual.shape == ()
-        np.testing.assert_almost_equal(self.binary_accuracy, actual, decimal=5)
+        assert float(actual) == pytest.approx(float(self.binary_accuracy), abs=1.5e-5)
 
     def test_functional(self):
         actual = bin_acc(self.predictions, self.targets)
         assert actual.shape == ()
-        np.testing.assert_almost_equal(self.binary_accuracy, actual, decimal=5)
+        assert float(actual) == pytest.approx(float(self.binary_accuracy), abs=1.5e-5)
 
     def test_hundred(self):
         binary_accuracy = BinaryAccuracy()
         actual = binary_accuracy(self.predictions, self.label_predictions)
         assert actual.shape == ()
-        np.testing.assert_almost_equal(100.0, actual, decimal=5)
+        assert float(actual) == pytest.approx(100.0, abs=1.5e-5)
 
     def test_sum(self):
         binary_accuracy = BinaryAccuracy(reduction='sum')
         actual = binary_accuracy(self.predictions, self.targets)
         assert actual.shape == ()
-        np.testing.assert_almost_equal(self.binary_accuracy_none.sum(), actual)
+        assert float(actual) == pytest.approx(float(self.binary_accuracy_none.sum()))
 
     def test_functional_sum(self):
         actual = bin_acc(self.predictions, self.targets, reduction='sum')
         assert actual.shape == ()
-        np.testing.assert_almost_equal(self.binary_accuracy_none.sum(), actual)
+        assert float(actual) == pytest.approx(float(self.binary_accuracy_none.sum()))
 
     def test_sum_hundred(self):
         binary_accuracy = BinaryAccuracy(reduction='sum')
         actual = binary_accuracy(self.predictions, self.label_predictions)
         assert actual.shape == ()
-        np.testing.assert_almost_equal(100.0 * len(self.predictions), actual)
+        assert float(actual) == pytest.approx(100.0 * len(self.predictions))
 
     def test_none(self):
         binary_accuracy = BinaryAccuracy(reduction='none')
@@ -222,14 +221,14 @@ class BinaryAccuracyTest:
         actual = binary_accuracy(self.predictions, self.targets)
         label_predictions = (self.predictions > threshold).float()
         assert actual.shape == ()
-        np.testing.assert_almost_equal((label_predictions == self.targets).float().mean() * 100, actual)
+        assert float(actual) == pytest.approx(float((label_predictions == self.targets).float().mean() * 100))
 
     def test_functional_threshold(self):
         threshold = -0.5
         actual = bin_acc(self.predictions, self.targets, threshold=threshold)
         label_predictions = (self.predictions > threshold).float()
         assert actual.shape == ()
-        np.testing.assert_almost_equal((label_predictions == self.targets).float().mean() * 100, actual)
+        assert float(actual) == pytest.approx(float((label_predictions == self.targets).float().mean() * 100))
 
     @pytest.mark.skipif(not torch.cuda.is_available(), reason="no gpu available")
     def test_on_gpu(self):
@@ -237,13 +236,13 @@ class BinaryAccuracyTest:
         binary_accuracy.cuda()
         actual = binary_accuracy(self.predictions.cuda(), self.targets.cuda())
         assert actual.shape == ()
-        np.testing.assert_almost_equal(self.binary_accuracy, actual.cpu(), decimal=5)
+        assert float(actual.cpu()) == pytest.approx(float(self.binary_accuracy), abs=1.5e-5)
 
     @pytest.mark.skipif(not torch.cuda.is_available(), reason="no gpu available")
     def test_functional_on_gpu(self):
         actual = bin_acc(self.predictions.cuda(), self.targets.cuda())
         assert actual.shape == ()
-        np.testing.assert_almost_equal(self.binary_accuracy, actual.cpu(), decimal=5)
+        assert float(actual.cpu()) == pytest.approx(float(self.binary_accuracy), abs=1.5e-5)
 
 
 class TopKAccuracyTest:
@@ -267,35 +266,35 @@ class TopKAccuracyTest:
         top_k_acc = TopKAccuracy(3)
         actual = top_k_acc(self.predictions, self.targets)
         assert actual.shape == ()
-        np.testing.assert_almost_equal(self.top_k_acc, actual, decimal=5)
+        assert float(actual) == pytest.approx(float(self.top_k_acc), abs=1.5e-5)
 
     def test_functional(self):
         actual = topk(self.predictions, self.targets, 3)
         assert actual.shape == ()
-        np.testing.assert_almost_equal(self.top_k_acc, actual, decimal=5)
+        assert float(actual) == pytest.approx(float(self.top_k_acc), abs=1.5e-5)
 
     def test_hundred(self):
         top_k_acc = TopKAccuracy(3)
         actual = top_k_acc(self.predictions, self.top_3_label_predictions[:, 0])
         assert actual.shape == ()
-        np.testing.assert_almost_equal(100.0, actual)
+        assert float(actual) == pytest.approx(100.0)
 
     def test_sum(self):
         top_k_acc = TopKAccuracy(3, reduction='sum')
         actual = top_k_acc(self.predictions, self.targets)
         assert actual.shape == ()
-        np.testing.assert_almost_equal(self.top_k_acc * len(self.predictions), actual, decimal=0)
+        assert float(actual) == pytest.approx(float(self.top_k_acc * len(self.predictions)), abs=0.5)
 
     def test_functional_sum(self):
         actual = topk(self.predictions, self.targets, 3, reduction='sum')
         assert actual.shape == ()
-        np.testing.assert_almost_equal(self.top_k_acc * len(self.predictions), actual, decimal=0)
+        assert float(actual) == pytest.approx(float(self.top_k_acc * len(self.predictions)), abs=0.5)
 
     def test_sum_hundred(self):
         top_k_acc = TopKAccuracy(3, reduction='sum')
         actual = top_k_acc(self.predictions, self.top_3_label_predictions[:, 0])
         assert actual.shape == ()
-        np.testing.assert_almost_equal(100.0 * len(self.predictions), actual, decimal=0)
+        assert float(actual) == pytest.approx(100.0 * len(self.predictions), abs=0.5)
 
     def test_none(self):
         top_k_acc = TopKAccuracy(3, reduction='none')
@@ -320,13 +319,13 @@ class TopKAccuracyTest:
         top_k_acc.cuda()
         actual = top_k_acc(self.predictions.cuda(), self.targets.cuda())
         assert actual.shape == ()
-        np.testing.assert_almost_equal(self.top_k_acc, actual.cpu(), decimal=5)
+        assert float(actual.cpu()) == pytest.approx(float(self.top_k_acc), abs=1.5e-5)
 
     @pytest.mark.skipif(not torch.cuda.is_available(), reason="no gpu available")
     def test_functional_on_gpu(self):
         actual = topk(self.predictions.cuda(), self.targets.cuda(), 3)
         assert actual.shape == ()
-        np.testing.assert_almost_equal(self.top_k_acc, actual.cpu(), decimal=5)
+        assert float(actual.cpu()) == pytest.approx(float(self.top_k_acc), abs=1.5e-5)
 
 
 class IgnoreIndexTopKAccuracyTest:
@@ -349,12 +348,12 @@ class IgnoreIndexTopKAccuracyTest:
         top_k_acc = TopKAccuracy(3)
         actual = top_k_acc(self.predictions, self.targets)
         assert actual.shape == ()
-        np.testing.assert_almost_equal(self.top_k_acc, actual)
+        assert float(actual) == pytest.approx(float(self.top_k_acc))
 
     def test_functional_standard(self):
         actual = topk(self.predictions, self.targets, 3)
         assert actual.shape == ()
-        np.testing.assert_almost_equal(self.top_k_acc, actual)
+        assert float(actual) == pytest.approx(float(self.top_k_acc))
 
     def test_ignore_index_with_different_value(self):
         top_k_acc = TopKAccuracy(3, ignore_index=-1)
@@ -371,9 +370,9 @@ class IgnoreIndexTopKAccuracyTest:
         top_k_acc = TopKAccuracy(3, ignore_index=1)
         actual = top_k_acc(self.predictions, self.targets)
         assert actual.shape == ()
-        np.testing.assert_almost_equal(40.0, actual)
+        assert float(actual) == pytest.approx(40.0)
 
     def test_functional_ignore_index_with_valid_index(self):
         actual = topk(self.predictions, self.targets, 3, ignore_index=1)
         assert actual.shape == ()
-        np.testing.assert_almost_equal(40.0, actual)
+        assert float(actual) == pytest.approx(40.0)

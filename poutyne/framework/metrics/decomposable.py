@@ -56,7 +56,7 @@ class DecomposableMetric(Metric):
 
     def _output_to_array(self, output):
         if (torch.is_tensor(output) or isinstance(output, np.ndarray)) and len(output.shape) == 0:
-            values = [float(output)]
+            values = [float(output.detach() if torch.is_tensor(output) else output)]
         elif isinstance(output, Mapping):
             values = [float(output[name]) for name in self.names]
         elif isinstance(output, Iterable):

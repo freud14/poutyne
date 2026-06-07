@@ -85,7 +85,7 @@ class OptimizerCheckpointTest:
 
         self.optimizer.step()
 
-        return float(loss)
+        return float(loss.detach())
 
     def _test_checkpoint(self, optimizer_states):
         for epoch, epoch_optimizer_state in optimizer_states.items():

@@ -125,3 +125,6 @@ quote-style = "preserve"
 addopts = "--cov --cov-report html --cov-report xml"
 testpaths = ["tests"]
 python_classes = ["*Test"]
+filterwarnings = [
+    "ignore:Metric `SpearmanCorrcoef` will save all targets:UserWarning:torchmetrics",
+]

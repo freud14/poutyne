@@ -685,7 +685,7 @@ class Model:
             self._adjust_step_size(examples_in_step)
             self.optimizer.step()
 
-        loss = float(loss_tensor)
+        loss = float(loss_tensor.detach())
         return loss, batch_metrics, do_backprop, pred_y
 
     def _fit_generator_one_batch_per_step(self, epoch_iterator, callback_list):
@@ -714,7 +714,7 @@ class Model:
         callback.on_backward_end(step)
         self.optimizer.step()
 
-        loss = float(loss_tensor)
+        loss = float(loss_tensor.detach())
         return loss, batch_metrics, pred_y
 
     def _run_validation(self, valid_step_iterator, callback_list):
@@ -1494,7 +1494,7 @@ class Model:
             pred_y = self.network(*x)
         loss = self.loss_function(pred_y, y)
         if not return_loss_tensor:
-            loss = float(loss)
+            loss = float(loss.detach())
         with torch.no_grad():
             batch_metrics = self._compute_batch_metrics(pred_y, y)
             for epoch_metric in self.epoch_metrics:
